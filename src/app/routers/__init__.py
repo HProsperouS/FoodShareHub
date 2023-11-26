@@ -1,2 +1,2 @@
 # web routers
-from .web.foodshare import foodshare_router
+from .web import foodshare_router
