@@ -12,8 +12,8 @@ from starlette.middleware.sessions import SessionMiddleware
 # import Python's standard libraries
 
 # Import local libraries
-import app.utils.constants as C
-from routers.web import * 
+import utils.constants as C
+from routers import * 
 
 app = FastAPI(
     title="FoodShareHub",
