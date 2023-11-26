@@ -26,3 +26,10 @@ PASSWORD_HASHER = PasswordHasher(
 DOMAIN = "https://localhost:8080" if DEBUG_MODE else "https://deployed.live"
 FLASH_MESSAGES = "_messages"
 SESSION_COOKIE = "session"
+API_PREFIX = "/api"
+
+# User Roles
+GUEST = "guest"
+USER = "user"
+ADMIN = "admin"
+ALLROLES = (GUEST, USER, ADMIN)

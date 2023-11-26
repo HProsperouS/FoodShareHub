@@ -2,7 +2,6 @@ import orjson
 from fastapi import FastAPI, Request
 from fastapi.responses import (
     FileResponse, 
-    ORJSONResponse,
     RedirectResponse,
     HTMLResponse
 )
@@ -18,6 +17,7 @@ from utils.jinja2_helper import (
     flash, 
     render_template,
 )
+from models.response import PrettyORJSON
 
 app = FastAPI(
     title="FoodShareHub",
@@ -32,27 +32,12 @@ app = FastAPI(
             name="static"
         ),
     ],
-    default_response_class=ORJSONResponse,
+    default_response_class=PrettyORJSON,
     docs_url="/docs" if C.DEBUG_MODE else None,
     redoc_url="/redoc" if C.DEBUG_MODE else None,
     openapi_url="/openapi.json" if C.DEBUG_MODE else None,
     swagger_ui_oauth2_redirect_url=None,
 )
-
-@app.get("/")
-async def read_root(request: Request) -> HTMLResponse:
-    flash(
-        request=request,
-        message="This is a test flash message", 
-        category="success",
-    )
-
-    return await render_template(
-        name="index.html",
-        context={
-            "request": request,
-        },
-    )
 
 def add_middlewares(app: FastAPI) -> None:
     """Add middlewares to the FastAPI app.
@@ -68,6 +53,7 @@ def add_middlewares(app: FastAPI) -> None:
     )
 
 """--------------------------- Start of App Routes ---------------------------"""
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     # TODO: Edit your favicon.ico in the static folder
@@ -82,6 +68,11 @@ def add_routers(app: FastAPI) -> None:
             The FastAPI app.
     """
     app.include_router(foodshare_router)
+    app.include_router(allroles_router)
+    app.include_router(guest_router)
+    app.include_router(user_router)
+    app.include_router(admin_router)
+
 """--------------------------- End of App Routes ---------------------------"""
 
 add_middlewares(app)
