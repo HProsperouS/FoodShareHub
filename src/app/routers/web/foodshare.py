@@ -1,24 +1,35 @@
-from fastapi import Request, APIRouter
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-# from .web_utils import render_template
+# import third-party libraries
+from fastapi import (
+    APIRouter,
+    Request,
+)
+from fastapi.responses import (
+    HTMLResponse,
+    RedirectResponse,
+)
 
-templates = Jinja2Templates(directory="templates")
+# import local libraries
+from utils.jinja2_helper import (
+    flash, 
+    render_template,
+)
 
 foodshare_router = APIRouter(
+    include_in_schema=False,
     prefix='/foodshare',
     tags= ['FoodSharingPlatform']
 )
 
-# @router.get("/foodshare/add", response_class=HTMLResponse)
-# async def fooditem_add(request: Request):
-
-#     return await render_template(
-#         name="admin/mod_dashboard.html",
-#         context={
-#         },
-#     )
-
-@foodshare_router.get("/add", response_class=HTMLResponse)
-async def donation_add(request: Request):
-    return templates.TemplateResponse("foodshare/addDonation.html", {"request": request})
+@foodshare_router.get("/add")
+async def index(request: Request) -> RedirectResponse:
+    flash(
+        request=request,
+        message="This is a test flash message", 
+        category="test",
+    )
+    return await render_template(
+        name="foodshare/addDonation.html",
+        context={
+            "request": request,
+        },
+    )

@@ -1,10 +1,5 @@
-# Import third-party libraries
 import orjson
 from fastapi import FastAPI
-from fastapi import (
-    FastAPI,
-    Request
-)
 from fastapi.responses import (
     FileResponse, 
     ORJSONResponse,
@@ -12,15 +7,13 @@ from fastapi.responses import (
     HTMLResponse
 )
 from starlette.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from starlette.routing import Mount
+from starlette.middleware.sessions import SessionMiddleware
+# import Python's standard libraries
 
 # Import local libraries
-import utils.constants as C
-import routers
-
-# import Python's standard libraries
-templates = Jinja2Templates(directory="templates")
+import app.utils.constants as C
+from routers.web import * 
 
 app = FastAPI(
     title="FoodShareHub",
@@ -36,18 +29,24 @@ app = FastAPI(
         ),
     ],
     default_response_class=ORJSONResponse,
-    swagger_ui_oauth2_redirect_url=None
+    docs_url="/docs" if C.DEBUG_MODE else None,
+    redoc_url="/redoc" if C.DEBUG_MODE else None,
+    openapi_url="/openapi.json" if C.DEBUG_MODE else None,
+    swagger_ui_oauth2_redirect_url=None,
 )
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    flash_message_text = "This is a custom flash message!"
-    flash_message_class = "alert-success"  
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "flash_message_text": flash_message_text, "flash_message_class": flash_message_class}
-    )
+def add_middlewares(app: FastAPI) -> None:
+    """Add middlewares to the FastAPI app.
 
+    Args:
+        app (FastAPI):
+            The FastAPI app.
+    """
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key="change_me",
+        session_cookie=C.SESSION_COOKIE,
+    )
 
 """--------------------------- Start of App Routes ---------------------------"""
 @app.get("/favicon.ico", include_in_schema=False)
@@ -56,8 +55,18 @@ async def favicon():
     return FileResponse(C.FAVICON_PATH)
 
 # Web routers
-app.include_router(routers.foodshare_router)
+def add_routers(app: FastAPI) -> None:
+    """Add routers to the FastAPI app.
+
+    Args:
+        app (FastAPI):
+            The FastAPI app.
+    """
+    app.include_router(foodshare_router)
 """--------------------------- End of App Routes ---------------------------"""
+
+add_middlewares(app)
+add_routers(app)
 
 if __name__ == "__main__":
     import uvicorn
