@@ -29,10 +29,10 @@ async def home(request: Request):
         "index.html",
         {"request": request, "flash_message_text": flash_message_text, "flash_message_class": flash_message_class}
     )
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    # TODO: Edit your favicon.ico in the static folder
-    return FileResponse(C.FAVICON_PATH)
+# @app.get("/favicon.ico", include_in_schema=False)
+# async def favicon():
+#     # TODO: Edit your favicon.ico in the static folder
+#     return FileResponse(C.FAVICON_PATH)
 
 if __name__ == "__main__":
     import uvicorn
