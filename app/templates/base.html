@@ -5,12 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %} - Web</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='lib/bootstrap/dist/css/bootstrap.min.css') }}" /> 
+    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/main.css') }}?v=5.6" />
     <!-- Custom CSS -->
-    
-        <link rel="stylesheet" href="{{ url_for('static', path='lib/bootstrap/dist/css/bootstrap.min.css') }}" /> 
-        <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}?v=5.6" />
-    
-    
     <link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/animate.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', path='assets/css/main.css') }}?v=1.1" />
     
@@ -330,13 +327,20 @@
         </div>
     </div>
     <!--End header-->
-    {% block content %}
+
     <div class="container">
+        {% if flash_message_text %}
+        <div class="alert {{ flash_message_class }} alert-dismissible fade show" role="alert">
+            {{ flash_message_text }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
         <main role="main" class="pb-3">
-            {% block body %}{% endblock %}
+            {% block content %}
+            {% endblock %}
         </main>
     </div>
-    {% endblock %}
+    
     <hr>
 
     <footer class="main">
@@ -400,10 +404,9 @@
     </footer>
 
     {% block scripts %}
+    <script src="{{ url_for('static', path='lib/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', path='lib/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script> 
     <!-- Vendor JS -->
-     <script src="{{ url_for('static', path='lib/jquery/dist/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static', path='lib/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script> 
-    
     <script src="{{ url_for('static', path='lib/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', path='lib/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/vendor/modernizr-3.6.0.min.js') }}"></script>
