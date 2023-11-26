@@ -331,18 +331,19 @@
     <!--End header-->
 
     <div class="container">
-        {% if flash_message_text %}
-        <div class="alert {{ flash_message_class }} alert-dismissible fade show" role="alert">
-            {{ flash_message_text }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endif %}
+        {% for message in get_flashed_messages() %}
+            {% if message.category and message.category.strip() %}
+                <div class="alert alert-{{ message.category }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message.message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
         <main role="main" class="pb-3">
             {% block content %}
             {% endblock %}
         </main>
-    </div>
-    
+    </div> 
     <hr>
 
     <footer class="main">

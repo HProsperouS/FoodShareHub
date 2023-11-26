@@ -1,5 +1,5 @@
 import orjson
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import (
     FileResponse, 
     ORJSONResponse,
@@ -14,6 +14,10 @@ from starlette.middleware.sessions import SessionMiddleware
 # Import local libraries
 import utils.constants as C
 from routers import * 
+from utils.jinja2_helper import (
+    flash, 
+    render_template,
+)
 
 app = FastAPI(
     title="FoodShareHub",
@@ -34,6 +38,21 @@ app = FastAPI(
     openapi_url="/openapi.json" if C.DEBUG_MODE else None,
     swagger_ui_oauth2_redirect_url=None,
 )
+
+@app.get("/")
+async def read_root(request: Request) -> HTMLResponse:
+    flash(
+        request=request,
+        message="This is a test flash message", 
+        category="success",
+    )
+
+    return await render_template(
+        name="index.html",
+        context={
+            "request": request,
+        },
+    )
 
 def add_middlewares(app: FastAPI) -> None:
     """Add middlewares to the FastAPI app.
