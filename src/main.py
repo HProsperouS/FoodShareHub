@@ -7,11 +7,13 @@ from fastapi.responses import (
 )
 from fastapi.staticfiles import StaticFiles
 from starlette.routing import Mount
+from starlette.middleware.sessions import SessionMiddleware
 
 # import Python's standard libraries
 
 # import local libraries
 import utils.constants as C
+from routers.web import *
 
 app = FastAPI(
     title="Mirai",
@@ -37,6 +39,31 @@ app = FastAPI(
 async def favicon():
     # TODO: Edit your favicon.ico in the static folder
     return FileResponse(C.FAVICON_PATH)
+
+def add_middlewares(app: FastAPI) -> None:
+    """Add middlewares to the FastAPI app.
+
+    Args:
+        app (FastAPI):
+            The FastAPI app.
+    """
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key="change_me",
+        session_cookie=C.SESSION_COOKIE,
+    )
+
+def add_routers(app: FastAPI) -> None:
+    """Add routers to the FastAPI app.
+
+    Args:
+        app (FastAPI):
+            The FastAPI app.
+    """
+    app.include_router(general_router)
+
+add_middlewares(app)
+add_routers(app)
 
 if __name__ == "__main__":
     import uvicorn

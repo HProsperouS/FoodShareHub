@@ -21,3 +21,8 @@ PASSWORD_HASHER = PasswordHasher(
     memory_cost=64*1024, # 64MiB
     type=Argon2Type.ID   # using hybrids of Argon2i and Argon2d
 )
+
+# Application constants
+DOMAIN = "https://localhost:8080" if DEBUG_MODE else "https://deployed.live"
+FLASH_MESSAGES = "_messages"
+SESSION_COOKIE = "session"
