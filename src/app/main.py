@@ -1,12 +1,18 @@
 # Import third-party libraries
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from starlette.staticfiles import StaticFiles
+import orjson
+from fastapi import FastAPI
+from fastapi import (
+    FastAPI,
+    Request
+)
 from fastapi.responses import (
     FileResponse, 
-    ORJSONResponse
+    ORJSONResponse,
+    RedirectResponse,
+    HTMLResponse
 )
+from starlette.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from starlette.routing import Mount
 
 # Import local libraries
@@ -14,7 +20,6 @@ import utils.constants as C
 import routers
 
 # import Python's standard libraries
-
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI(
@@ -51,8 +56,7 @@ async def favicon():
     return FileResponse(C.FAVICON_PATH)
 
 # Web routers
-app.include_router(routers.foodsharerouter)
-
+app.include_router(routers.foodshare_router)
 """--------------------------- End of App Routes ---------------------------"""
 
 if __name__ == "__main__":

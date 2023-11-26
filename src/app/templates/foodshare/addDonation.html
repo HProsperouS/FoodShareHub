@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+{% endblock %}
+
+{% block content %}
+<main class="main page">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container"> 
+            <div class="breadcrumb">
+                <a href="#" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
+                <span></span> FoodShare <span></span> Add Donation Food Item
+            </div>
+        </div>
+    </div>
+    <!-- <div class="page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 m-auto">
+                    <div class="row">
+                        <div class="col-xl-12" style="max-width: 600px; margin: 0 auto;">
+                            <div class="login_wrap widget-taber-content background-white">
+                                <div class="padding_eight_all bg-white">
+                                    <div class="heading_s1" style="margin-top:100px">
+                                        <h1 class="mb-5">Create Your Food Item</h1>
+                                    </div>
+                                    <form method="post" enctype="multipart/form-data">
+                                        <div class="form-group-2">
+                                            <label class="col-sm-2 col-form-label">Image</label>
+                                            <div class="col-sm-10">
+                                                <input id="image" type="file" accept="image/*" class="form-control" onchange="showImgPreview(this)" />
+                                                <span class="text-danger"></span>
+                                            </div>
+                                            <img id="imgPreview" style="height:300px;width:300px;object-fit:cover; margin-top: 10px; display:none" src="/uploads/user.png" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 col-form-label" for="name">Name</label>
+                                            <div class="col-sm-10">
+                                                <input id="name" type="text" name="Name" class="form-control" />
+                                                <span class="text-danger"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 col-form-label" for="Category">Category</label>
+                                            <div class="col-sm-10">
+                                                <select name="Category" class="form-select">
+                                                    <option value="Fresh produce" selected>Fresh produce</option>
+                                                    <option value="Canned food">Canned food</option>
+                                                    <option value="Snacks">Snacks</option>
+                                                    <option value="Beverages">Beverages</option>
+                                                    <option value="Meats">Meats</option>
+                                                </select>
+                                                <span class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-30">
+                                            <button id="submitBtn" type="submit" value="Add" class="btn btn-fill-out btn-block hover-up font-weight-bold">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+</main>
+<!-- <section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
+                <div>
+                    <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                    <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Basic</h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Product title</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_name" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Full description</label>
+                            <textarea placeholder="Type here" class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Regular price</label>
+                                    <div class="row gx-2">
+                                        <input placeholder="$" type="text" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Promotional price</label>
+                                    <input placeholder="$" type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label class="form-label">Currency</label>
+                                <select class="form-select">
+                                    <option>USD</option>
+                                    <option>EUR</option>
+                                    <option>RUBL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Tax rate</label>
+                            <input type="text" placeholder="%" class="form-control" id="product_name" />
+                        </div>
+                        <label class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" value="" />
+                            <span class="form-check-label"> Make a template </span>
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Media</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-upload">
+                        <img src="{{ url_for('static', path='assets/imgs/theme/upload.svg') }}" alt="" width="100" height="100" />
+                        <input class="form-control" type="file" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> -->
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <!-- <script>
+        function showImgPreview(input) {
+            var imgPreview = document.getElementById("imgPreview");
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = "block";
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                imgPreview.style.display = "none";
+            }
+        }
+    </script>
+    
+    <script>
+        document.getElementById("ExpiryDate").min = new Date().toISOString().split("T")[0];
+    </script>
+    
+    <script>
+        const fileInput = document.getElementById("image")
+        fileInput.addEventListener("change", (event) => {
+            const file = event.target.files[0]
+            if (!file) {
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", file)
+    
+            fetch("/api/google", {
+                method: "POST",
+                body: formData
+            }).then((response) => {
+                return response.text()
+            }).then((data) => {
+                document.getElementById("name").value = data
+            }).catch((error) => {
+                document.getElementById("name").value = "Unkown"
+            })
+        })
+    </script> -->
+{% endblock %}
