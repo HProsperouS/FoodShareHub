@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+
+{% endblock %}
+
+{% block content %}
+<main class="main page">
+    
+    <div class="container" style="padding: 10px;">
+        <div class="row ">
+            <div class="col-4 d-none d-md-block">
+              <img src="https://images.unsplash.com/photo-1553787434-45e1d245bfbb?q=80&w=1420&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
+            </div>
+            
+            <div class="col-8">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        
+                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Sign Up</button>
+                    </li>
+               
+                </ul>
+                
+                    
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+                        <form>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputPassword1" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="exampleInputPassword1">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Remember Me</label>
+                            </div>
+                    
+                            <div class="row">
+                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                    <button class="btn btn-lg btn-block btn-primary" style="background-color: #dd4b39;"type="submit"><i class="fab fa-google me-2"></i> Google</button>
+                                    <button class="btn btn-lg btn-block btn-primary" style="background-color: #397bdd;"type="submit"><i class="fab fa-facebook me-2"></i> Facebook</button>
+                                    
+                                    <!-- <h4>
+                                        <a href="#"><i class="bi bi-facebook"></i></a>
+                                        <a href="#"><i class="bi bi-twitter"></i>Twitter</a>
+                                        <a href="#"><i class="bi bi-google"></i>Google</a>
+                                    </h4> -->
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="form-group " style="text-align: right;">
+                                        <button type="submit" class="btn btn-primary " >Login</button>
+                                    </div>
+                                </div>
+                            </div>      
+                        </form>                      
+                    </div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+                        <form>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputPassword1" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="exampleInputPassword1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="exampleInputPassword2">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Remember Me</label>
+                            </div>
+                    
+                            <div class="row">
+                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                    <button class="btn btn-lg btn-block btn-primary" style="background-color: #dd4b39;"type="submit"><i class="fab fa-google me-2"></i> Google</button>
+                                    <button class="btn btn-lg btn-block btn-primary" style="background-color: #397bdd;"type="submit"><i class="fab fa-facebook me-2"></i> Facebook</button>
+                                    
+                                    <!-- <h4>
+                                        <a href="#"><i class="bi bi-facebook"></i></a>
+                                        <a href="#"><i class="bi bi-twitter"></i>Twitter</a>
+                                        <a href="#"><i class="bi bi-google"></i>Google</a>
+                                    </h4> -->
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="form-group " style="text-align: right;">
+                                        <button type="submit" class="btn btn-primary " >Sign Up</button>
+                                    </div>
+                                </div>
+                            </div>      
+                        </form>                        
+                    </div>
+
+                </div>
+                
+            
+                
+            </div>
+        </div>
+    </div>
+
+</main>
+{% endblock %}
