@@ -333,7 +333,7 @@
     </div>
     <!--End header-->
 
-    <div class="container">
+    <div>
         {% for message in get_flashed_messages() %}
             {% if message.category and message.category.strip() %}
                 <div class="alert alert-{{ message.category }} alert-dismissible fade show" role="alert">
@@ -342,10 +342,8 @@
                 </div>
             {% endif %}
         {% endfor %}
-        <main role="main" class="pb-3">
-            {% block content %}
-            {% endblock %}
-        </main>
+        {% block content %}
+        {% endblock %}
     </div> 
     <hr>
 
