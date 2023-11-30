@@ -23,16 +23,18 @@
         </div>
     </div>
     <div class="container mb-30">
+    <form method="post" enctype="multipart/form-data" id="process_add_listing_form" action="{{ url_for('process_add_listing_form') }}">
         <div class="row">
             <div class="col-lg-4">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h4>Picture</h4>
+                        <h4>Image</h4>
                     </div>
                     <div class="card-body">
                         <div class="input-upload">
-                            <img src="{{ url_for('static', path='assets/imgs/theme/upload.svg') }}" alt="" />
-                            <input class="form-control" type="file" />
+                            <img class="preview-image" id="preview" src="{{ url_for('static', path='assets/imgs/theme/upload.svg') }}" alt="Preview Image"/>
+                            <input class="form-control" type="file" name="image" accept="image/*" onchange="showImgPreview(this)" />
+                            <span for="Upload" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -44,43 +46,55 @@
                         <h4>Food Item Details</h4>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <div class="mb-4">
+                            <label for="name" class="form-label">Food Item title</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="name" name="name" />
+                            <span for="Upload" class="text-danger"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="description">Description</label>
+                            <textarea placeholder="Type here" class="form-control" rows="12" style="height: 170px;" id="description" name="description" ></textarea>
+                            <span for="Upload" class="text-danger"></span>
+                        </div>
+                        <div class="row">
                             <div class="mb-4">
-                                <label for="product_name" class="form-label">Food Item title</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_name" />
+                                <label class="form-label" for="category">Categories</label>
+                                <select class="form-select" id="category" name="category" >
+                                    <option selected disabled>-- Please Select --</option>
+                                    <option>Milks and Dairies</option>
+                                    <option>Wines & Alcohol</option>
+                                    <option>Pet Foods & Toy</option>
+                                    <option>Baking material</option>
+                                    <option>Vegetables</option>
+                                    <option>Fresh Seafood</option>
+                                    <option>Noodles & Rice</option>
+                                    <option>Others</option>
+                                </select>
+                                <span for="Upload" class="text-danger"></span>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="mb-4">
-                                <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" class="form-control" rows="12" style="height: 170px;"></textarea>
-                            </div>
-                            <div class="row">
-                                <div class="mb-4">
-                                    <label class="form-label">Categories</label>
-                                    <select class="form-select">
-                                        <option selected disabled>-- Please Select --</option>
-                                        <option>Milks and Dairies</option>
-                                        <option>Wines & Alcohol</option>
-                                        <option>Pet Foods & Toy</option>
-                                        <option>Baking material</option>
-                                        <option>Vegetables</option>
-                                        <option>Fresh Seafood</option>
-                                        <option>Noodles & Rice</option>
-                                        <option>Others</option>
-                                    </select>
+                                <label class="form-label" for="expiry_date">Expiry Date:</label>
+                                <div class="row gx-2">
+                                    <span class="text-muted">Please ensure your food has at least a 7-day buffer before expiry.</span>
+                                    <input type="date" id="expiry_date" class="form-control" name="expiry_date" />
                                 </div>
+                                <span for="Upload" class="text-danger"></span>
                             </div>
-                            <div class="row">
-                                <div class="mb-4">
-                                    <label class="form-label">Pick Up Location</label>
-                                    <div class="row gx-2">
-                                        <input placeholder="Please enter your postal code" type="text" class="form-control" />
-                                    </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-4">
+                                <label class="form-label" for="postal_code">Pick Up Location</label>
+                                <div class="row gx-2">
+                                    <input placeholder="Please enter your postal code" type="text" class="form-control" id="postal_code" name="postal_code" />
                                 </div>
+                                <span for="Upload" class="text-danger"></span>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>        
+            </div> 
         </div>
         <div class="row">
             <div class="col-lg-12">
@@ -89,53 +103,118 @@
                 </div>
             </div>
         </div>
+    </form>
     </div>
 </main>
 
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <!-- <script>
+    {{ super() }}    
+    <script>
+        // Start: Function to show uploaded image preview
         function showImgPreview(input) {
-            var imgPreview = document.getElementById("imgPreview");
-            if (input.files && input.files[0]) {
+            // Get the selected file
+            var file = input.files[0];
+            // Check if a file is selected
+            if (file) {
+                // Create a FileReader object
                 var reader = new FileReader();
-                reader.onload = function (e) {
-                    imgPreview.src = e.target.result;
-                    imgPreview.style.display = "block";
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                imgPreview.style.display = "none";
+
+                // Set up the onload event for the FileReader
+                reader.onload = function(e) {
+                    // Perform actions to display the preview, for example, updating an <img> element
+                    $('#preview').attr('src', e.target.result);
+                };
+
+                // Read the file content
+                reader.readAsDataURL(file);
             }
         }
-    </script>
-    
-    <script>
-        document.getElementById("ExpiryDate").min = new Date().toISOString().split("T")[0];
-    </script>
-    
-    <script>
-        const fileInput = document.getElementById("image")
-        fileInput.addEventListener("change", (event) => {
-            const file = event.target.files[0]
-            if (!file) {
-                return;
+        // End: Function to show uploaded image preview
+        
+        // Start: Sets the minimum value allowed of the datepicker to current date
+        $(document).ready(function() {
+            $("#expiry_date").prop("min", new Date().toISOString().split("T")[0]);
+        });
+        // End: Sets the minimum value allowed of the datepicker to current date
+
+        function validateForm() {
+            var isValid = true;
+
+            // Image validation
+            var imageInput = $("input[name='image']");
+            if (imageInput.val() === "") {
+                isValid = false;
+                showError(imageInput, "Please select an image");
             }
-            const formData = new FormData();
-            formData.append("file", file)
-    
-            fetch("/api/google", {
-                method: "POST",
-                body: formData
-            }).then((response) => {
-                return response.text()
-            }).then((data) => {
-                document.getElementById("name").value = data
-            }).catch((error) => {
-                document.getElementById("name").value = "Unkown"
-            })
-        })
-    </script> -->
+
+            // Food Item title validation
+            var nameInput = $("#name");
+            if (nameInput.val() === "") {
+                isValid = false;
+                showError(nameInput, "Please enter a Food Item title");
+            }
+
+            // Description validation
+            var descriptionInput = $("#description");
+            if (descriptionInput.val() === "") {
+                isValid = false;
+                showError(descriptionInput, "Please enter a description");
+            }
+
+            // Categories validation
+            var categoryInput = $("#category");
+            if (categoryInput.val() === null) {
+                isValid = false;
+                showError(categoryInput, "Please select a category");
+            }
+
+            // Expiry Date validation
+            var expiryDateInput = $("#expiry_date");
+            if (expiryDateInput.val() === "") {
+                isValid = false;
+                showError(expiryDateInput, "Please enter an expiry date");
+            }
+
+            // Pick Up Location validation
+            var postalCodeInput = $("#postal_code");
+            if (postalCodeInput.val() === "") {
+                isValid = false;
+                showError(postalCodeInput, "Please enter a postal code");
+            }
+
+            return isValid;
+        }
+
+        $("#process_add_listing_form").submit(function(e) {
+            
+            var isValid = validateForm();
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                e.preventDefault();
+            }
+            
+        });
+
+        // Add blur event listener to each input field
+        $("input, textarea, select").blur(function() {
+            hideError($(this));
+        });
+
+        // Function to show error message and highlight input
+        function showError(input, message) {
+            var errorSpan = input.siblings(".text-danger");
+            errorSpan.text(message);
+            input.addClass("is-invalid");
+        }
+
+        // Function to hide error message and remove highlighting
+        function hideError(input) {
+            var errorSpan = input.siblings(".text-danger");
+            errorSpan.text("");
+            input.removeClass("is-invalid");
+        }
+    </script>
 {% endblock %}
