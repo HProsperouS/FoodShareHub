@@ -1,13 +1,17 @@
 import orjson
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import (
     FileResponse, 
     RedirectResponse,
     HTMLResponse
 )
+
 from starlette.staticfiles import StaticFiles
 from starlette.routing import Mount
 from starlette.middleware.sessions import SessionMiddleware
+import os
+from dotenv import load_dotenv
+
 # import Python's standard libraries
 
 # Import local libraries
@@ -17,7 +21,11 @@ from utils.jinja2_helper import (
     flash, 
     render_template,
 )
-from models.response import PrettyORJSON
+from schemas import PrettyORJSON
+from db.dependencies import init_db
+
+# Load Environment Variables
+load_dotenv()
 
 app = FastAPI(
     title="FoodShareHub",
@@ -54,11 +62,6 @@ def add_middlewares(app: FastAPI) -> None:
 
 """--------------------------- Start of App Routes ---------------------------"""
 
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    # TODO: Edit your favicon.ico in the static folder
-    return FileResponse(C.FAVICON_PATH)
-
 # Web routers
 def add_routers(app: FastAPI) -> None:
     """Add routers to the FastAPI app.
@@ -74,7 +77,8 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(admin_router)
 
 """--------------------------- End of App Routes ---------------------------"""
-
+# Initialize the database
+init_db()
 add_middlewares(app)
 add_routers(app)
 
