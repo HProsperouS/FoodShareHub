@@ -126,6 +126,6 @@ mkcert -key-file app-private-key.pem -cert-file app-cert.pem -ecdsa localhost 12
 mkcert -install
 ```
 
-1. Place the certificate and private key with the [main.py](http://main.py "‌") as shown in the screenshot below
+1. Place the certificate and private key with the [main.py](/src/app/main.py) as shown in the screenshot below
 
 [![image.png](/res/self-sign.png)](/res/self-sign.png)
