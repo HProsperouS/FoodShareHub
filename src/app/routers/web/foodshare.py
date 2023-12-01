@@ -15,7 +15,7 @@ from utils.jinja2_helper import (
 )
 
 foodshare_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     prefix='/foodshare',
     tags= ['FoodSharingPlatform']
 )

@@ -21,7 +21,7 @@ from depends import (
 )
 
 user_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     tags= ["User"]
 )
 RBAC_DEPENDS = Depends(USER_RBAC, use_cache=False)

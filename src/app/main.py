@@ -9,7 +9,6 @@ from fastapi.responses import (
 from starlette.staticfiles import StaticFiles
 from starlette.routing import Mount
 from starlette.middleware.sessions import SessionMiddleware
-import os
 from dotenv import load_dotenv
 
 # import Python's standard libraries
@@ -59,6 +58,7 @@ def add_middlewares(app: FastAPI) -> None:
         SessionMiddleware,
         secret_key="change_me",
         session_cookie=C.SESSION_COOKIE,
+        https_only=not C.DEBUG_MODE,
     )
     add_app_exception_handlers(app)
 
@@ -79,15 +79,6 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(admin_router)
 
 """--------------------------- End of App Routes ---------------------------"""
-
-"""--------------------------- Start of Exceptions ---------------------------"""
-# Exception handler for 404 errors
-@app.exception_handler(HTTPException)
-async def not_found_exception_handler(request, exc: HTTPException) -> HTMLResponse:
-    if exc.status_code == 404:
-        return await render_template(name="error/page-404.html")
-    return exc
-"""--------------------------- End of Exceptions ---------------------------"""
 
 # Initialize the database
 init_db()

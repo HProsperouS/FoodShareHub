@@ -15,7 +15,7 @@ from utils.jinja2_helper import (
 )
 
 authentication_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     prefix='/authentication',
     tags= ['Authentication']
 )

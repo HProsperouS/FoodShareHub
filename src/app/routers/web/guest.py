@@ -21,7 +21,7 @@ from depends import (
 )
 
 guest_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     tags= ["Guest"]
 )
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)

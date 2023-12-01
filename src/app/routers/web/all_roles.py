@@ -21,7 +21,7 @@ from depends import (
 )
 
 allroles_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     tags= ["AllRoles"]
 )
 RBAC_DEPENDS = Depends(ALLROLES_RBAC, use_cache=False)

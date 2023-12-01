@@ -21,7 +21,7 @@ from depends import (
 )
 
 admin_router = APIRouter(
-    include_in_schema=False,
+    include_in_schema=True,
     tags= ["Admin"]
 )
 RBAC_DEPENDS = Depends(ADMIN_RBAC, use_cache=False)
