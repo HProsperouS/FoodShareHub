@@ -77,6 +77,16 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(admin_router)
 
 """--------------------------- End of App Routes ---------------------------"""
+
+"""--------------------------- Start of Exceptions ---------------------------"""
+# Exception handler for 404 errors
+@app.exception_handler(HTTPException)
+async def not_found_exception_handler(request, exc: HTTPException) -> HTMLResponse:
+    if exc.status_code == 404:
+        return await render_template(name="error/page-404.html")
+    return exc
+"""--------------------------- End of Exceptions ---------------------------"""
+
 # Initialize the database
 init_db()
 add_middlewares(app)
