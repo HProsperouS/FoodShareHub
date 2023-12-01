@@ -17,11 +17,12 @@ from dotenv import load_dotenv
 # Import local libraries
 import utils.constants as C
 from routers import * 
-from utils.jinja2_helper import (
+from utils import (
     flash, 
     render_template,
 )
-from schemas import PrettyORJSON
+from utils.classes import PrettyORJSON
+from middleware import add_app_exception_handlers
 from db.dependencies import init_db
 
 # Load Environment Variables
@@ -59,6 +60,7 @@ def add_middlewares(app: FastAPI) -> None:
         secret_key="change_me",
         session_cookie=C.SESSION_COOKIE,
     )
+    add_app_exception_handlers(app)
 
 """--------------------------- Start of App Routes ---------------------------"""
 

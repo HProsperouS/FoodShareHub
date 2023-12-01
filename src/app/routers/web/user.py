@@ -30,7 +30,7 @@ RBAC_DEPENDS = Depends(USER_RBAC, use_cache=False)
 async def usertest(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLResponse:
     if not isinstance(rbac_res, RBACResults):
         return rbac_res
-    
+
     return await render_template(
         name="index.html",
         context={

@@ -27,6 +27,60 @@ DOMAIN = "https://localhost:8080" if DEBUG_MODE else "https://deployed.live"
 FLASH_MESSAGES = "_messages"
 SESSION_COOKIE = "session"
 API_PREFIX = "/api"
+ERROR_TABLE = {
+    400: {
+        "title": "400 - Bad Request",
+        "description": "The request was invalid"
+    },
+    401: {
+        "title": "401 - Unauthorized",
+        "description": "The requested resource is unauthorized"
+    },
+    403: {
+        "title": "403 - Forbidden",
+        "description": "The requested resource is forbidden"
+    },
+    404: {
+        "title": "404 - Page Not Found",
+        "description": "The requested resource was not found"
+    },
+    405: {
+        "title": "405 - Method Not Allowed",
+        "description": "The method is not allowed for the requested URL"
+    },
+    418: {
+        "title": "I'm a teapot",
+        "description": "I'm a teapot"
+    },
+    422: {
+        "title": "422 - Unprocessable Entity",
+        "description": "Unprocessable entity"
+    },
+    429: {
+        "title": "429 - Too Many Requests",
+        "description": "Too many requests, please slow down and try again later",
+    },
+    500: {
+        "title": "500 - Internal Server Error",
+        "description": "Internal server error"
+    },
+    503: {
+        "title": "503 - Service Unavailable",
+        "description": "Service unavailable"
+    },
+    504: {
+        "title": "504 - Gateway Timeout",
+        "description": "Gateway timeout"
+    },
+    505: {
+        "title": "505 - HTTP Version Not Supported",
+        "description": "HTTP version not supported"
+    },
+    511: {
+        "title": "511 - Network Authentication Required",
+        "description": "Network authentication required"
+    },
+}
 
 # User Roles
 GUEST = "guest"

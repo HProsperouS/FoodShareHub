@@ -1,7 +1,4 @@
 # import third-party libraries
-from pymongo.database import Database
-from pymongo.collection import Collection
-import pymongo
 from fastapi import (
     Request, 
     WebSocket,
@@ -19,12 +16,15 @@ from utils.jinja2_helper import (
     render_template,
 )
 
+# import Python's standard libraries
+from typing import Any # TODO: to remove
+
 async def verify_access(
     request: Request | WebSocket,
     role_arr: set[str] | str,
-    col: Collection | None = None,
+    col: Any | None = None,
     clear_session_if_invalid: bool | None = True,
-    admin_db: Database | None = None,
+    admin_db: Any | None = None,
 ) -> None | RedirectResponse:
     """Verifies the user's access based on their role.
 
