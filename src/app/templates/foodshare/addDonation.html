@@ -147,22 +147,22 @@
                         "Content-Type": "application/json",
                     },
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.json(); // Assuming server returns JSON response
-                    })
-                    .then(data => {
-                        console.log("Success:", data);
-                        // Handle success, e.g., show a success message
-                        alert("Your product has been uploaded successfully");
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        // Handle error, e.g., show an error message
-                        alert("An error occurred while uploading your product");
-                    });
+                    // .then(response => {
+                    //     if (!response.ok) {
+                    //         throw new Error(`HTTP error! Status: ${response.status}`);
+                    //     }
+                    //     return response.json(); // Assuming server returns JSON response
+                    // })
+                    // .then(data => {
+                    //     console.log("Success:", data);
+                    //     // Handle success, e.g., show a success message
+                    //     alert("Your product has been uploaded successfully");
+                    // })
+                    // .catch(error => {
+                    //     console.error("Error:", error);
+                    //     // Handle error, e.g., show an error message
+                    //     alert("An error occurred while uploading your product");
+                    // });
                 // const reader = new FileReader();
 
                 // reader.onloadend = function() {
