@@ -14,7 +14,7 @@ class AttachmentCreate(BaseModel):
 
 class FoodItemCreate(BaseModel):
     name: str
-    category: str
+    category_id: int
     description: str
     expiry_date: date
     postal_code: Optional[str] = None

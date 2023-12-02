@@ -59,16 +59,11 @@
                         <div class="row">
                             <div class="mb-4">
                                 <label class="form-label" for="category">Categories</label>
-                                <select class="form-select" id="category" name="category" >
+                                <select class="form-select" id="category" name="category">
                                     <option selected disabled>-- Please Select --</option>
-                                    <option>Milks and Dairies</option>
-                                    <option>Wines & Alcohol</option>
-                                    <option>Pet Foods & Toy</option>
-                                    <option>Baking material</option>
-                                    <option>Vegetables</option>
-                                    <option>Fresh Seafood</option>
-                                    <option>Noodles & Rice</option>
-                                    <option>Others</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
                                 </select>
                                 <span for="Upload" class="text-danger"></span>
                             </div>
@@ -127,7 +122,7 @@
                 // Retrieve form data
                 const formData = {
                     name: document.getElementById("name").value,
-                    category: document.getElementById("category").value,
+                    category_id: document.getElementById("category").value,
                     description: document.getElementById("description").value,
                     expiry_date: document.getElementById("expiry_date").value,
                     postal_code: document.getElementById("postal_code").value,
