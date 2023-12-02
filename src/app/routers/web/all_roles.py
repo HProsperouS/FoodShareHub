@@ -31,11 +31,11 @@ async def index(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLR
     if not isinstance(rbac_res, RBACResults):
         return rbac_res
 
-    flash(
-        request=request,
-        message="This is a test flash message", 
-        category="success",
-    )
+    # flash(
+    #     request=request,
+    #     message="This is a test flash message", 
+    #     category="success",
+    # )
     return await render_template(
         name="index.html",
         context={

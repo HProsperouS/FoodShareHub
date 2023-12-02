@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 # Import local libraries
 import utils.constants as C
-from routers import * 
+import routers
 from utils import (
     flash, 
     render_template,
@@ -64,7 +64,7 @@ def add_middlewares(app: FastAPI) -> None:
 
 """--------------------------- Start of App Routes ---------------------------"""
 
-# Web routers
+# All routers
 def add_routers(app: FastAPI) -> None:
     """Add routers to the FastAPI app.
 
@@ -72,11 +72,17 @@ def add_routers(app: FastAPI) -> None:
         app (FastAPI):
             The FastAPI app.
     """
-    app.include_router(foodshare_router)
-    app.include_router(allroles_router)
-    app.include_router(guest_router)
-    app.include_router(user_router)
-    app.include_router(admin_router)
+    # Web routers
+    app.include_router(routers.foodshare_router)
+    app.include_router(routers.allroles_router)
+    app.include_router(routers.guest_router)
+    app.include_router(routers.user_router)
+    app.include_router(routers.admin_router)
+
+    # API routers
+    app.include_router(routers.foodshare_api)
+
+
 
 """--------------------------- End of App Routes ---------------------------"""
 
