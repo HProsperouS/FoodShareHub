@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="container mb-30">
-    <form method="post" enctype="multipart/form-data" id="process_add_listing_form" action="{{ url_for('process_add_listing_form') }}">
+    <form id="process_add_listing_form" enctype="multipart/form-data">
         <div class="row">
             <div class="col-lg-4">
                 <div class="card mb-4">
@@ -33,7 +33,7 @@
                     <div class="card-body">
                         <div class="input-upload">
                             <img class="preview-image" id="preview" src="{{ url_for('static', path='assets/imgs/theme/upload.svg') }}" alt="Preview Image"/>
-                            <input class="form-control" type="file" name="image" accept="image/*" onchange="showImgPreview(this)" />
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*" onchange="showImgPreview(this); updateBase64Value();" />
                             <span for="Upload" class="text-danger"></span>
                         </div>
                     </div>
@@ -99,18 +99,133 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="text-align: right;">
-                    <button type="submit" class="btn btn-md rounded font-sm hover-up" >Submit</button>
+                    <button type="submit" class="btn btn-md rounded font-sm hover-up">Submit</button>
                 </div>
             </div>
         </div>
     </form>
     </div>
 </main>
-
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}    
+    {{ super() }}
+    <script>
+    var _base64;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("process_add_listing_form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var isValid = validateForm();
+
+            if (isValid) {
+                // Retrieve image input
+                const fileInput = document.getElementById("image");
+                const file = fileInput.files[0];
+
+                // Retrieve form data
+                const formData = {
+                    name: document.getElementById("name").value,
+                    category: document.getElementById("category").value,
+                    description: document.getElementById("description").value,
+                    expiry_date: document.getElementById("expiry_date").value,
+                    postal_code: document.getElementById("postal_code").value,
+                    image: {
+                        filename: fileInput.files[0].name,
+                        content_type: fileInput.files[0].type,
+                        size: fileInput.files[0].size,
+                        base64: _base64
+                    }
+                };
+
+                // Send form data using Fetch API
+                fetch("/api/foodshare/addMyListing", {
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json(); // Assuming server returns JSON response
+                    })
+                    .then(data => {
+                        console.log("Success:", data);
+                        // Handle success, e.g., show a success message
+                        alert("Your product has been uploaded successfully");
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        // Handle error, e.g., show an error message
+                        alert("An error occurred while uploading your product");
+                    });
+                // const reader = new FileReader();
+
+                // reader.onloadend = function() {
+                //     const base64Image = reader.result.split(",")[1];
+                //     document.getElementById("base64Image").value = base64Image;
+                //     // formData.file;
+                //     formData.base64Image = base64Image;
+
+                //     console.log("BODY: ", JSON.stringify(formData));
+
+                //     // Send form data using Fetch API
+                //     fetch("/api/foodshare/addMyListing", {
+                //         method: "POST",
+                //         body: JSON.stringify(formData),
+                //         headers: {
+                //             "Content-Type": "application/json",
+                //         },
+                //     })
+                //     // .then(response => {
+                //     //     if (!response.ok) {
+                //     //         throw new Error(`HTTP error! Status: ${response.status}`);
+                //     //     }
+                //     //     return response.json(); // Assuming server returns JSON response
+                //     // })
+                //     // .then(data => {
+                //     //     console.log("Success:", data);
+                //     //     // Handle success, e.g., show a success message
+                //     //     alert("Your product has been uploaded successfully");
+                //     // })
+                //     // .catch(error => {
+                //     //     console.error("Error:", error);
+                //     //     // Handle error, e.g., show an error message
+                //     //     alert("An error occurred while uploading your product");
+                //     // });
+                // };
+                // reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // Function to convert file to base64
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    function updateBase64Value(){
+        const fileInput = document.getElementById("image");
+        const file = fileInput.files[0];
+        getBase64(file)
+            .then(base64Value => {
+                _base64 = base64Value;
+            })
+            .catch(error => {
+                console.error("Error converting file to base64:", error);
+            });
+    } 
+    </script>
+
     <script>
         // Start: Function to show uploaded image preview
         function showImgPreview(input) {
@@ -186,17 +301,6 @@
 
             return isValid;
         }
-
-        $("#process_add_listing_form").submit(function(e) {
-            
-            var isValid = validateForm();
-
-            // Prevent form submission if validation fails
-            if (!isValid) {
-                e.preventDefault();
-            }
-            
-        });
 
         // Add blur event listener to each input field
         $("input, textarea, select").blur(function() {
