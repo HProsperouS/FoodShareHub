@@ -5,3 +5,6 @@ from .jinja2_helper import (
     get_flashed_messages,
     render_template,
 )
+from .helper import(
+    decode_base64_file
+)
