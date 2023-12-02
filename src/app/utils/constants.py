@@ -6,6 +6,7 @@ from argon2 import (
 
 # import Python's standard libraries
 import pathlib
+import os
 
 DEBUG_MODE = True
 APP_ROOT_PATH = pathlib.Path(__file__).parent.parent.resolve()
@@ -87,3 +88,10 @@ GUEST = "guest"
 USER = "user"
 ADMIN = "admin"
 ALLROLES = (GUEST, USER, ADMIN)
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+S3_REGION = os.getenv("S3_REGION")
