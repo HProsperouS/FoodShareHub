@@ -58,6 +58,7 @@ async def verify_access(
 
     session_id = request.session.get(C.SESSION_COOKIE, None)
     # TODO: Get user info from session id
+    
     user_roles = (C.GUEST,) # <- dummy data
     for role in user_roles:
         if role in role_arr:

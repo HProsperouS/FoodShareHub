@@ -26,6 +26,12 @@ from db.dependencies import init_db
 
 # Load Environment Variables
 load_dotenv()
+# from models.response import PrettyORJSON
+from datetime import datetime, timedelta
+# import aioredis
+
+# redis cached endpoint
+# redis_pool = aioredis.from_url("testcache-ampw1p.serverless.use1.cache.amazonaws.com:6379")
 
 app = FastAPI(
     title="FoodShareHub",
@@ -59,12 +65,24 @@ def add_middlewares(app: FastAPI) -> None:
         secret_key="change_me",
         session_cookie=C.SESSION_COOKIE,
         https_only=not C.DEBUG_MODE,
+        max_age=600,
+        # storage=aioredis.RedisStorage(redis_pool) # stores in redis now
     )
     add_app_exception_handlers(app)
 
 """--------------------------- Start of App Routes ---------------------------"""
 
-# All routers
+
+
+
+"""--------------------------- Start of App Routes ---------------------------"""
+
+# @app.get("/favicon.ico", include_in_schema=False)
+# async def favicon():
+#     # TODO: Edit your favicon.ico in the static folder
+#     return FileResponse(C.FAVICON_PATH)
+
+# Web routers
 def add_routers(app: FastAPI) -> None:
     """Add routers to the FastAPI app.
 
@@ -78,7 +96,7 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(routers.guest_router)
     app.include_router(routers.user_router)
     app.include_router(routers.admin_router)
-
+    app.include_router(routers.authentication_router)
     # API routers
     app.include_router(routers.foodshare_api)
 
