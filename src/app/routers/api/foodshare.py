@@ -3,30 +3,20 @@ from fastapi import (
     APIRouter,
     Request,
     Depends,
-    HTTPException,
-    Form,
-    File,
-    UploadFile
 )
 from fastapi.responses import (
-    HTMLResponse,
     RedirectResponse,
-    JSONResponse
+    ORJSONResponse
 )
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-from datetime import date
-import os, boto3
-from botocore.exceptions import ClientError 
-import base64
+import boto3
 import uuid
 import botocore
 
 # import local libraries
 from utils.jinja2_helper import (
     flash, 
-    render_template,
-    url_for
 )
 from utils.helper import (
     decode_base64_file
@@ -60,7 +50,7 @@ def upload_to_s3(file_data, file_name, bucket_name):
     path="/foodshare/addMyListing",
     description="Create FoodItem and list donation. ",
 )
-async def process_add_listing_form(request: Request, formData: FoodItemCreate, db: Session = Depends(get_db)) -> RedirectResponse:
+async def process_add_listing_form(request: Request, formData: FoodItemCreate, db: Session = Depends(get_db)) -> ORJSONResponse:
     # try:
         
     #     return JSONResponse(content={"message": "Data received successfully"})
@@ -71,22 +61,21 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
 
     # Process the form data
     print(f"Product Name: {formData.name}")
-    print(f"Category: {formData.category}")
+    print(f"Category: {formData.category_id}")
     print(f"Description: {formData.description}")
     print(f"Expiry Date: {formData.expiry_date}")
     print(f"Postal Code: {formData.postal_code}")
-    print(f"Postal Code: {formData.image.filename}")
+    print(f"Image Filename: {formData.image.filename}")
 
     # Start: Upload image to S3 
     unique_filename = str(uuid.uuid4()) + "_" + formData.image.filename
-    image_data = base64.b64decode(formData.image.base64)
     file = decode_base64_file(formData.image.base64)
 
-    # Upload the image to S3
     if upload_to_s3(file, unique_filename, C.S3_BUCKET_NAME):
         print("Image uploaded to S3 successfully")
     else:
-        return JSONResponse(content={"error": "Failed to upload image to S3"}, status_code=500)
+        return ORJSONResponse(content={"error": "Failed to upload image to S3"}, status_code=500)
+    # End: Upload image to S3 
 
     # Start: Save FoodItem created into RDS
     # Save the form data to the database
@@ -107,10 +96,13 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
         message="Your product have been uploaded successfully", 
         category="success",
     )
+    # Redirect URL in the JSON response
+    redirect_url = "/"
 
-    # Render a response, you can customize this based on your needs
-    return RedirectResponse(url="/",status_code=303)
-    #return RedirectResponse(url="/", status_code=303)
+    return ORJSONResponse(
+        content={"redirect_url": redirect_url}
+    )
+
 
 
 

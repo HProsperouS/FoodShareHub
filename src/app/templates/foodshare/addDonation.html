@@ -142,22 +142,16 @@
                         "Content-Type": "application/json",
                     },
                 })
-                    // .then(response => {
-                    //     if (!response.ok) {
-                    //         throw new Error(`HTTP error! Status: ${response.status}`);
-                    //     }
-                    //     return response.json(); // Assuming server returns JSON response
-                    // })
-                    // .then(data => {
-                    //     console.log("Success:", data);
-                    //     // Handle success, e.g., show a success message
-                    //     alert("Your product has been uploaded successfully");
-                    // })
-                    // .catch(error => {
-                    //     console.error("Error:", error);
-                    //     // Handle error, e.g., show an error message
-                    //     alert("An error occurred while uploading your product");
-                    // });
+                .then(response => response.json())
+                .then(data => {
+                    // Extract the redirect URL from the JSON response
+                    const redirectUrl = data.redirect_url;
+                    // Redirect to the extracted URL
+                    window.location.href = redirectUrl;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
                 // const reader = new FileReader();
 
                 // reader.onloadend = function() {
