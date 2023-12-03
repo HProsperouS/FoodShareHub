@@ -23,11 +23,10 @@ from utils.jinja2_helper import (
     flash, 
     render_template,
 )
-from db.crud.fooditem_crud import add_fooditem, get_all_fooditems, get_fooditem_by_id, update_fooditem
-from schemas.request.donation import FoodItemCreate
-from schemas.response.donation import FoodItemResponse
-from db.dependencies import get_db
-from db.models.donation import FoodItem
+from db import (
+    get_all_FoodItemCategories,
+    get_db,
+)
 
 foodshare_router = APIRouter(
     include_in_schema=False,
@@ -36,11 +35,13 @@ foodshare_router = APIRouter(
 )
 
 @foodshare_router.get("/addMyListing")
-async def show_add_listing_form(request: Request) -> HTMLResponse:
+async def show_add_listing_form(request: Request, db: Session = Depends(get_db) ) -> HTMLResponse:
+    categories = await get_all_FoodItemCategories(db)
     return await render_template(
         name="foodshare/addDonation.html",
         context={
             "request": request,
+            "categories": categories,  # Pass the categories to the DDL
         },
     )
 
