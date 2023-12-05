@@ -115,11 +115,12 @@
             var isValid = validateForm();
 
             if (isValid) {
-                // Retrieve image input
+                // Start: Retrieve image input
                 const fileInput = document.getElementById("image");
                 const file = fileInput.files[0];
+                // End: Retrieve image input
 
-                // Retrieve form data
+                // Start: Retrieve form data
                 const formData = {
                     name: document.getElementById("name").value,
                     category_id: document.getElementById("category").value,
@@ -133,8 +134,12 @@
                         base64: _base64
                     }
                 };
+                // End: Retrieve form data
 
-                // Send form data using Fetch API
+                const loadingDiv = document.getElementById('loadingDiv');
+                loadingDiv.style.display = '';
+
+                // Start: Send form data using Fetch API
                 fetch("/api/foodshare/addMyListing", {
                     method: "POST",
                     body: JSON.stringify(formData),
@@ -144,6 +149,8 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Hide loader
+                    loadingDiv.style.display = 'none';
                     // Extract the redirect URL from the JSON response
                     const redirectUrl = data.redirect_url;
                     // Redirect to the extracted URL
@@ -152,42 +159,7 @@
                 .catch(error => {
                     console.error("Error:", error);
                 });
-                // const reader = new FileReader();
-
-                // reader.onloadend = function() {
-                //     const base64Image = reader.result.split(",")[1];
-                //     document.getElementById("base64Image").value = base64Image;
-                //     // formData.file;
-                //     formData.base64Image = base64Image;
-
-                //     console.log("BODY: ", JSON.stringify(formData));
-
-                //     // Send form data using Fetch API
-                //     fetch("/api/foodshare/addMyListing", {
-                //         method: "POST",
-                //         body: JSON.stringify(formData),
-                //         headers: {
-                //             "Content-Type": "application/json",
-                //         },
-                //     })
-                //     // .then(response => {
-                //     //     if (!response.ok) {
-                //     //         throw new Error(`HTTP error! Status: ${response.status}`);
-                //     //     }
-                //     //     return response.json(); // Assuming server returns JSON response
-                //     // })
-                //     // .then(data => {
-                //     //     console.log("Success:", data);
-                //     //     // Handle success, e.g., show a success message
-                //     //     alert("Your product has been uploaded successfully");
-                //     // })
-                //     // .catch(error => {
-                //     //     console.error("Error:", error);
-                //     //     // Handle error, e.g., show an error message
-                //     //     alert("An error occurred while uploading your product");
-                //     // });
-                // };
-                // reader.readAsDataURL(file);
+                // End: Send form data using Fetch API
             }
         });
     });
