@@ -105,7 +105,7 @@ def add_routers(app: FastAPI) -> None:
 """--------------------------- End of App Routes ---------------------------"""
 
 # Initialize the database
-# init_db()
+init_db()
 add_middlewares(app)
 add_routers(app)
 

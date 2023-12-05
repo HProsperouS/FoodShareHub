@@ -15,9 +15,10 @@ def get_db():
 
 def init_db():
     # Check if tables exist before creating
-    inspector = inspect(session.engine)
-    existing_tables = inspector.get_table_names()
+    # inspector = inspect(session.engine)
+    # existing_tables = inspector.get_table_names()
 
-    if not set(existing_tables).intersection({'items', 'other_table_name'}):
+    # if not set(existing_tables).intersection({'items', 'other_table_name'}):
         # Tables don't exist, create them
         Base.metadata.create_all(bind=session.engine)
+        # Base.metadata.drop_all(bind=session.engine)

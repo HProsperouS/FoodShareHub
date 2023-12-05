@@ -26,7 +26,7 @@
             <div class="col-12">
                 <div class="shop-product-fillter">
                     <div class="totall-product">
-                        <p>We found <strong class="text-brand">29</strong> items you listed, Thank You for your contribution to Singapore!</p>
+                        <p>We found <strong class="text-brand">{{ count }}</strong> items you listed, Thank You for your contribution to Singapore!</p>
                     </div>
                     <div class="sort-by-product-area">
                         <div class="sort-by-cover mr-10">
@@ -67,12 +67,13 @@
                     </div>
                 </div>
                 <div class="row product-grid">
+                    {% for donation in donations %}
                     <div class="col-lg-1-5 col-md-4 col-12 col-sm-6">
                         <div class="product-cart-wrap mb-30">
                             <div class="product-img-action-wrap">
                                 <div class="product-img product-img-zoom">
                                     <a href="#">
-                                        <img class="default-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-1.jpg') }}" alt="" />
+                                        <img class="default-img" src="{{ donation.food_item.attachment.file_name }}" alt="" />
                                         <img class="hover-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-2.jpg') }}" alt="" />
                                     </a>
                                 </div>
@@ -84,7 +85,8 @@
                                     </a>
                                 </div>
                                 <div class="product-badges product-badges-position product-badges-mrg">
-                                    <span class="hot">Hot</span>
+                                    <span class="hot">{{ donation.food_item.attachment.file_name if donation.food_item.attachment else 'No File' }}</span>
+
                                 </div>
                             </div>
                             <div class="product-content-wrap">                                
@@ -95,6 +97,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                     <!--end product card-->
                     <!-- Quick view -->
                     <div class="modal fade custom-modal" id="quickViewModal1" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
@@ -175,8 +178,8 @@
 </main>
 
 <script>
-    document.querySelector('.button-add-to-cart').onclick = function () {
-        window.location.href = '/FoodSharing/EditDonationInfo';
+    document.querySelector('.fi-rs-edit').onclick = function () {
+        window.location.href = '/foodshare/editMyListing';
     };
 </script>
 {% endblock %}

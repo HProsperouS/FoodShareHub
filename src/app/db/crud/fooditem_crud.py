@@ -3,12 +3,11 @@ from sqlalchemy.orm import Session
 from db.models.donation import FoodItem
 
 
-def add_fooditem(db: Session, fooditem_data: dict):
-    db_fooditem = FoodItem(**fooditem_data)
-    db.add(db_fooditem)
+def add_fooditem(db: Session, fooditem_data: FoodItem):
+    db.add(fooditem_data)
     db.commit()
-    db.refresh(db_fooditem)
-    return db_fooditem
+    db.refresh(fooditem_data)
+    return fooditem_data
 
 def get_all_fooditems(db: Session):
     return db.query(FoodItem).order_by(FoodItem.id).all()

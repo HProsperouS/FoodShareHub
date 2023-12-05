@@ -7,20 +7,20 @@ from fastapi import UploadFile
 
 
 class AttachmentCreate(BaseModel):
-    filename: str
-    content_type: str
-    size: int
-    base64: str
+    FileName: str
+    ContentType: str
+    Size: int
+    Base64: str
 
 class FoodItemCreate(BaseModel):
-    name: str
-    category_id: int
-    description: str
-    expiry_date: date
-    postal_code: Optional[str] = None
-    image: AttachmentCreate
+    Name: str
+    CategoryID: int
+    Description: str
+    ExpiryDate: date
+    PostalCode: Optional[str] = None
+    Image: AttachmentCreate
 
 class DonationCreate(BaseModel):
-    status: DonationStatus
-    location: str = ''
-    fooditem: FoodItemCreate
+    Status: DonationStatus
+    Location: str = ''
+    FoodItem: FoodItemCreate

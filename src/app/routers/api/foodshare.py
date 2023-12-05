@@ -22,12 +22,25 @@ from utils.helper import (
     decode_base64_file
 )
 from utils import constants as C
-from db.crud.fooditem_crud import add_fooditem, get_all_fooditems, get_fooditem_by_id, update_fooditem
+from db import (
+    # FoodItem Section
+    add_fooditem, 
+    get_all_fooditems, 
+    get_fooditem_by_id, 
+    update_fooditem,
+    # Donation Section
+    add_donation
+    )
 from schemas.request.donation import FoodItemCreate
 from schemas.response.donation import FoodItemResponse
 from db.dependencies import get_db
-from db.models.donation import FoodItem
 
+from db.models.donation import (
+    FoodItem, 
+    Attachment,
+    Donation,
+    DonationStatus)
+from datetime import datetime
 
 foodshare_api = APIRouter(
     include_in_schema=True,
@@ -35,7 +48,6 @@ foodshare_api = APIRouter(
     tags= ['FoodSharingPlatformAPI']
 )
 
-s3 = boto3.client('s3')
 def upload_to_s3(file_data, file_name, bucket_name):
     try:
         s3 = boto3.client('s3')
@@ -53,23 +65,15 @@ def upload_to_s3(file_data, file_name, bucket_name):
 async def process_add_listing_form(request: Request, formData: FoodItemCreate, db: Session = Depends(get_db)) -> ORJSONResponse:
     # try:
         
-    #     return JSONResponse(content={"message": "Data received successfully"})
+    #     return ORJSONResponse(content={"message": "Data received successfully"})
     # except ValidationError as e:
     #     print(e.errors())
     #     print(e.json())
-    #     return JSONResponse(content={"error": str(e)}, status_code=422)
-
-    # Process the form data
-    print(f"Product Name: {formData.name}")
-    print(f"Category: {formData.category_id}")
-    print(f"Description: {formData.description}")
-    print(f"Expiry Date: {formData.expiry_date}")
-    print(f"Postal Code: {formData.postal_code}")
-    print(f"Image Filename: {formData.image.filename}")
+    #     return ORJSONResponse(content={"error": str(e)}, status_code=422)
 
     # Start: Upload image to S3 
-    unique_filename = str(uuid.uuid4()) + "_" + formData.image.filename
-    file = decode_base64_file(formData.image.base64)
+    unique_filename = str(uuid.uuid4()) + "_" + formData.Image.FileName
+    file = decode_base64_file(formData.Image.Base64)
 
     if upload_to_s3(file, unique_filename, C.S3_BUCKET_NAME):
         print("Image uploaded to S3 successfully")
@@ -77,25 +81,46 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
         return ORJSONResponse(content={"error": "Failed to upload image to S3"}, status_code=500)
     # End: Upload image to S3 
 
-    # Start: Save FoodItem created into RDS
-    # Save the form data to the database
-    # db_fooditem = FoodItem(
-    #     name=name,
-    #     category=category,
-    #     description=description,
-    #     image=image,
-    #     expiry_date=expiry_date,
-    # )
-    # db.add(db_fooditem)
-    # db.commit()
-    # db.refresh(db_fooditem)
-    # End: Save FoodItem created into RDS
+    # Start: Save FoodItem and Attachment into RDS using cascading
+    s3_file_path = f"s3://{C.S3_BUCKET_NAME}/uploads/{unique_filename}"
 
+    new_attachment = Attachment(
+        FileName=unique_filename,
+        ContentType=formData.Image.ContentType,
+        FileSize=formData.Image.Size,
+        FilePath=s3_file_path
+    )
+
+    new_fooditem = FoodItem(
+        Name=formData.Name,
+        Description=formData.Description,
+        CategoryID=formData.CategoryID,
+        Attachment=new_attachment
+    )
+
+    new_donation = Donation(
+        Status=DonationStatus.ACTIVE,
+        CreatedDate=datetime.now(),
+        MeetUpLocation=formData.PostalCode,
+        Username = "JiaJun Liu",
+        FoodItem = new_fooditem
+    )
+
+    db.add(new_donation)
+    db.commit()
+    # Optionally, you might want to refresh the new_donation object after the commit
+    db.refresh(new_donation)
+    # await add_donation(db, new_donation)
+
+    # End: Save FoodItem and Attachment into RDS using cascading
+
+    # Flash Message TOBE shown in the redirected page
     flash(
         request=request,
         message="Your product have been uploaded successfully", 
         category="success",
     )
+
     # Redirect URL in the JSON response
     redirect_url = "/"
 

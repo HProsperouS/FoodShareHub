@@ -3,99 +3,69 @@ from sqlalchemy.orm import relationship
 from enum import Enum as PythonEnum
 from datetime import datetime
 from db.base import Base
-
+import pytz
 
 '''SQLAlchemy models'''
 class FoodItemCategory(Base):
-    __tablename__ = "food_item_categories"
+    __tablename__ = "FoodItemCategories"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, default="")
+    Id = Column(Integer, primary_key=True, index=True)
+    Name = Column(String, default="")
 
-    food_items = relationship("FoodItem", back_populates="category")
+    FoodItems = relationship("FoodItem", back_populates="Category")
+
+class Attachment(Base):
+    __tablename__ = "Attachments"
+
+    Id = Column(Integer, primary_key=True, index=True)
+    FileName = Column(String, default="")
+    ContentType = Column(String, default="")
+    FileSize = Column(Integer, default="")
+    FilePath = Column(String, default="")
+    
+    FoodItem = relationship("FoodItem", back_populates="Attachment")
 
 class FoodItem(Base):
-    __tablename__ = "attachments"
+    __tablename__ = "FoodItems"
 
-    id = Column(Integer, primary_key=True, index=True)
-    file_name = Column(String, default="")
-    content_type = Column(String, default="")
-    file_size = Column(Integer, default="")
-    file_path = Column(String, default="")
+    Id = Column(Integer, primary_key=True, index=True)
+    Name = Column(String, default="")
+    Description = Column(String, default="")
     
-    food_item_id = Column(Integer, ForeignKey("food_items.id"))
-    food_item = relationship("FoodItem", back_populates="attachments")
+    CategoryID = Column(Integer, ForeignKey("FoodItemCategories.Id"))
+    Category = relationship("FoodItemCategory", back_populates="FoodItems")
 
-class FoodItem(Base):
-    __tablename__ = "food_items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, default="")
-    description = Column(String, default="")
-
-    category_id = Column(Integer, ForeignKey("food_item_categories.id"))
-    category = relationship("FoodItemCategory", back_populates="food_items")
-
-# class DonationStatus(PythonEnum):
-#     ACTIVE = 'ACTIVE'
-#     RESERVED = 'RESERVED'
-#     COMPLETED = 'COMPLETED'
-#     CANCELLED = 'CANCELLED'
-
-# class Donation(Base):
-#     __tablename__ = "donations"
-
-#     id = Column(Integer, primary_key=True, index=True)
-#     status = Column(Enum(DonationStatus), nullable=False)
-#     date = Column(DateTime, default=datetime.now)
-#     meet_up_location = Column(String, default="")
+    # attachment = relationship("Attachment", back_populates="food_item", cascade="all, delete-orphan")
+    AttachmentID = Column(Integer, ForeignKey("Attachments.Id"))
+    Attachment = relationship("Attachment", back_populates="FoodItem", cascade="save-update, merge")
+    Donation = relationship("Donation", back_populates="FoodItem")
     
-#     # user_id = Column(Integer, ForeignKey("users.id"))
-#     # user = relationship("User", back_populates="donations")
-#     @property
-#     def donor(self):
-#         # Use AWS Cognito APIs to fetch user details based on cognito_sub
-#         # Example: Use Boto3 to call Cognito APIs
-#         # user_details = cognito_client.admin_get_user(UserPoolId='your_user_pool_id', Username=self.cognito_sub)
-#         # return user_details['Username']
-#         pass
+class DonationStatus(PythonEnum):
+    ACTIVE = 'ACTIVE'
+    INACTIVE = 'INACTIVE'
+    RESERVED = 'RESERVED'
+    COMPLETED = 'COMPLETED'
+
+class Donation(Base):
+    __tablename__ = "Donations"
+
+    Id = Column(Integer, primary_key=True, index=True)
+    Status = Column(Enum(DonationStatus), nullable=False)
+
+    # Start: Set the timezone to Singapore
+    singapore_timezone = pytz.timezone('Asia/Singapore')
+    current_time_singapore = datetime.now(singapore_timezone)
+    CreatedDate = Column(DateTime(timezone=True), default=current_time_singapore)
+    # End: Set the timezone to Singapore
+
+    MeetUpLocation = Column(String, default="")
     
-#     food_item_id = Column(Integer, ForeignKey("food_items.id"))
-#     food_item = relationship("FoodItem", back_populates="donation")
-#     donation_request = relationship("DonationRequest", back_populates="donation")
+    # TODO: User, TOBE Replace by Cognito Method Soon
+    Username = Column(String, default="Liu JiaJun")
 
-# class RequestStatus(PythonEnum):
-#     PENDING = 'PENDING'
-#     ACCEPTED = 'ACCEPTED'
-#     DONE = 'DONE'
+    # Relationships
+    FoodItemID = Column(Integer, ForeignKey("FoodItems.Id"))
+    FoodItem = relationship("FoodItem", back_populates="Donation", cascade="save-update, merge")
 
-# class DonationRequest(Base):
-#     __tablename__ = "donation_requests"
-
-#     id = Column(Integer, primary_key=True, index=True)
-#     donation_id = Column(Integer, ForeignKey("donations.id"))
-#     donation = relationship("Donation", back_populates="donation_request")
-
-#     # donor_id = Column(Integer, ForeignKey("users.id"))
-#     # donor = relationship("User", foreign_keys=[donor_id], back_populates="donation_requests_donor")
-
-#     # recipient_id = Column(Integer, ForeignKey("users.id"))
-#     # recipient = relationship("User", foreign_keys=[recipient_id], back_populates="donation_requests_recipient")
-
-#     @property
-#     def donor(self):
-#         # Use AWS Cognito APIs to fetch user details based on cognito_sub
-#         # Example: Use Boto3 to call Cognito APIs
-#         # user_details = cognito_client.admin_get_user(UserPoolId='your_user_pool_id', Username=self.cognito_sub)
-#         # return user_details['Username']
-#         pass
-
-#     @property
-#     def recipient(self):
-#         # Similar to the donor property, fetch recipient details
-#         pass
-
-#     status = Column(Enum(RequestStatus), nullable=False)
-#     date = Column(DateTime, default=datetime.now)
 
 

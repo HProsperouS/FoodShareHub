@@ -11,9 +11,10 @@ from fastapi import (
 from fastapi.responses import (
     HTMLResponse,
     RedirectResponse,
-    JSONResponse
+    ORJSONResponse
 )
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
 import os, boto3
 from botocore.exceptions import ClientError 
@@ -24,8 +25,12 @@ from utils.jinja2_helper import (
     render_template,
 )
 from db import (
-    get_all_FoodItemCategories,
+    # DB Session
     get_db,
+    # DB Query
+    get_all_FoodItemCategories,
+    get_all_donations,
+    get_donation_by_id,
 )
 
 foodshare_router = APIRouter(
@@ -46,11 +51,17 @@ async def show_add_listing_form(request: Request, db: Session = Depends(get_db) 
     )
 
 @foodshare_router.get("/myListings")
-async def myListing(request: Request) -> HTMLResponse:
+async def myListing(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    # TODO: Modify the method to get donations based on the (User ID or User Name) from the Session once Coginito Login is done
+    donations = get_all_donations(db)
+    count = len(donations)
+
     return await render_template(
         name="foodshare/listMyDonations.html",
         context={
             "request": request,
+            "donations": donations,
+            "count": count
         },
     )
 
