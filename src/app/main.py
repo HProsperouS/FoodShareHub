@@ -1,37 +1,24 @@
-import orjson
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import (
-    FileResponse, 
-    RedirectResponse,
-    HTMLResponse
-)
-
+# import third-party libraries
+from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 from starlette.routing import Mount
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 
-# import Python's standard libraries
-
 # Import local libraries
 import utils.constants as C
 import routers
-from utils import (
-    flash, 
-    render_template,
-)
 from utils.classes import PrettyORJSON
 from middleware import add_app_exception_handlers
 from db.dependencies import init_db
 
-# Load Environment Variables
-load_dotenv()
-# from models.response import PrettyORJSON
-from datetime import datetime, timedelta
 # import aioredis
 
 # redis cached endpoint
 # redis_pool = aioredis.from_url("testcache-ampw1p.serverless.use1.cache.amazonaws.com:6379")
+
+# Load Environment Variables
+load_dotenv()
 
 app = FastAPI(
     title="FoodShareHub",
@@ -71,17 +58,6 @@ def add_middlewares(app: FastAPI) -> None:
     add_app_exception_handlers(app)
 
 """--------------------------- Start of App Routes ---------------------------"""
-
-
-
-
-"""--------------------------- Start of App Routes ---------------------------"""
-
-# @app.get("/favicon.ico", include_in_schema=False)
-# async def favicon():
-#     # TODO: Edit your favicon.ico in the static folder
-#     return FileResponse(C.FAVICON_PATH)
-
 # Web routers
 def add_routers(app: FastAPI) -> None:
     """Add routers to the FastAPI app.
@@ -100,11 +76,8 @@ def add_routers(app: FastAPI) -> None:
     # API routers
     app.include_router(routers.foodshare_api)
 
-
-
 """--------------------------- End of App Routes ---------------------------"""
 
-# Initialize the database
 init_db()
 add_middlewares(app)
 add_routers(app)
