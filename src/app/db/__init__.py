@@ -12,9 +12,12 @@ from .crud.fooditem_category_crud import(
 )
 
 # Donation Related Methods
-# from .crud.donation_crud import(
-   
-# )
+from .crud.donation_crud import(
+   add_donation,
+   get_all_donations,
+   get_donation_by_id,
+   update_donation
+)
 
 # DB Session
 from .dependencies import(
