@@ -13,6 +13,8 @@ from fastapi.responses import (
     RedirectResponse,
     ORJSONResponse
 )
+from fastapi.encoders import jsonable_encoder
+
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
@@ -56,6 +58,7 @@ async def myListing(request: Request, db: Session = Depends(get_db)) -> HTMLResp
     donations = get_all_donations(db)
     count = len(donations)
 
+    print(jsonable_encoder(donations))
     return await render_template(
         name="foodshare/listMyDonations.html",
         context={

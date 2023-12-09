@@ -5,14 +5,10 @@ from fastapi import (
     Depends,
 )
 from fastapi.responses import (
-    RedirectResponse,
     ORJSONResponse
 )
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-import boto3
-import uuid
-import botocore
 
 # import local libraries
 from utils.jinja2_helper import (
@@ -30,7 +26,7 @@ from db import (
     update_fooditem,
     # Donation Section
     add_donation
-    )
+)
 from schemas.request.donation import FoodItemCreate
 from schemas.response.donation import FoodItemResponse
 from db.dependencies import get_db
@@ -39,8 +35,16 @@ from db.models.donation import (
     FoodItem, 
     Attachment,
     Donation,
-    DonationStatus)
+    DonationStatus
+)
+
+from aws.services import(
+    upload_to_s3
+)
+
+# import Python's standard libraries
 from datetime import datetime
+import uuid
 
 foodshare_api = APIRouter(
     include_in_schema=True,
@@ -48,16 +52,6 @@ foodshare_api = APIRouter(
     tags= ['FoodSharingPlatformAPI']
 )
 
-def upload_to_s3(file_data, file_name, bucket_name):
-    try:
-        s3 = boto3.client('s3')
-        folder_path = "uploads/"
-        s3.upload_fileobj(file_data, bucket_name, f"{folder_path}{file_name}")
-        return True
-    except botocore.exceptions.ClientError as e:
-        print(f"Error uploading to S3: {e}")
-        return False
-    
 @foodshare_api.post(
     path="/foodshare/addMyListing",
     description="Create FoodItem and list donation. ",
@@ -75,7 +69,7 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
     unique_filename = str(uuid.uuid4()) + "_" + formData.Image.FileName
     file = decode_base64_file(formData.Image.Base64)
 
-    if upload_to_s3(file, unique_filename, C.S3_BUCKET_NAME):
+    if upload_to_s3(file, unique_filename, C.S3_BUCKET_NAME, formData.Image.ContentType):
         print("Image uploaded to S3 successfully")
     else:
         return ORJSONResponse(content={"error": "Failed to upload image to S3"}, status_code=500)
@@ -84,11 +78,14 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
     # Start: Save FoodItem and Attachment into RDS using cascading
     s3_file_path = f"s3://{C.S3_BUCKET_NAME}/uploads/{unique_filename}"
 
+    #Sample of the URL: https://myfoodsharehub-bucket.s3.amazonaws.com/uploads/997941e7-8a79-4fd7-a103-ed338fdf9a7f_logo.svg
+    publicAccessURL = f"https://{C.S3_BUCKET_NAME}.s3.amazonaws.com/uploads/{unique_filename}"
     new_attachment = Attachment(
         FileName=unique_filename,
         ContentType=formData.Image.ContentType,
         FileSize=formData.Image.Size,
-        FilePath=s3_file_path
+        FilePath=s3_file_path,
+        PublicAccessURL = publicAccessURL
     )
 
     new_fooditem = FoodItem(
@@ -106,12 +103,7 @@ async def process_add_listing_form(request: Request, formData: FoodItemCreate, d
         FoodItem = new_fooditem
     )
 
-    db.add(new_donation)
-    db.commit()
-    # Optionally, you might want to refresh the new_donation object after the commit
-    db.refresh(new_donation)
-    # await add_donation(db, new_donation)
-
+    add_donation(db, new_donation)
     # End: Save FoodItem and Attachment into RDS using cascading
 
     # Flash Message TOBE shown in the redirected page

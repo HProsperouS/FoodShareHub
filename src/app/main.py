@@ -78,7 +78,6 @@ def add_routers(app: FastAPI) -> None:
 
 """--------------------------- End of App Routes ---------------------------"""
 
-init_db()
 add_middlewares(app)
 add_routers(app)
 

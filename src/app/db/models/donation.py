@@ -22,7 +22,8 @@ class Attachment(Base):
     ContentType = Column(String, default="")
     FileSize = Column(Integer, default="")
     FilePath = Column(String, default="")
-    
+    PublicAccessURL = Column(String, default="")
+
     FoodItem = relationship("FoodItem", back_populates="Attachment")
 
 class FoodItem(Base):
@@ -66,6 +67,5 @@ class Donation(Base):
     # Relationships
     FoodItemID = Column(Integer, ForeignKey("FoodItems.Id"))
     FoodItem = relationship("FoodItem", back_populates="Donation", cascade="save-update, merge")
-
 
 

@@ -4,11 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.models.donation import Donation
 from sqlalchemy.future import select
 
-async def add_donation(db: Session, donation_data: Donation):
-    async with db.begin():
-        db.add(donation_data)
-        await db.commit()
-        await db.refresh(donation_data)
+def add_donation(db: Session, donation_data: Donation):
+    db.add(donation_data)
+    db.commit()
     return donation_data
 
 def get_all_donations(db: Session):
