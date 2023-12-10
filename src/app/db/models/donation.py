@@ -14,6 +14,11 @@ class FoodItemCategory(Base):
 
     FoodItems = relationship("FoodItem", back_populates="Category")
 
+    def to_json_serializable(self):
+        return {
+            'Name': self.Name,
+        }
+
 class Attachment(Base):
     __tablename__ = "Attachments"
 
@@ -25,6 +30,11 @@ class Attachment(Base):
     PublicAccessURL = Column(String, default="")
 
     FoodItem = relationship("FoodItem", back_populates="Attachment")
+
+    def to_json_serializable(self):
+        return {
+            'PublicAccessURL': self.PublicAccessURL,
+        }
 
 class FoodItem(Base):
     __tablename__ = "FoodItems"
@@ -41,6 +51,15 @@ class FoodItem(Base):
     Attachment = relationship("Attachment", back_populates="FoodItem", cascade="save-update, merge")
     Donation = relationship("Donation", back_populates="FoodItem")
     
+    def to_json_serializable(self):
+        return {
+            'Id': self.Id,
+            'Name': self.Name,
+            'Description': self.Description,
+            'Category': self.Category.to_json_serializable(),  
+            'Attachment': self.Attachment.to_json_serializable() if self.Attachment else None, 
+        }
+
 class DonationStatus(PythonEnum):
     ACTIVE = 'ACTIVE'
     INACTIVE = 'INACTIVE'
@@ -68,4 +87,12 @@ class Donation(Base):
     FoodItemID = Column(Integer, ForeignKey("FoodItems.Id"))
     FoodItem = relationship("FoodItem", back_populates="Donation", cascade="save-update, merge")
 
+    def to_json_serializable(self):
+        return {
+            'Username': self.Username,
+            'Status': self.Status.value,  
+            'CreatedDate': self.CreatedDate.isoformat(),
+            'MeetUpLocation': self.MeetUpLocation,
+            'FoodItem': self.FoodItem.to_json_serializable(), 
+        }
 

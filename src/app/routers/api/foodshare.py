@@ -57,14 +57,6 @@ foodshare_api = APIRouter(
     description="Create FoodItem and list donation. ",
 )
 async def process_add_listing_form(request: Request, formData: FoodItemCreate, db: Session = Depends(get_db)) -> ORJSONResponse:
-    # try:
-        
-    #     return ORJSONResponse(content={"message": "Data received successfully"})
-    # except ValidationError as e:
-    #     print(e.errors())
-    #     print(e.json())
-    #     return ORJSONResponse(content={"error": str(e)}, status_code=422)
-
     # Start: Upload image to S3 
     unique_filename = str(uuid.uuid4()) + "_" + formData.Image.FileName
     file = decode_base64_file(formData.Image.Base64)
