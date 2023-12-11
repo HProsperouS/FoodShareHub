@@ -34,7 +34,7 @@
                         <div class="input-upload">
                             <img class="preview-image" id="preview" src="{{ url_for('static', path='assets/imgs/theme/upload.svg') }}" alt="Preview Image"/>
                             <input class="form-control" type="file" id="image" name="image" accept="image/*" onchange="showImgPreview(this); updateBase64Value();" />
-                            <span for="Upload" class="text-danger"></span>
+                            <span for="image" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -49,12 +49,12 @@
                         <div class="mb-4">
                             <label for="name" class="form-label">Food Item title</label>
                             <input type="text" placeholder="Type here" class="form-control" id="name" name="name" />
-                            <span for="Upload" class="text-danger"></span>
+                            <span for="name" class="text-danger"></span>
                         </div>
                         <div class="mb-4">
                             <label class="form-label" for="description">Description</label>
                             <textarea placeholder="Type here" class="form-control" rows="12" style="height: 170px;" id="description" name="description" ></textarea>
-                            <span for="Upload" class="text-danger"></span>
+                            <span for="description" class="text-danger"></span>
                         </div>
                         <div class="row">
                             <div class="mb-4">
@@ -65,7 +65,7 @@
                                         <option value="{{ category.Id }}">{{ category.Name }}</option>
                                     {% endfor %}
                                 </select>
-                                <span for="Upload" class="text-danger"></span>
+                                <span for="category" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -74,17 +74,15 @@
                                 <div class="row gx-2">
                                     <span class="text-muted">Please ensure your food has at least a 7-day buffer before expiry.</span>
                                     <input type="date" id="expiry_date" class="form-control" name="expiry_date" />
+                                    <span for="expiry_date" class="text-danger"></span>
                                 </div>
-                                <span for="Upload" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="mb-4">
-                                <label class="form-label" for="postal_code">Pick Up Location</label>
-                                <div class="row gx-2">
-                                    <input placeholder="Please enter your postal code" type="text" class="form-control" id="postal_code" name="postal_code" />
-                                </div>
-                                <span for="Upload" class="text-danger"></span>
+                                <label class="form-label" for="pickup_location">Pick Up Location</label>
+                                <input placeholder="Please enter your pick-up location" type="text" class="form-control" id="pickup_location" name="pickup_location" />
+                                <span for="pickup_location" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -126,7 +124,7 @@
                     CategoryID: document.getElementById("category").value,
                     Description: document.getElementById("description").value,
                     ExpiryDate: document.getElementById("expiry_date").value,
-                    PostalCode: document.getElementById("postal_code").value,
+                    PostalCode: document.getElementById("pickup_location").value,
                     Image: {
                         FileName: fileInput.files[0].name,
                         ContentType: fileInput.files[0].type,
@@ -256,10 +254,10 @@
             }
 
             // Pick Up Location validation
-            var postalCodeInput = $("#postal_code");
-            if (postalCodeInput.val() === "") {
+            var pickUpLocationInput = $("#pickup_location");
+            if (pickUpLocationInput.val() === "") {
                 isValid = false;
-                showError(postalCodeInput, "Please enter a postal code");
+                showError(pickUpLocationInput, "Please enter a pick-up location");
             }
 
             return isValid;
