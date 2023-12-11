@@ -46,6 +46,8 @@ class FoodItem(Base):
     CategoryID = Column(Integer, ForeignKey("FoodItemCategories.Id"))
     Category = relationship("FoodItemCategory", back_populates="FoodItems")
 
+    ExpiryDate = Column(DateTime)
+
     # attachment = relationship("Attachment", back_populates="food_item", cascade="all, delete-orphan")
     AttachmentID = Column(Integer, ForeignKey("Attachments.Id"))
     Attachment = relationship("Attachment", back_populates="FoodItem", cascade="save-update, merge")
@@ -76,6 +78,7 @@ class Donation(Base):
     singapore_timezone = pytz.timezone('Asia/Singapore')
     current_time_singapore = datetime.now(singapore_timezone)
     CreatedDate = Column(DateTime(timezone=True), default=current_time_singapore)
+    UpdatedDate = Column(DateTime(timezone=True), default=current_time_singapore)
     # End: Set the timezone to Singapore
 
     MeetUpLocation = Column(String, default="")
