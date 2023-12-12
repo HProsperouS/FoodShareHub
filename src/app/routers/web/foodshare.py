@@ -53,12 +53,11 @@ async def show_add_listing_form(request: Request, db: Session = Depends(get_db) 
     )
 
 @foodshare_router.get("/myListings")
-async def myListing(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+async def show_my_listings_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     # TODO: Modify the method to get donations based on the (User ID or User Name) from the Session once Coginito Login is done
     donations = get_all_donations(db)
     count = len(donations)
 
-    print(jsonable_encoder(donations))
     return await render_template(
         name="foodshare/listMyDonations.html",
         context={
@@ -68,11 +67,17 @@ async def myListing(request: Request, db: Session = Depends(get_db)) -> HTMLResp
         },
     )
 
-@foodshare_router.get("/editMyListing")
-async def myListing(request: Request) -> HTMLResponse:
+@foodshare_router.get("/editMyListing/{id}")
+async def editMyListing(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+
+    myDonation = await get_donation_by_id(db, id)
+    categories = await get_all_FoodItemCategories(db)
+
     return await render_template(
         name="foodshare/editDonationInfo.html",
         context={
             "request": request,
+            "donation": myDonation,
+            "categories": categories
         },
     )
