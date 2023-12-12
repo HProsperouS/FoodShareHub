@@ -82,6 +82,9 @@
                                         class="fi-rs-edit" onclick="redirectToEditMyDonation('{{donation.Id}}')"></i></a>
                                     <a id="{{ donation.Id }}" aria-label="Quick view" class="action-btn" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-donation='{{ donation.to_json_serializable()|tojson|safe }}' onclick="showDonationDetails(this.id)">
                                         <i class="fi-rs-eye"></i>
+                                    </a>
+                                    <a aria-label="Remove This Listing" class="action-btn">
+                                        <i class="fi-rs-trash"></i>
                                     </a>                                                                                                                                                        
                                 </div>
                                 <div class="product-badges product-badges-position product-badges-mrg">
