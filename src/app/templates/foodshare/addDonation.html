@@ -120,20 +120,20 @@
 
                 // Start: Retrieve form data
                 const formData = {
-                    Name: document.getElementById("name").value,
-                    CategoryID: document.getElementById("category").value,
-                    Description: document.getElementById("description").value,
-                    ExpiryDate: document.getElementById("expiry_date").value,
-                    PostalCode: document.getElementById("pickup_location").value,
-                    Image: {
-                        FileName: fileInput.files[0].name,
-                        ContentType: fileInput.files[0].type,
-                        Size: fileInput.files[0].size,
-                        Base64: _base64
+                    MeetUpLocation: document.getElementById("pickup_location").value,
+                    FoodItem: {
+                        Name: document.getElementById("name").value,
+                        CategoryID: document.getElementById("category").value,
+                        Description: document.getElementById("description").value,
+                        ExpiryDate: document.getElementById("expiry_date").value,
+                        Image: {
+                            FileName: fileInput.files[0].name,
+                            ContentType: fileInput.files[0].type,
+                            Size: fileInput.files[0].size,
+                            Base64: _base64
+                        }
                     }
                 };
-                // console.log(formData)
-                // debugger
                 // End: Retrieve form data
 
                 const loadingDiv = document.getElementById('loadingDiv');
@@ -151,8 +151,14 @@
                 .then(data => {
                     // Hide loader
                     loadingDiv.style.display = 'none';
+
                     // Extract the redirect URL from the JSON response
                     const redirectUrl = data.redirect_url;
+
+                    // Extract the message from the JSON response
+                    const message = data.message;
+                    setNotificationMessage(message.category, message.text);
+
                     // Redirect to the extracted URL
                     window.location.href = redirectUrl;
                 })

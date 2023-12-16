@@ -28,9 +28,8 @@ class Attachment(Base):
     FileSize = Column(Integer, default="")
     FilePath = Column(String, default="")
     PublicAccessURL = Column(String, default="")
-
     FoodItem = relationship("FoodItem", back_populates="Attachment")
-
+    
     def to_json_serializable(self):
         return {
             'PublicAccessURL': self.PublicAccessURL,
@@ -48,7 +47,6 @@ class FoodItem(Base):
 
     ExpiryDate = Column(DateTime)
 
-    # attachment = relationship("Attachment", back_populates="food_item", cascade="all, delete-orphan")
     AttachmentID = Column(Integer, ForeignKey("Attachments.Id"))
     Attachment = relationship("Attachment", back_populates="FoodItem", cascade="save-update, merge")
     Donation = relationship("Donation", back_populates="FoodItem")

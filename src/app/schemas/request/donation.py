@@ -15,10 +15,27 @@ class FoodItemCreate(BaseModel):
     CategoryID: int
     Description: str
     ExpiryDate: date
-    PostalCode: Optional[str] = None
     Image: AttachmentCreate
 
 class DonationCreate(BaseModel):
-    Status: DonationStatus
-    Location: str = ''
+    MeetUpLocation: str = ''
     FoodItem: FoodItemCreate
+
+class AttachmentUpdate(BaseModel):
+    FileName: str
+    ContentType: str
+    Size: int
+    Base64: str
+    Uploaded: bool
+
+class FoodItemUpdate(BaseModel):
+    Name: str
+    CategoryID: int
+    Description: str
+    ExpiryDate: date
+    PostalCode: Optional[str] = None
+    Image: AttachmentUpdate
+
+class DonationUpdate(BaseModel):
+    MeetUpLocation: str = ''
+    FoodItem: FoodItemUpdate
