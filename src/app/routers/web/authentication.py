@@ -16,7 +16,7 @@ from typing import Annotated
 # from FoodShareHub.src.app.middleware.JWTAuth import JWTAuthorizationCredentials, JWTBearer, get_jwks
 import boto3
 import uuid
-from redis import asyncio as aioredis
+# from redis import asyncio as aioredis
 # import local libraries
 from utils.jinja2_helper import (
     flash, 
@@ -29,15 +29,15 @@ from fastapi.templating import Jinja2Templates
 import os
 from dotenv import load_dotenv
 from botocore.exceptions import ClientError
-import hmac
-import hashlib
-import base64
+# import hmac
+# import hashlib
+# import base64
 load_dotenv()
 
 # TODO Remember to pip install setuptools
 # TODO Remember to pip install redis>=4.2.0rc1
 # global redis cached endpoint
-redis_pool = aioredis.from_url("redis://demo-redis.ampw1p.ng.0001.use1.cache.amazonaws.com:6379")
+# redis_pool = aioredis.from_url("redis://demo-redis.ampw1p.ng.0001.use1.cache.amazonaws.com:6379")
     
 authentication_router = APIRouter(
     include_in_schema=True,
@@ -62,13 +62,15 @@ client = boto3.client('cognito-idp',region_name = 'us-east-1')
 # Need JWT token
 # MFA - Need to get secret_hash from the sign up and use it as setup key for MFA. and se
 
-def create_session(request:Request, username: str,role:str):
+def create_session(request:Request, username: str,role:str,user_id:str,email:str):
     session_id = str(uuid.uuid4())
 
     request.session["session"] = {
         "session_id" : session_id,
-        "user_id": username,
-        "role": "User"   
+        "username": username,
+        "user_id":user_id,
+        "email":email,
+        "role": role   
         }
 
     # redis_conn = await aioredis.create_redis_pool(redis_pool)
@@ -282,21 +284,35 @@ async def login(request:Request,password: Annotated[str, Form(...,min_length=6)]
 
         print("check 1")
         
-        session = auth_user["Session"]
-        challengename = auth_user["ChallengeName"]
-        access_token = "N/A"
-        print("check 2")
-        if challengename == "MFA_SETUP":
-            associate = client.associate_software_token(Session=session)
-            session = associate["Session"]
-            access_token = associate["SecretCode"]
-            request.session["mfa_setup_key"] = access_token
-            print(associate)
+        # session = auth_user["Session"]
+        # challengename = auth_user["ChallengeName"]
+        # access_token = "N/A"
+        # print("check 2")
+        # if challengename == "MFA_SETUP":
+        #     associate = client.associate_software_token(Session=session)
+        #     session = associate["Session"]
+        #     access_token = associate["SecretCode"]
+        #     request.session["mfa_setup_key"] = access_token
+        #     print(associate)
         
-        print("check 3")
-        request.session["login_mfa"] = {'username':username,"session":session,"challengename":challengename,"access_token":access_token}
-        print("check 4")
-        
+        # print("check 3")
+        # request.session["login_mfa"] = {'username':username,"session":session,"challengename":challengename,"access_token":access_token}
+        # print("check 4")
+        get_user = client.get_user(AccessToken=auth_user["AuthenticationResult"]["AccessToken"])
+        print(get_user)
+        user_attributes = get_user["UserAttributes"]
+        role = "N/A"
+        email="N/A"
+        id = "N/A"
+        for attribute in user_attributes:
+            if attribute["Name"] == "rolecustom:role":
+                role = attribute["Value"]
+            if attribute["Name"] == "email":
+                email = attribute["Value"]
+            if attribute["Name"] == "sub":
+                id = attribute["Value"]
+        create_session(username=username,role=role,request=request,email=email,user_id=id) 
+        print(request.session["session"])
         return RedirectResponse(url="/authentication/confirmation",status_code=303)
 
     except Exception as e:
