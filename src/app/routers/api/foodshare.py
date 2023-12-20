@@ -25,7 +25,8 @@ from db import (
     update_fooditem,
     # Donation Section
     add_donation,
-    update_donation
+    update_donation,
+    softdelete_donation
 )
 from schemas.request.donation import DonationCreate, DonationUpdate, ImageData
 from db.dependencies import get_db
@@ -189,9 +190,28 @@ async def process_update_listing_form(
 async def detect_fooditem(image_data: ImageData):
     image_bytes = base64.b64decode(image_data.base64_data)
     labels, inappropriate_labels = detect_objects_and_moderate(image_bytes)
-    print(labels)
-    print(inappropriate_labels)
+    # print(labels)
+    # print(inappropriate_labels)
     if inappropriate_labels:
         return ORJSONResponse(content={"message": "Inappropriate content detected. Please upload another image to avoid a ban."})
     else:
         return ORJSONResponse(content={"labels": labels})
+    
+@foodshare_api.post(
+    path="/foodshare/deleteMyListing/{id}",
+    description="Soft delete listings, set the status of the donation to INACTIVE based on the donation id",
+)
+async def process_delete_listing(id: int, db: Session = Depends(get_db)) -> ORJSONResponse:
+
+    # # Set the donation status to INACTIVE
+    await softdelete_donation(db, id)
+
+    # Toastr 
+    success_message = {"category": "success", "text": "Your product have been deleted successfully"}
+
+    # Redirect URL in the JSON response
+    redirect_url = "/foodshare/myListings"
+
+    return ORJSONResponse(
+        content={"redirect_url": redirect_url, "message": success_message}
+    )

@@ -9,8 +9,9 @@ def add_donation(db: Session, donation_data: Donation):
     db.commit()
 
 def get_all_donations(db: Session):
-    return db.query(Donation).order_by(Donation.Id).all()
-
+    # Get all donations with status not INACTIVE
+    return db.query(Donation).filter(Donation.Status != "INACTIVE").order_by(Donation.Id).all()
+    
 async def get_donation_by_id(db: Session, donation_id: int):
     return db.query(Donation).filter(Donation.Id == donation_id).first()
 
@@ -43,6 +44,18 @@ async def update_donation(db: Session, donation_id: int, updated_data: Donation,
         existing_donation.UpdatedDate = updated_data.UpdatedDate
         # Start: Donation Table
 
+        db.commit()
+    else:
+        print("Donation record not found.")
+
+async def softdelete_donation(db: Session, donation_id: int):
+
+    existing_donation = db.query(Donation).filter_by(Id=donation_id).first()
+
+    if existing_donation:
+        existing_donation.Status = "INACTIVE"
+        # existing_donation.FoodItem.Status = "INACTIVE"
+        # existing_donation.FoodItem.Attachment.Status = "INACTIVE"
         db.commit()
     else:
         print("Donation record not found.")
