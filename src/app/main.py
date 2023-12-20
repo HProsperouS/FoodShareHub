@@ -1,9 +1,17 @@
-# import third-party libraries
-from fastapi import FastAPI
+
+import orjson
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.responses import (
+    FileResponse, 
+    RedirectResponse,
+    HTMLResponse
+)
+
 from starlette.staticfiles import StaticFiles
 from starlette.routing import Mount
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
+# from middleware.JWTAuth import JWTBearer, get_jwks
 
 # Import local libraries
 import utils.constants as C
@@ -12,10 +20,19 @@ from utils.classes import PrettyORJSON
 from middleware import add_app_exception_handlers
 from db.dependencies import init_db
 
-# import aioredis
+# Load Environment Variables
+load_dotenv()
+
+from redis import Redis
+# from starlette_session.backends import BackendType
 
 # redis cached endpoint
-# redis_pool = aioredis.from_url("testcache-ampw1p.serverless.use1.cache.amazonaws.com:6379")
+redis_client = Redis.from_url("redis://demo-redis.ampw1p.ng.0001.use1.cache.amazonaws.com:6379")
+
+# JWT Authentication
+# auth = JWTBearer(get_jwks())
+
+
 
 # Load Environment Variables
 load_dotenv()
@@ -53,7 +70,8 @@ def add_middlewares(app: FastAPI) -> None:
         session_cookie=C.SESSION_COOKIE,
         https_only=not C.DEBUG_MODE,
         max_age=600,
-        # storage=aioredis.RedisStorage(redis_pool) # stores in redis now
+        # backend_type=BackendType.redis,
+        # backend_client=redis_client,
     )
     add_app_exception_handlers(app)
 
@@ -73,8 +91,9 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(routers.user_router)
     app.include_router(routers.admin_router)
     app.include_router(routers.authentication_router)
+    # app.include_router(routers.authentication_router,dependencies=[Depends(auth)])
     # API routers
-    app.include_router(routers.foodshare_api)
+    # app.include_router(routers.foodshare_api)
 
 """--------------------------- End of App Routes ---------------------------"""
 

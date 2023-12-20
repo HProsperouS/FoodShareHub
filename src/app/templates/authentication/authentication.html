@@ -70,9 +70,36 @@
                         <form method="POST" action="/authentication/signup" id="SignUp">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" aria-describedby="usernameHelp" name="username">
+                                <input type="text" class="form-control is_valid" id="username_signup" aria-describedby="usernameHelp" name="username" onblur="username_signup()">
                                 <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
                             </div>
+                            
+                            <!-- <div class="" id="username_signup_feedback" style="display: none;">
+                            Looks good!
+                            </div>
+                            </form>
+                            <script>
+                                function username_signup(){
+                                    username = document.getElementById("username_signup").innerText
+                                    username_feedback = document.getElementById("username_signup_feedback")
+                                    if (len(username) > 3 ){
+                                        if(username_feedback.classList.contains("invalid-feedback")){
+                                            username_feedback.classList.remove("invalid-feedback")
+                                        }
+                                        username_feedback.classList.add("valid-feedback")
+                                        username_feedback.style.display = "block"
+                                    }
+                                    else{
+                                        if(username_feedback.classList.contains("valid-feedback")){
+                                            username_feedback.classList.remove("valid-feedback")
+                                        }
+                                        username_feedback.classList.add("invalid-feedback")
+                                        username_feedback.style.display = "block"
+                                    }
+                                    
+                                }
+                                
+                            </script> -->
                             <div class="mb-3">
                                 <label for="emailaddress" class="form-label">Email address</label>
                                 <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
@@ -84,7 +111,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="confirmPassword" class="form-control" id="confirmPassword">
+                                <input type="password" class="form-control" id="confirmPassword">
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="inputState">Role Applied</label>
