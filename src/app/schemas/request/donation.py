@@ -39,3 +39,6 @@ class FoodItemUpdate(BaseModel):
 class DonationUpdate(BaseModel):
     MeetUpLocation: str = ''
     FoodItem: FoodItemUpdate
+
+class ImageData(BaseModel):
+    base64_data: str

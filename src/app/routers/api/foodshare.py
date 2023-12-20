@@ -13,9 +13,6 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 # import local libraries
-from utils.jinja2_helper import (
-    flash, 
-)
 from utils.helper import (
     decode_base64_file
 )
@@ -30,7 +27,7 @@ from db import (
     add_donation,
     update_donation
 )
-from schemas.request.donation import DonationCreate, DonationUpdate
+from schemas.request.donation import DonationCreate, DonationUpdate, ImageData
 from db.dependencies import get_db
 
 from db.models.donation import (
@@ -41,12 +38,15 @@ from db.models.donation import (
 )
 
 from aws.services import(
-    upload_to_s3
+    upload_to_s3,
+    detect_objects,
+    detect_objects_and_moderate
 )
 
 # import Python's standard libraries
 from datetime import datetime
 import uuid
+import base64
 
 foodshare_api = APIRouter(
     include_in_schema=True,
@@ -180,4 +180,18 @@ async def process_update_listing_form(
     return ORJSONResponse(
         content={"redirect_url": redirect_url, "message": success_message}
     )
-    
+
+
+@foodshare_api.post(
+    path="/foodshare/detectobject",
+    description="Detect FoodItem Image uploaded and return labels",
+)
+async def detect_fooditem(image_data: ImageData):
+    image_bytes = base64.b64decode(image_data.base64_data)
+    labels, inappropriate_labels = detect_objects_and_moderate(image_bytes)
+    print(labels)
+    print(inappropriate_labels)
+    if inappropriate_labels:
+        return ORJSONResponse(content={"message": "Inappropriate content detected. Please upload another image to avoid a ban."})
+    else:
+        return ORJSONResponse(content={"labels": labels})

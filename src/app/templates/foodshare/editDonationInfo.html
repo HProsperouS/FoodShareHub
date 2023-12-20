@@ -34,7 +34,8 @@
                         <div class="input-upload">
                             <img class="preview-image" id="preview" src="{{ donation.FoodItem.Attachment.PublicAccessURL }}" alt="Preview Image"/>
                             <p style="margin-bottom: 15px; display: none;">Uploaded: {{ donation.FoodItem.Attachment.FileName.split('_')[-1] }}</p>
-                            <input class="form-control" type="file" id="image" name="image" accept="image/*" onchange="showImgPreview(this); updateBase64Value();  "/>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/jpeg, image/png" onchange="showImgPreview(this); updateBase64Value();" />
+                            <span class="text-muted">Accepted Format: <strong>JPEG</strong> & <strong>PNG</strong></span>
                             <span for="image" class="text-danger"></span>
                             <input id="defaultBase64Value"  value="{{ donation.FoodItem.FileName }}" hidden>
                         </div>
@@ -201,10 +202,78 @@
         getBase64(file)
             .then(base64Value => {
                 _base64 = base64Value;
+                detectFoodItemImage();
             })
             .catch(error => {
                 console.error("Error converting file to base64:", error);
             });
+    }
+    function detectFoodItemImage(){
+        const loadingDiv = document.getElementById('loadingDiv');
+        loadingDiv.style.display = '';
+        
+        const image_data = {
+            base64_data: _base64
+        }
+
+        // Start: Send image data using Fetch API
+        fetch("/api/foodshare/detectobject", {
+            method: "POST",
+            body: JSON.stringify(image_data),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loader
+            loadingDiv.style.display = 'none';
+            // If inappropriate imaged uploaded
+            if(data.message){
+                showAlertModal("Last Warning", data.message)
+            }else{
+                // Fill in Food Item Name and Select Food Item Category
+                const nameField = document.getElementById('name');
+                const categoryDropdown = document.getElementById('category');
+
+                // Check if labels array is not empty
+                if (data.labels && data.labels.length > 0) {
+                    // Extract all label names from the data
+                    const labelNames = data.labels.map(label => label.Name);
+
+                    // Fill in Food Item Name with the first label
+                    const firstLabel = labelNames[0];
+                    nameField.value = firstLabel;
+
+                    // Select options in the category dropdown that match the label names
+                    let foundOption = false;
+                    labelNames.forEach(labelName => {
+                        const optionToSelect = Array.from(categoryDropdown.options).find(option => option.text.toLowerCase().includes(labelName.toLowerCase()));
+
+                        if (optionToSelect) {
+                            optionToSelect.selected = true;
+                            foundOption = true;
+                        }
+                    });
+                    // If none of the options were found, select the 'others' option
+                    if (!foundOption) {
+                        const othersOption = Array.from(categoryDropdown.options).find(option => option.text.toLowerCase() === 'others');
+                        if (othersOption) {
+                            othersOption.selected = true;
+                        } else {
+                            // Handle the case where both the desired option and 'others' option are not found
+                            console.log(`Category options not found, and 'others' option not available.`);
+                        }
+                    }
+                } else {
+                    console.error('No labels detected in the image.');
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+        // End: Send image data using Fetch API
     } 
     </script>
 
@@ -302,6 +371,18 @@
             var errorSpan = input.siblings(".text-danger");
             errorSpan.text("");
             input.removeClass("is-invalid");
+        }
+
+        function showAlertModal(label, message) {
+            const alertModalLabel = document.getElementById('alertModalLabel');
+            const alertModalBody = document.getElementById('alertModalBody');
+
+            alertModalLabel.textContent = label;
+            alertModalBody.textContent = message;
+            
+            // Show the modal
+            const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+            alertModal.show();
         }
     </script>
 {% endblock %}

@@ -270,6 +270,20 @@
                 </div>
             {% endif %}
         {% endfor %}
+        <!-- Alert Modal -->
+        <div id="alertModal" class="modal fade" >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="alertModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="alertModalBody">
+                        <!-- Message content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div> 
     <div>
         {% block content %}
