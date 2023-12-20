@@ -230,7 +230,14 @@
             loadingDiv.style.display = 'none';
             // If inappropriate imaged uploaded
             if(data.message){
-                showAlertModal("Last Warning", data.message)
+                // Display Sweet Alert
+                Swal.fire({
+                    title: 'warning!',
+                    text: data.message,
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+                // Reset image input and image preview
                 resetImageInput();
             }else{
                 // Fill in Food Item Name and Select Food Item Category
