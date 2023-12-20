@@ -198,7 +198,6 @@
     } 
 
     function detectFoodItemImage(){
-        console.log("detecting item")
         const loadingDiv = document.getElementById('loadingDiv');
         loadingDiv.style.display = '';
         
@@ -220,15 +219,14 @@
             loadingDiv.style.display = 'none';
             // If inappropriate imaged uploaded
             if(data.message){
-                // Display Alert Modal
-                // showAlertModal("Last Warning", data.message);
+                // Display SweetAlert
                 Swal.fire({
-                    title: 'Error!',
+                    title: 'warning!',
                     text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Accept'
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
                 });
-                // Reset the image input
+                // Reset the image input and image preview
                 resetImageInput();
             }else{
                 // Fill in Food Item Name and Select Food Item Category
