@@ -107,6 +107,7 @@
 {% block scripts %}
     {{ super() }}
     <script>
+    
     var _base64;
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -197,6 +198,7 @@
     } 
 
     function detectFoodItemImage(){
+        console.log("detecting item")
         const loadingDiv = document.getElementById('loadingDiv');
         loadingDiv.style.display = '';
         
@@ -219,7 +221,13 @@
             // If inappropriate imaged uploaded
             if(data.message){
                 // Display Alert Modal
-                showAlertModal("Last Warning", data.message);
+                // showAlertModal("Last Warning", data.message);
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Accept'
+                });
                 // Reset the image input
                 resetImageInput();
             }else{
