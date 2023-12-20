@@ -58,6 +58,8 @@ async def verify_access(
 
     session_id = request.session.get(C.SESSION_COOKIE, None)
     # TODO: Get user info from session id
+    user_info = request.session.get(session_id)
+
     
     user_roles = (C.GUEST,) # <- dummy data
     for role in user_roles:
@@ -69,6 +71,9 @@ class RBACResults:
     def __init__(self) -> None:
         """Initialises the RBACResults class."""
         self.__user_info = None # TODO: Add user info here
+        self.__email = None
+        self.__username = None
+        self.__role = None
 
 class RBACDepends:
     def __init__(self, role_arr: tuple[str] | str, default_endpoint: str | None = None, sensitive: bool | None = False) -> None:

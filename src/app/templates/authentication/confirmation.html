@@ -18,12 +18,14 @@
             
             <div class="col-8" style="text-align: center;">
                 <form method="POST" action="/authentication/confirmation/">
-                    
+                    {% if request.session["mfa_setup_key"] %}
+                        <div> Here is your setup key with Google Auth: {{request.session["mfa_setup_key"]}}</div>
+                    {% endif %}
                     <div class="form-group">
                         <label for="confirmation">Confirmation</label>
                         <input type="text" class="form-control" id="confirmation" placeholder="Enter code here . . . " name="code">
                     </div>
-                   
+                    
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
    
