@@ -218,7 +218,10 @@
             loadingDiv.style.display = 'none';
             // If inappropriate imaged uploaded
             if(data.message){
-                showAlertModal("Last Warning", data.message)
+                // Display Alert Modal
+                showAlertModal("Last Warning", data.message);
+                // Reset the image input
+                resetImageInput();
             }else{
                 // Fill in Food Item Name and Select Food Item Category
                 const nameField = document.getElementById('name');
@@ -370,6 +373,16 @@
             // Show the modal
             const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
             alertModal.show();
+        }
+
+        function resetImageInput() {
+            // Reset the file input
+            var imageInput = document.getElementById('image');
+            imageInput.value = null;
+
+            // Reset the preview image
+            var previewImage = document.getElementById('preview');
+            previewImage.src = "{{ url_for('static', path='assets/imgs/theme/upload.svg') }}";
         }
     </script>
 {% endblock %}
