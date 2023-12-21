@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+<style>
+    
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<main class="main page">
+    
+    
+    <div class="container" style="padding: 30px;">
+        <div class="row" style="display: flex;justify-content: center;align-items: center;" >
+            
+            
+            <div class="col-6" style="text-align: center;" >
+                <form method="POST" action="/authentication/confirmation/">
+                    {% if request.session["mfa_setup_key"] %}
+                        <div> Here is your setup key with Google Auth: {{request.session["mfa_setup_key"]}}</div>
+                    {% endif %}
+                    <h3> Sign Up Confirmation</h3>
+                </br>
+                    
+                    <div class="form-group">
+                        
+                        <input type="text" class="form-control" id="confirmation" placeholder="Enter confirmation code here . . . " name="code">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+   
+            </div>
+        </div>
+    </div>
+
+</main>
+<script>
+    window.onload = function() {
+    const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 5000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+Toast.fire({
+  icon: "success",
+  title: "A Confirmation Code has been sent to your email"
+});
+    };
+    
+    
+</script>
+{% endblock %}
+
+
+
+
