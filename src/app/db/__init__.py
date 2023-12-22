@@ -20,6 +20,13 @@ from .crud.donation_crud import(
    softdelete_donation
 )
 
+# Search Related Methods
+from .crud.search_crud import(
+   search_donation_by_category,
+   search_donation_by_name,
+   search_donation_by_category_and_name
+)
+
 # DB Session
 from .dependencies import(
    get_db

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ url_for('static', path='assets/imgs/theme/FSH-Browser-Logo.jpeg') }}">
     <title>{% block title %}{% endblock %} - Web</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='lib/bootstrap/dist/css/bootstrap.min.css') }}" /> 
     <link rel="stylesheet" href="{{ url_for('static', path='assets/css/main.css') }}?v=5.6" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/animate.min.css') }}" />
@@ -25,9 +24,6 @@
 
     <!-- Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
-    
-
 </head>
 
 <body>
@@ -41,29 +37,30 @@
                 <div class="header-wrap">
                     <div class="logo logo-width-1">
                         <!-- logo-width-1 -->
-                        <a href="#" class=""><img style="border:100px;" src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
+                        <a href="/" class=""><img style="border:100px;" src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
+                            <div id="search" class="form">
+                                <select id="searchCategory" class="select-active">
                                     <option>All Categories</option>
-                                    <option>Milks and Dairies</option>
-                                    <option>Wines & Alcohol</option>
-                                    <option>Pet Foods & Toy</option>
-                                    <option>Baking material</option>
+                                    <option>Milks & Dairies</option>
+                                    <option>Fresh Fruits</option>
                                     <option>Vegetables</option>
-                                    <option>Fresh Seafood</option>
+                                    <option>Wine & Drinks</option>
+                                    <option>Baking Material</option>
+                                    <option>Pet Foods</option>
                                     <option>Noodles & Rice</option>
+                                    <option>Snacks</option>
                                     <option>Others</option>
                                 </select>
-                                <input type="text" placeholder="Search for items..." />
-                            </form>
+                                <input id="searchInput" type="text" placeholder="Search for items..."/>
+                            </div>
                         </div>
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="search-location">
-                                    <form action="#">
+                                    <form>
                                         <select class="select-active">
                                             <option>Your Location</option>
                                             <option>Singapore</option>
@@ -72,15 +69,15 @@
                                 </div>
                                 <div class="header-action-icon-2">
                                     <a href="#">
-                                        <img class="svgInject" alt="Nest" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notification.svg') }}" />
+                                        <img class="svgInject" alt="FSH" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notification.svg') }}" />
                                         <span class="pro-count blue" id="notificationCount">3</span>
                                     </a>
                                     <a href="#"><span class="lable ml-0">Notifications</span></a>
 
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a href="#">
-                                        <img class="svgInject" alt="Nest" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-user.svg') }}" />
+                                    <a>
+                                        <img class="svgInject" alt="FSH" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-user.svg') }}" />
                                     </a>
                                     {% if request.session["session"] %}
                                         {% if request.session["session"]["role"] %}
@@ -119,7 +116,7 @@
             <div class="container">
                 <div class="header-wrap header-space-between position-relative">
                     <div class="logo logo-width-1 d-block d-lg-none">
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
+                        <a href="/"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
                     </div>
                     <div class="header-nav d-none d-lg-flex">
                         <div class="main-categori-wrap d-none d-lg-block">
@@ -131,33 +128,33 @@
                                 <div class="d-flex categori-dropdown-inner">
                                     <ul>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Milks & Dairies</a>
+                                            <a onclick="performSearchByCategory('Milks & Dairies')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Milks & Dairies</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-8.svg') }}" alt="" />Vegetables</a>
+                                            <a onclick="performSearchByCategory('Vegetables')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-8.svg') }}" alt="" />Vegetables</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Baking Material</a>
+                                            <a onclick="performSearchByCategory('Baking Material')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Baking Material</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-9.svg') }}" alt="" />Noodles & Rice</a>
+                                            <a onclick="performSearchByCategory('Noodles & Rice')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-9.svg') }}" alt="" />Noodles & Rice</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-4.svg') }}" alt="" />Others</a>
+                                            <a onclick="performSearchByCategory('Others')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-4.svg') }}" alt="" />Others</a>
                                         </li>  
                                     </ul>
                                     <ul class="end">
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-7.svg') }}" alt="" />Fresh Fruits</a>
+                                            <a onclick="performSearchByCategory('Fresh Fruits')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-7.svg') }}" alt="" />Fresh Fruits</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-2.svg') }}" alt="" />Wine & Drinks</a>
+                                            <a onclick="performSearchByCategory('Wine & Drinks')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-2.svg') }}" alt="" />Wine & Drinks</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-4.svg') }}" alt="" />Pet Foods</a>
+                                            <a onclick="performSearchByCategory('Pet Foods')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-4.svg') }}" alt="" />Pet Foods</a>
                                         </li>
                                         <li>
-                                            <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-5.svg') }}" alt="" />Snacks</a>
+                                            <a onclick="performSearchByCategory('Snacks')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-5.svg') }}" alt="" />Snacks</a>
                                         </li>                                 
                                     </ul>
                                 </div>
@@ -171,18 +168,10 @@
                                         <a href="/">Home</a>
                                     </li>
                                     <li>
-                                        <a href="#">Food Share<i class="fi-rs-angle-down"></i></a>
+                                        <a>Food Share<i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
                                             <li><a href="{{ url_for('show_my_listings_page') }}">My Listings</a></li>
                                             <li><a href="{{ url_for('show_add_listing_form') }}">Add FoodItems</a></li>
-                                            <!-- <li>
-                                                <a href="#">Single Post <i class="fi-rs-angle-right"></i></a>
-                                                <ul class="level-menu level-menu-modify">
-                                                    <li><a href="blog-post-left.html">Left Sidebar</a></li>
-                                                    <li><a href="blog-post-right.html">Right Sidebar</a></li>
-                                                    <li><a href="blog-post-fullwidth.html">No Sidebar</a></li>
-                                                </ul>
-                                            </li> -->
                                         </ul>
                                     </li>
                                 </ul>
@@ -240,24 +229,24 @@
                 </div>
                 <div class="mobile-header-info-wrap">
                     <div class="single-mobile-header-info">
-                        <a href="#"><i class="fi-rs-marker"></i> 180 Ang Mo Kio Ave 8, Singapore 569830 </a>
+                        <a><i class="fi-rs-marker"></i> 180 Ang Mo Kio Ave 8, Singapore 569830 </a>
                     </div>
                     <div class="single-mobile-header-info">
-                        <a href="#"><i class="fi-rs-user"></i>Log In / Sign Up </a>
+                        <a><i class="fi-rs-user"></i>Log In / Sign Up </a>
                     </div>
                     <div class="single-mobile-header-info">
-                        <a href="#"><i class="fi-rs-headphones"></i>(+65) - 8183 - 8227 </a>
+                        <a><i class="fi-rs-headphones"></i>(+65) - 8183 - 8227 </a>
                     </div>
                 </div>
                 <div class="mobile-social-icon mb-50">
                     <h6 class="mb-15">Follow Us</h6>
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
+                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
+                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
+                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
+                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
+                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
                 </div>
-                <div class="site-copyright">Copyright 2023 © FoodShareHub. All rights reserved. </div>
+                <div class="site-copyright">Copyright 2024 © FoodShareHub. All rights reserved. </div>
             </div>
         </div>
     </div>
@@ -313,17 +302,17 @@
                     <div class="footer-link-widget col">
                         <h4 class="widget-title">Company</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms &amp; Conditions</a></li>
-                            <li><a href="#">Contact Us</a></li>
+                            <li><a>About Us</a></li>
+                            <li><a>Privacy Policy</a></li>
+                            <li><a >Terms &amp; Conditions</a></li>
+                            <li><a>Contact Us</a></li>
                         </ul>
                     </div>
                     <div class="footer-link-widget col">
                         <h4 class="widget-title">Account</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="#">Sign In</a></li>
-                            <li><a href="#">Sign Up</a></li>
+                            <li><a>Sign In</a></li>
+                            <li><a>Sign Up</a></li>
                         </ul>
                     </div>
                 </div>
@@ -342,11 +331,11 @@
                 <div class="col-xl-4 col-lg-6 col-md-6 text-end d-none d-md-block">
                     <div class="mobile-social-icon">
                         <h6>Follow Us</h6>
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
-                        <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
+                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
+                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
+                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
+                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
+                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
                     </div>
                 </div>
             </div>
@@ -365,11 +354,7 @@
     </div>
 
     {% block scripts %}
-    <script src="{{ url_for('static', path='lib/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', path='lib/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script> 
     <!-- Vendor JS -->
-    <script src="{{ url_for('static', path='lib/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', path='lib/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/vendor/modernizr-3.6.0.min.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/vendor/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/vendor/jquery-migrate-3.3.0.min.js') }}"></script>
@@ -401,8 +386,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-       
-
         // Set notification in local storage
         function setNotificationMessage(category, text) {
             const notificationObject = { category, text };
@@ -410,9 +393,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if there is a notification message in local storage
+            // Start: Toastr, Check if there is a notification message in local storage
             const storedNotification = JSON.parse(localStorage.getItem('notificationMessage'));
-            
+    
             if (storedNotification) {
                 // Extract category and text from the stored object
                 const { category, text } = storedNotification;
@@ -429,7 +412,69 @@
                 // Clear the notification message from local storage
                 localStorage.removeItem('notificationMessage');
             }
+            // End: Toastr, Check if there is a notification message in local storage
+
+            // Start: Get URL parameters and populate the search box and category selected when the search results page loads
+            const searchInput = document.getElementById('searchInput');
+            const searchCategory = document.getElementById('searchCategory');
+            const categoryRender = document.getElementById("select2-searchCategory-container");
+
+            const searchCategoryFromUrl = getParameterByName('category');
+            const searchInputFromUrl = getParameterByName('name');
+
+            const decodedCategory = decodeURIComponent(searchCategoryFromUrl);
+            const decodedSerchInput = decodeURIComponent(searchInputFromUrl);
+
+            if (searchCategoryFromUrl) {
+                searchCategory.value = decodedCategory;
+                categoryRender.title = decodedCategory;
+                categoryRender.textContent  = decodedCategory;
+                debugger
+            }
+            if (searchInputFromUrl) {
+                searchInput.value = decodedSerchInput;
+            }
+            // End: Get URL parameters and populate the search box and category selected when the search results page loads
         });
+        
+        // Add an event listener to trigger the search on pressing 'Enter'
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Perform search by using the search bar
+        function performSearch() {
+            const searchCategory = document.getElementById('searchCategory').value;
+            const searchTerm = document.getElementById('searchInput').value;
+            if(searchTerm != ""){
+                const loadingDiv = document.getElementById('loadingDiv');
+                loadingDiv.style.display = '';
+
+                const searchUrl = `/foodshare/search?category=${encodeURIComponent(searchCategory)}&name=${encodeURIComponent(searchTerm)}`;
+                window.location.href = searchUrl;
+            }
+        }
+
+        // Perform search by clicking the category
+        function performSearchByCategory(category) {
+            const loadingDiv = document.getElementById('loadingDiv');
+            loadingDiv.style.display = '';
+
+            const searchUrl = `/foodshare/search?category=${encodeURIComponent(category)}`;
+            window.location.href = searchUrl;
+        }
+
+        // Get URL Parameter
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, "\\$&");
+            const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return results[2].replace(/\+/g, " ");
+        }
     </script>
     {% endblock %}
 </body>

@@ -1,5 +1,6 @@
 # # db/crud/donation_crud.py
 from sqlalchemy.orm import Session
+from sqlalchemy import and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models.donation import Donation
 from sqlalchemy.future import select

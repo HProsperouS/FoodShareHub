@@ -3,6 +3,7 @@ from fastapi import (
     APIRouter,
     Request,
     Depends,
+    Query,
     HTTPException, 
     status
 )
@@ -26,7 +27,10 @@ from db import (
     # Donation Section
     add_donation,
     update_donation,
-    softdelete_donation
+    softdelete_donation,
+    # Search
+    search_donation_by_name,
+    search_donation_by_category
 )
 from schemas.request.donation import DonationCreate, DonationUpdate, ImageData
 from db.dependencies import get_db
@@ -90,6 +94,9 @@ async def process_add_listing_form(request: Request, formData: DonationCreate, d
         Attachment=new_attachment,
     )
 
+    # Get Session 
+    # session = request.session.get("session")
+    
     new_donation = Donation(
         Status=DonationStatus.ACTIVE,
         CreatedDate=datetime.now(),
@@ -124,7 +131,7 @@ async def process_update_listing_form(
     # Check if the image is updated
     image_updated = formData.FoodItem.Image.Uploaded
 
-     # Start: Upload image to S3， Upload to S3 if the image being updated
+    # Start: Upload image to S3， Upload to S3 if the image being updated
     if(image_updated):
         unique_filename = str(uuid.uuid4()) + "_" + formData.FoodItem.Image.FileName
         file = decode_base64_file(formData.FoodItem.Image.Base64)
