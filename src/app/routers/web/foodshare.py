@@ -83,6 +83,18 @@ async def editMyListing(request: Request, id: int, db: Session = Depends(get_db)
         },
     )
 
+@foodshare_router.get("/donationDetails/{id}")
+async def donationDetails(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+
+    myDonation = await get_donation_by_id(db, id)
+
+    return await render_template(
+        name="foodshare/donationDetails.html",
+        context={
+            "request": request,
+            "donation": myDonation,
+        },
+    )
 
 @foodshare_router.get(
     path="/search",
