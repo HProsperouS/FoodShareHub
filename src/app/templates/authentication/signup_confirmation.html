@@ -19,16 +19,16 @@
             
             
             <div class="col-6" style="text-align: center;" >
-                <form method="POST" action="/authentication/confirmation/">
-                    {% if request.session["mfa_setup_key"] %}
+                <form id="signup_confirmation_form">
+                    <!-- {% if request.session["mfa_setup_key"] %}
                         <div> Here is your setup key with Google Auth: {{request.session["mfa_setup_key"]}}</div>
-                    {% endif %}
+                    {% endif %} -->
                     <h3> Sign Up Confirmation</h3>
                 </br>
                     
                     <div class="form-group">
                         
-                        <input type="text" class="form-control" id="confirmation" placeholder="Enter confirmation code here . . . " name="code">
+                        <input type="text" class="form-control" id="code" placeholder="Enter confirmation code here . . . " name="code">
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -40,26 +40,83 @@
 
 </main>
 <script>
-    window.onload = function() {
-    const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 5000,
-  timerProgressBar: true,
-  didOpen: (toast) => {
-    toast.onmouseenter = Swal.stopTimer;
-    toast.onmouseleave = Swal.resumeTimer;
-  }
-});
-Toast.fire({
-  icon: "success",
-  title: "A Confirmation Code has been sent to your email"
-});
-    };
-    
-    
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("signup_confirmation_form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Show loader
+            const loadingDiv = document.getElementById('loadingDiv');
+            loadingDiv.style.display = "block";
+
+            const formData = {
+                Code: document.getElementById("code").value,
+            };
+        
+            console.log("fetching api")
+            // Start: Send form data using Fetch API
+            fetch("/authentication/confirmation", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("redirecting")
+                console.log(data)
+                
+                // Hide loader
+                // loadingDiv.style.display = 'none';
+
+                // Check for status of Login
+                if(data.status === "success"){
+                    console.log("success")
+                    // Extract the redirect URL from the JSON response
+                    const redirectUrl = data.redirect_url;
+
+                    // Extract the message from the JSON response
+                    // const message = data.message;
+                    // setNotificationMessage(message.category, message.text);
+
+                    // Set item in local to display message in next page
+                    localStorage.setItem("action","success_signup")
+                    
+                    // Redirect to the extracted URL
+                    window.location.href = redirectUrl;
+
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+                    
+                } else if(data.status === "fail"){
+                    console.log("fail")
+                    
+                    // Hide loader
+                    // loadingDiv.style.display = "none";
+
+                    // Display Error notification if code confirmation fails
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        confirmButtonColor:"#3BB77E",
+                        text: "Code is invalid or has expired, Please try again",
+                        // footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                }
+
+                
+            })
+            .catch(error => {
+                console.error("Error:", error);
+               
+            });
+            // End: Send form data using Fetch API
+            
+        })
+
+    })
 </script>
+
 {% endblock %}
 
 

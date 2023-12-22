@@ -114,6 +114,9 @@
         document.getElementById("signup_form").addEventListener("submit", function(event) {
             event.preventDefault();
            
+            // Show loader
+            const loadingDiv = document.getElementById("loadingDiv");
+            // loadingDiv.style.display = '';
 
             if (validateForm()) {
                 console.log("validation pass")
@@ -148,24 +151,51 @@
                 .then(data => {
                     console.log("redirecting")
                     console.log(data)
-                    // Hide loader
-                    // loadingDiv.style.display = 'none';
 
-                    // Extract the redirect URL from the JSON response
-                    const redirectUrl = data.redirect_url;
+                    if(data.status === "success"){
+                        // Extract the redirect URL from the JSON response
+                        const redirectUrl = data.redirect_url;
 
-                    // Extract the message from the JSON response
-                    // const message = data.message;
-                    // setNotificationMessage(message.category, message.text);
+                        // store action in local storage
+                        localStorage.setItem("action","signup_confirmation")
+                        localStorage.setItem("data",document.getElementById("email").value)
 
-                    // Redirect to the extracted URL
-                    window.location.href = redirectUrl;
+                        // Extract the message from the JSON response
+                        // const message = data.message;
+                        // setNotificationMessage(message.category, message.text);
+
+                        // Redirect to the extracted URL
+                        window.location.href = redirectUrl;
+
+                        // Hide loader
+                        // loadingDiv.style.display = 'none';
+                    }else if(data.status === "fail"){
+                        // Extract the redirect URL from the JSON response
+                        const redirectUrl = data.redirect_url;
+
+                        // store action in local storage
+                        localStorage.setItem("action","signup_error")
+                        localStorage.setItem("data",data.message)
+                        // localStorage.setItem("data",document.getElementById("email").value)
+
+                        // Extract the message from the JSON response
+                        // const message = data.message;
+                        // setNotificationMessage(message.category, message.text);
+
+                        // Redirect to the extracted URL
+                        window.location.href = redirectUrl;
+
+                        // Hide loader
+                        // loadingDiv.style.display = 'none';
+                    }
                 })
                 .catch(error => {
                     console.error("Error:", error);
                 });
                 // End: Send form data using Fetch API
             }
+            // Hide loader
+            // loadingDiv.style.display = 'none';
         })
     })
         

@@ -11,13 +11,13 @@
 <main class="main page" style="padding-left: 50px;padding-right:50px;padding-top:10px;">
     <h2  style="text-align: center;">Sign In</h2>
     <h5 style="text-align: center;">Dont have an account? <a href="/authentication/signup"> Sign Up </a></h5>
-    <form  id="SignUp">
+    <form  id="signin_form">
         <!-- method="POST" action="/authentication/sigin" -->
         <div class="row">
             <div class="col-6">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control is_valid" id="username_signup" aria-describedby="usernameHelp" name="username" onblur="username_signup()">
+                    <label for="name" class="form-label">Username</label>
+                    <input type="text" class="form-control is_valid" id="name" aria-describedby="usernameHelp" name="name" >
                     <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
                 </div>
             </div>
@@ -35,11 +35,6 @@
                 <!-- </div> -->
             </div>
         </div>
-        
-               
-                
-                
-       
 
         <div class="row" >
             <div class="col-5">
@@ -54,27 +49,129 @@
             </div>
             </div>
         </div>
-    </br>
-        
-      
-        
-
-
-        
-
-        
+        </br>
         <div  style="text-align: center;">
             <button class="btn btn-lg btn-block btn-primary" style="background-color: #dd4b39;"type="submit"><i class="fab fa-google me-2"></i> Google</button>
             <button class="btn btn-lg btn-block btn-primary" style="background-color: #397bdd;"type="submit"><i class="fab fa-facebook me-2"></i> Facebook</button>
-            
-            <!-- <h4>
-                <a href="#"><i class="bi bi-facebook"></i></a>
-                <a href="#"><i class="bi bi-twitter"></i>Twitter</a>
-                <a href="#"><i class="bi bi-google"></i>Google</a>
-            </h4> -->
         </div>
-            
-         
     </form>
 </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("signin_form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Show loader
+            const loadingDiv = document.getElementById('loadingDiv');
+            loadingDiv.style.display = "block";
+
+            const formData = {
+                Name: document.getElementById("name").value,
+                Password: document.getElementById("password").value,
+            };
+        
+            console.log("fetching api")
+            // Start: Send form data using Fetch API
+            fetch("/authentication/signin", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("redirecting")
+                console.log(data)
+                
+                // Hide loader
+                // loadingDiv.style.display = 'none';
+
+                // Check for status of Login
+                if(data.status === "success"){
+                    console.log("success")
+                    // Extract the redirect URL from the JSON response
+                    const redirectUrl = data.redirect_url;
+
+                    // Extract the message from the JSON response
+                    // const message = data.message;
+                    // setNotificationMessage(message.category, message.text);
+
+                    // Set item in local to display message in next page
+                    localStorage.setItem("action","success_login")
+
+                    // Redirect to the extracted URL
+                    window.location.href = redirectUrl;
+
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+                    
+                } else if(data.status === "fail"){
+                    console.log("fail")
+                    
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+
+                    // Display Error notification if authentication fails
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        confirmButtonColor:"#3BB77E",
+                        text: "Invalid username or password, Please try again",
+                        // footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                }
+
+                
+            })
+            .catch(error => {
+                console.error("Error:", error);
+               
+            });
+            // End: Send form data using Fetch API
+            
+        })
+
+    })
+    // function validateForm() {
+    //         var isValid = true;
+
+
+    //         // Username validation
+    //         var nameInput = $("#name");
+    //         if (nameInput.val() === "") {
+    //             isValid = false;
+                
+    //             showError(nameInput, "Username cannot be empty");
+    //         }else{
+    //             hideError(nameInput)
+    //         }
+
+           
+    //         // Password validation
+    //         var passwordInput = $("#password");
+    //         if(passwordInput.val() === ""){
+    //             isValid = false
+    //             showError(passwordInput, "Password cannot be empty")
+    //         }else{
+    //             hideError(passwordInput)
+    //         }
+
+    //         return isValid;
+    // }
+
+    // // Function to show error message and highlight input
+    // function showError(input, message) {
+    //     var errorSpan = input.siblings(".text-danger");
+    //     errorSpan.text(message);
+    //     input.addClass("is-invalid");
+    // }
+
+    // // Function to hide error message and remove highlighting
+    // function hideError(input) {
+    //     var errorSpan = input.siblings(".text-danger");
+    //     errorSpan.text("");
+    //     input.removeClass("is-invalid");
+    // }
+</script>
 {% endblock %}

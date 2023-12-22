@@ -64,7 +64,7 @@ client = boto3.client('cognito-idp',region_name = 'us-east-1')
 # Need JWT token
 # MFA - Need to get secret_hash from the sign up and use it as setup key for MFA. and se
 
-#Models
+# User Objects
 class NewUser(BaseModel):
     Name: str
     Email: str
@@ -74,9 +74,12 @@ class NewUser(BaseModel):
 class ExistingUser(BaseModel):
     Name: str
     Password: str
+
+class SignUpConfirmation(BaseModel):
+    Code: str
     
 
-
+# Creates a session for authenticated user
 def create_session(request:Request, username: str,role:str,user_id:str,email:str):
     session_id = str(uuid.uuid4())
 
@@ -97,6 +100,7 @@ def create_session(request:Request, username: str,role:str,user_id:str,email:str
     
     return "Session created"
 
+# Api call to aws to authenticate user
 def authenticate_user(username: str,password: str):
 
     try:
@@ -112,6 +116,7 @@ def authenticate_user(username: str,password: str):
     except ClientError as e:
         print(e)
 
+# First time MFA setup ( optional )
 def mfa_setup(username:str,session:str,access_token:str,code:str):
     try:
         print("verify token")
@@ -122,14 +127,14 @@ def mfa_setup(username:str,session:str,access_token:str,code:str):
         print(e)
         return "Unsuccessful"
 
-
+# Runs during login if user has MFA setup 
 def multifactor_auth(username:str,code:str,session:str):
     try:
         response = client.respond_to_auth_challenge(
             ClientId=COGNITO_CLIENT_ID,
             ChallengeName="SOFTWARE_TOKEN_MFA",
             ChallengeResponses={
-                'USERNAME': username,  # Provide the user's username or email
+                'USERNAME': username,  
                 'SOFTWARE_TOKEN_MFA_CODE': code,
             },
             Session=session,
@@ -143,6 +148,7 @@ def multifactor_auth(username:str,code:str,session:str):
 @authentication_router.get("/signup")
 async def signup_get(request: Request) -> RedirectResponse:
     try:
+        # checks for current session
         if request.session.get("session") is None:
             
             return await render_template(
@@ -156,6 +162,7 @@ async def signup_get(request: Request) -> RedirectResponse:
     except Exception as e:
         print(e)
 
+# Create a new user
 @authentication_router.post("/signup")
 async def signup(request:Request, formData:NewUser ) -> ORJSONResponse:
     # username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str,Form()], role: Annotated[str,Form()]
@@ -179,35 +186,26 @@ async def signup(request:Request, formData:NewUser ) -> ORJSONResponse:
 
         print(confirmation_mail)
 
+        # temporary store name to be used in session later
         request.session["account_confirmation"] = formData.Name
-
-        # flash(
-        #     request=request,
-        #     message=f"Please check your email for confirmation code", 
-        #     category="success",
-        #     )
 
         # return RedirectResponse(url="/authentication/confirmation",status_code=303)
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/authentication/confirmation",}
+            content={"redirect_url": "http://127.0.0.1:8000/authentication/confirmation","statys":"success"}
         )
     
-    # need set proper invalid input exceptions
     except Exception as e: 
 
         print(e) 
-
-        flash(
-            request=request,
-            message=f"Password needs to be at least 6 characters", 
-            category="danger",
-            )
         
-        return RedirectResponse(url="/authentication/",status_code=303) 
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/authentication/signup","status":"fail","message":str(e)}
+        )
 
 @authentication_router.get("/signin")
 async def signin_get(request: Request) -> RedirectResponse:
     try:
+        # Checks for current session
         if request.session.get("session") is None:
             
             return await render_template(
@@ -222,15 +220,18 @@ async def signin_get(request: Request) -> RedirectResponse:
         print(e)
 
 @authentication_router.post("/signin")
-async def signin_post(request:Request,password: Annotated[str, Form(...,min_length=6)], username: Annotated[str,Form()],) -> RedirectResponse:
+async def signin_post(request:Request,formData:ExistingUser) -> ORJSONResponse:
     
     try:
-        print("Authenticating")
-        auth_user = authenticate_user(username,password)
-        print(auth_user)
+        print("Authenticating user")
+        name = formData.Name
+        password = formData.Password
 
-        print("check 1")
-        
+        # Function to authenticae user
+        auth_user = authenticate_user(name,password)
+        print(auth_user)
+        print("Successfully authenticate user")
+
         # session = auth_user["Session"]
         # challengename = auth_user["ChallengeName"]
         # access_token = "N/A"
@@ -246,35 +247,45 @@ async def signin_post(request:Request,password: Annotated[str, Form(...,min_leng
         # request.session["login_mfa"] = {'username':username,"session":session,"challengename":challengename,"access_token":access_token}
         # print("check 4")
 
+        # Retrieve current user information
         get_user = client.get_user(AccessToken=auth_user["AuthenticationResult"]["AccessToken"])
         print(get_user)
+
+        # Attributes of user
         user_attributes = get_user["UserAttributes"]
         role = "N/A"
         email="N/A"
         id = "N/A"
         for attribute in user_attributes:
-            if attribute["Name"] == "rolecustom:role":
+            if attribute["Name"] == "custom:role":
                 role = attribute["Value"]
             if attribute["Name"] == "email":
                 email = attribute["Value"]
             if attribute["Name"] == "sub":
                 id = attribute["Value"]
-        create_session(username=username,role=role,request=request,email=email,user_id=id) 
+
+        # Create a new session for user
+        create_session(username=name,role=role,request=request,email=email,user_id=id) 
+
+        # Print current user session information
         print(request.session["session"])
-        return RedirectResponse(url="/authentication/confirmation",status_code=303)
+        # return RedirectResponse(url="/authentication/confirmation",status_code=303)
+
+        # Returns back JSON response
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
+        )
 
     except Exception as e:
         print(e)
 
-        flash(
-            request=request,
-            message="Incorrect username or password", 
-            category="danger",
+        # Returns back JSON response
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/authentication/signin","status":"fail"}
         )
 
-        return RedirectResponse(url="/authentication",status_code=303)
-
-
+# Confirmation page for account and mfa 
+# TODO Need to create 2 pages , one for accout and one for MFA
 @authentication_router.get("/confirmation")
 async def confirmation_get(request: Request) -> RedirectResponse:
     try:
@@ -289,14 +300,16 @@ async def confirmation_get(request: Request) -> RedirectResponse:
                 },
             )
     except Exception as e:
-        print(e)
-        print("check6")
-        
+        print("Confirmation Error:"+e)
+
+# TODO Need to work on seperating the confirmation post into account and MFA   
 @authentication_router.post("/confirmation")
-async def confirmation_post(request: Request, code: Annotated[str, Form()]) -> RedirectResponse:
+async def confirmation_post(request: Request, formData: SignUpConfirmation) -> ORJSONResponse:
     try:
-        print("checking")
+        print("Running confirmation")
+        code = formData.Code
         if request.session.get("account_confirmation") is not None:
+            print("Account confirmation")
             username : str = request.session["account_confirmation"]
             
             confirmation = client.confirm_sign_up(
@@ -307,24 +320,30 @@ async def confirmation_post(request: Request, code: Annotated[str, Form()]) -> R
 
             print(confirmation)
 
-            flash(
-                request=request,
-                message=f"Successfully activated account : {username}", 
-                category="success",
-            )
+            # flash(
+            #     request=request,
+            #     message=f"Successfully activated account : {username}", 
+            #     category="success",
+            # )
 
             request.session.clear()
 
-            return RedirectResponse(url="/authentication/signin",status_code=303)
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/authentication/signin","status":"success"}
+            )
         
         if request.session.get("login_mfa") is not None:
 
-            print("mfa")
+            print("MFA confirmation")
+
+            # Gets all information that temporary store in session
+            # TODO Not safe to store here , need another way
             challenge = request.session.get("login_mfa")["challengename"]
             username = request.session.get("login_mfa")["username"]
             session = request.session.get("login_mfa")["session"]
             access_token = request.session.get("login_mfa")["access_token"]
 
+            # Check if challenge is MFA setup or MFA authentication
             if challenge == "MFA_SETUP":
                 print("Setup")
                 mfa = mfa_setup(username=username,session=session,access_token=access_token,code=code)
@@ -334,6 +353,8 @@ async def confirmation_post(request: Request, code: Annotated[str, Form()]) -> R
                 mfa = multifactor_auth(username=username,code=code,session=session)
                 if mfa != "Unsuccessful":
                     request.session.clear()
+
+                    # Get current user information
                     get_user = client.get_user(AccessToken=mfa["AuthenticationResult"]["AccessToken"])
                     print(get_user)
                     user_attributes = get_user["UserAttributes"]
@@ -344,26 +365,21 @@ async def confirmation_post(request: Request, code: Annotated[str, Form()]) -> R
                     
                     create_session(username=username,role=role,request=request)
 
-        if mfa == "Unsuccessful":
-            flash(
-                request=request,
-                message=f"Invalid code, Please try again", 
-                category="danger",
-            )
-            return RedirectResponse(url="/authentication/confirmation",status_code=303)
-            
-        
+            if mfa == "Unsuccessful":
+                flash(
+                    request=request,
+                    message=f"Invalid code, Please try again", 
+                    category="danger",
+                )
+                return RedirectResponse(url="/authentication/confirmation",status_code=303)
         
 
     except Exception as e:
         print(e)
-        flash(
-            request=request,
-            message=f"Invalid confirmation code, Please try again", 
-            category="danger",
-        )
 
-        return RedirectResponse(url="/authentication/confirmation",status_code=303)
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/authentication/confirmation","status":"fail"}
+        )
 
 
 # auth = JWTBearer(get_jwks())
@@ -380,11 +396,12 @@ async def confirmation_post(request: Request, code: Annotated[str, Form()]) -> R
 
 
       
-
+# Logout user
 @authentication_router.post("/logout")
 async def logout(request: Request) -> RedirectResponse:
     
     try:
+        # Removes user current session
         if request.session["session"]:
             username = request.session["session"]["user_id"]
 
@@ -396,15 +413,9 @@ async def logout(request: Request) -> RedirectResponse:
 
             # redis_conn.close()
             # await redis_conn.wait_closed
-            
 
-        flash(
-            request=request,
-            message="You have logged out successfully", 
-            category="success",
-        )
 
-        return RedirectResponse("/authentication", status_code=303)
+        return RedirectResponse("/authentication/signin", status_code=303)
 
     except Exception as e:
         print(e)
@@ -417,12 +428,12 @@ async def index(request: Request) -> RedirectResponse:
         if request.session.get("session") is None:
             
             return await render_template( 
-                name="authentication/sigin.html",
+                name="authentication/signin.html",
                 context={
                     "request": request,
                 },
             )
         else:
-            return RedirectResponse(url="/foodshare/addMyListing", status_code=303)
+            return RedirectResponse(url="/foodshare/myListings", status_code=303)
     except Exception as e:
         print(e)
