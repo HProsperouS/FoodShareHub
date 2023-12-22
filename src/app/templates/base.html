@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 
-<body>
+<body >
     <!-- Start header -->
     <header class="header-area header-style-1 header-height-2">
         <div class="mobile-promotion">
@@ -81,7 +81,8 @@
                                     </a>
                                     {% if request.session["session"] %}
                                         {% if request.session["session"]["role"] %}
-                                            <a href="#"><span class="lable ml-0">{{request.session["session"]["user_id"]}} / {{request.session["session"]["role"]}}</span></a>
+                                            <a href="#"><span class="lable ml-0">{{request.session["session"]["username"]}} / {{request.session["session"]["role"]}}</span></a>
+                                            <p id="login_user" style="display: none;">{{request.session["session"]["username"]}}</p>
                                         {% endif %}
                                         <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                             <ul>
@@ -90,7 +91,7 @@
                                                 <li><a href="#"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
                                                 {% if request.session["session"] %}
                                                     <li>
-                                                        <form method="POST" action="/authentication/logout">
+                                                        <form method="POST" action="/authentication/logout" onsubmit="logout()">
                                                             <button class="btn btn-primary" type="submit">
                                                                 <i class="fi fi-rs-sign-out mr-10"></i>Sign out
                                                             </button>
@@ -118,7 +119,9 @@
                     <div class="logo logo-width-1 d-block d-lg-none">
                         <a href="/"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
                     </div>
+                    {% if request.session["session"] %}
                     <div class="header-nav d-none d-lg-flex">
+                        
                         <div class="main-categori-wrap d-none d-lg-block">
                             <a class="categories-button-active" href="#">
                                 <span class="fi-rs-apps"></span> <span class="et">Browse</span> All Categories
@@ -160,6 +163,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block font-heading">
                             <nav>
                                 <ul>
@@ -178,6 +182,7 @@
                             </nav>
                         </div>
                     </div>
+                    {% endif %}
                     <div class="header-action-icon-2 d-block d-lg-none">
                         <div class="burger-icon burger-icon-white">
                             <span class="burger-icon-top"></span>
@@ -189,7 +194,9 @@
             </div>
         </div>
     </header>
-    <div class="mobile-header-active mobile-header-wrapper-style">
+
+    
+    <div class="mobile-header-active mobile-header-wrapper-style" >
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
                 <div class="mobile-header-logo">
@@ -386,6 +393,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // On load check for actions to be done in local storage
+        window.onload = function() {
+            try{
+                var action = localStorage.getItem("action")
+                console.log(action)
+                // Toast template to use 
+                const SuccessToast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                // For successful login
+                if(action === "success_login"){
+                    console.log("trigger login toast")
+                    var login_user = document.getElementById("login_user").innerHTML
+                    SuccessToast.fire({
+                        icon: "success",
+                        title: `Welcome back ${login_user}`
+                    });
+                    localStorage.removeItem("action")
+                }
+                // For successful logout
+                else if(action === "success_logout"){
+                    console.log("trigger logout toast")
+                    SuccessToast.fire({
+                        icon: "success",
+                        title: "Logout Successfully"
+                    });
+                    localStorage.removeItem("action")
+                // For signup confirmation
+                }else if(action === "signup_confirmation"){
+                    console.log("trigger signup confirmation toast")
+                    var email = localStorage.getItem("data")
+                    SuccessToast.fire({
+                        icon:"success",
+                        title:`A confirmation code has been sent to ${email}`
+                    })
+                    localStorage.removeItem("action")
+                    localStorage.removeItem("data")
+                }else if(action === "success_signup"){
+                    console.log("success account activated toast")
+                    SuccessToast.fire({
+                        icon:"success",
+                        title:`Successfully activated account`
+                    })
+                    localStorage.removeItem("action")
+                }else if(action === "signup_error"){
+                    console.log("signup error toast")
+                    var message = localStorage.getItem("data")
+                    SuccessToast.fire({
+                        icon:"error",
+                        title:message
+                    })
+                    
+                }
+            }catch(error){
+                console.log(error)
+            }
+
+        }
+        
+        // Triggers logout action to store in local storage
+        function logout(){
+            console.log("logout")
+            localStorage.setItem("action","success_logout")
+        }
+
         // Set notification in local storage
         function setNotificationMessage(category, text) {
             const notificationObject = { category, text };

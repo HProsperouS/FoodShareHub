@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+
+{% endblock %}
+
+{% block content %}
+<!-- background-image: url(https://images.unsplash.com/photo-1553787434-45e1d245bfbb?q=80&w=1420&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D); -->
+<main class="main page" style="padding-left: 50px;padding-right:50px;padding-top:10px;">
+    <h2  style="text-align: center;">Sign Up</h2>
+    <h5 style="text-align: center;">Already have an account? <a href="/authentication/signin"> Log In </a></h5>
+    <form id="signup_form">
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="name" aria-describedby="usernameHelp" name="name">
+                    <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
+                    <span for="name" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="col-6">
+                <div class="mb-3">
+                    <label for="emailaddress" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
+                    <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
+                    <span for="email" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                    <span for="password" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="mb-3">
+                    <label for="confirmpassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmpassword">
+                    <span for="confirmpassword" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-6">
+                <label for="inputState">Role Applied</label>
+                <div class="row">
+                    <div class="col-6">
+                         <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="flexRadioDefault1" value="User">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                User
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="flexRadioDefault2" value="Admin" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Admin
+                            
+                        </div> 
+                    </div>
+                </div>
+               
+                
+                
+            </div>
+            <div class="col-6" style="text-align: right;">
+                <!-- <div class="col-lg-4 col-md-12 col-sm-12"> -->
+                    <div class="form-group " >
+                        <button type="submit" class="btn btn-primary " >Sign Up</button>
+                    </div>
+                <!-- </div> -->
+            </div>
+        </div>
+
+        <div class="row" >
+            <div class="col-5">
+                <div style="border-top:2px solid lightgrey;width: 100%;">
+            </div>
+            </div>
+            <div class="col-2" >
+                <h6 class="text" style="text-align: center;">Social Sign Up</h6>
+            </div>
+            <div class="col-5">
+                <div style="border-top:2px solid lightgrey;width: 100%;">
+            </div>
+            </div>
+        </div>
+        </br>
+        <div  style="text-align: center;">
+            <button class="btn btn-lg btn-block btn-primary" style="background-color: #dd4b39;"type="submit"><i class="fab fa-google me-2"></i> Google</button>
+            <button class="btn btn-lg btn-block btn-primary" style="background-color: #397bdd;"type="submit"><i class="fab fa-facebook me-2"></i> Facebook</button>
+            
+            <!-- <h4>
+                <a href="#"><i class="bi bi-facebook"></i></a>
+                <a href="#"><i class="bi bi-twitter"></i>Twitter</a>
+                <a href="#"><i class="bi bi-google"></i>Google</a>
+            </h4> -->
+        </div>
+            
+    </form>
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("signup_form").addEventListener("submit", function(event) {
+            event.preventDefault();
+           
+            // Show loader
+            const loadingDiv = document.getElementById("loadingDiv");
+            // loadingDiv.style.display = '';
+
+            if (validateForm()) {
+                console.log("validation pass")
+                var radioButtons = document.getElementsByName("role");
+                
+                // Loop through the radio buttons to find the checked one
+                for (var i = 0; i < radioButtons.length; i++) {
+                    console.log(radioButtons[i].value)
+                    if (radioButtons[i].checked) {
+                        var role = radioButtons[i].value;
+                        console.log("Selected Value:", role); 
+                    }
+                    
+                }
+                const formData = {
+                    Name: document.getElementById("name").value,
+                    Email: document.getElementById("email").value,
+                    Password: document.getElementById("password").value,
+                    Role: role,
+                };
+            
+                console.log("fetching api")
+                // Start: Send form data using Fetch API
+                fetch("/authentication/signup", {
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("redirecting")
+                    console.log(data)
+
+                    if(data.status === "success"){
+                        // Extract the redirect URL from the JSON response
+                        const redirectUrl = data.redirect_url;
+
+                        // store action in local storage
+                        localStorage.setItem("action","signup_confirmation")
+                        localStorage.setItem("data",document.getElementById("email").value)
+
+                        // Extract the message from the JSON response
+                        // const message = data.message;
+                        // setNotificationMessage(message.category, message.text);
+
+                        // Redirect to the extracted URL
+                        window.location.href = redirectUrl;
+
+                        // Hide loader
+                        // loadingDiv.style.display = 'none';
+                    }else if(data.status === "fail"){
+                        // Extract the redirect URL from the JSON response
+                        const redirectUrl = data.redirect_url;
+
+                        // store action in local storage
+                        localStorage.setItem("action","signup_error")
+                        localStorage.setItem("data",data.message)
+                        // localStorage.setItem("data",document.getElementById("email").value)
+
+                        // Extract the message from the JSON response
+                        // const message = data.message;
+                        // setNotificationMessage(message.category, message.text);
+
+                        // Redirect to the extracted URL
+                        window.location.href = redirectUrl;
+
+                        // Hide loader
+                        // loadingDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+                // End: Send form data using Fetch API
+            }
+            // Hide loader
+            // loadingDiv.style.display = 'none';
+        })
+    })
+        
+    
+    function validateForm() {
+            var isValid = true;
+
+            // Image validation
+            // var imageInput = $("input[name='image']");
+            // if (imageInput.val() === "") {
+            //     isValid = false;
+            //     showError(imageInput, "Please select an image");
+            // }
+
+            // Username validation
+            var nameInput = $("#name");
+            if (nameInput.val().length < 3 ) {
+                isValid = false;
+                
+                showError(nameInput, "Username needs to be 3 or more characters");
+            }else{
+                hideError(nameInput)
+            }
+
+            // email validation
+            var emailInput = $("#email");
+            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            var emailMatch = regex.test(emailInput.val())
+            console.log(emailMatch)
+            if (emailInput.val().length === 0) {
+                isValid = false;
+                showError(emailInput, "Email cannot be empty");
+            }else if(emailMatch === false){
+                isValid = false;
+                showError(emailInput,"Email format is incorrect. Ex: 123@mail.com")
+            }else{
+                hideError(emailInput)
+            }
+
+            // Password validation
+            var passwordInput = $("#password");
+            var confirmpasswordInput = $("#confirmpassword")
+            if (passwordInput.val() != confirmpasswordInput.val()) {
+                isValid = false;
+                showError(confirmpasswordInput, "Password & Confirm Password does not match")
+                showError(passwordInput, "Password & Confirm Password does not match");
+            }else if(passwordInput.val().length < 6){
+                isValid = false
+                showError(passwordInput, "Password needs to have 6 or more characters")
+            }else{
+                hideError(passwordInput)
+            }
+
+            return isValid;
+    }
+
+    // Function to show error message and highlight input
+    function showError(input, message) {
+        var errorSpan = input.siblings(".text-danger");
+        errorSpan.text(message);
+        input.addClass("is-invalid");
+    }
+
+    // Function to hide error message and remove highlighting
+    function hideError(input) {
+        var errorSpan = input.siblings(".text-danger");
+        errorSpan.text("");
+        input.removeClass("is-invalid");
+    }
+</script>
+{% endblock %}
