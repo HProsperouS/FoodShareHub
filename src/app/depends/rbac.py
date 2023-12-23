@@ -56,21 +56,20 @@ async def verify_access(
     else:
         role_arr = role_arr
 
-    session_id = request.session.get(C.SESSION_COOKIE, None)
-    # TODO: Get user info from session id
-    user_info = request.session.get(session_id)
-
+    # session_id = request.session.get(C.SESSION_COOKIE, None)
+    session_data = request.session.get(C.SESSION_COOKIE,None)
     
-    user_roles = (C.GUEST,) # <- dummy data
+    
+    user_roles = (C.USER,C.ADMIN,C.GUEST) # <- dummy data
     for role in user_roles:
         if role in role_arr:
-            return RBACResults() # <- Might want to return an initialised user object instead
+            return session_data # <- Might want to return an initialised user object instead
     return RedirectResponse(url="/")
 
 class RBACResults:
-    def __init__(self) -> None:
+    def __init__(self,user_info:dict) -> None:
         """Initialises the RBACResults class."""
-        self.__user_info = None # TODO: Add user info here
+        self.__user_info = user_info # TODO: Add user info here
         self.__email = None
         self.__username = None
         self.__role = None
@@ -156,7 +155,8 @@ class RBACDepends:
         if C.SESSION_COOKIE not in request.session:
             # not logged in
             if C.GUEST in self.__role_arr:
-                return RBACResults()
+                
+                return RBACResults(user_info=None)
 
             # Not authorised to view the route
             return self.return_redirect_response(
@@ -164,11 +164,28 @@ class RBACDepends:
             )
 
         # TODO: Get user role from database and check with self.__role_arr
-        return
+        # TODO Need to get from redis cache
+        user_role = request.session.get(C.SESSION_COOKIE,None)["role"]
+        
+        if user_role in self.__role_arr:
+            print(request.url)
+            response = await verify_access(
+                request=request,
+                role_arr=self.__role_arr,
+                # col=user_col,
+                clear_session_if_invalid=False,
+                # admin_db=admin_db,
+            )
+            if isinstance(response, dict):
+                return RBACResults(
+                    user_info=response,
+                
+                )
+
 
         # Not authorised to view the route
         return self.return_redirect_response(
-            request=request,
+            request=request
         )
 
 RBAC_TYPING = None | RedirectResponse | RBACResults
@@ -182,7 +199,7 @@ GUEST_RBAC = RBACDepends(
 )
 USER_RBAC = RBACDepends(
     role_arr=(C.USER,),
-    default_endpoint="login",
+    default_endpoint="index",
 )
 ADMIN_RBAC = RBACDepends(
     role_arr=(C.ADMIN,),

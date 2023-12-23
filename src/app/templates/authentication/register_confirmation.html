@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+<style>
+    
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<main class="main page">
+    
+    
+    <div class="container" style="padding: 30px;">
+        <div class="row" style="display: flex;justify-content: center;align-items: center;" >
+            
+            
+            <div class="col-6" style="text-align: center;" >
+                <form id="signup_confirmation_form">
+                    <!-- {% if request.session["mfa_setup_key"] %}
+                        <div> Here is your setup key with Google Auth: {{request.session["mfa_setup_key"]}}</div>
+                    {% endif %} -->
+                    <h3> Sign Up Confirmation</h3>
+                </br>
+                    
+                    <div class="form-group">
+                        
+                        <input type="text" class="form-control" id="code" placeholder="Enter confirmation code here . . . " name="code">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+   
+            </div>
+        </div>
+    </div>
+
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("signup_confirmation_form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Show loader
+            const loadingDiv = document.getElementById('loadingDiv');
+            loadingDiv.style.display = "block";
+
+            const formData = {
+                Code: document.getElementById("code").value,
+            };
+        
+            console.log("fetching api")
+            // Start: Send form data using Fetch API
+            fetch("/register/confirmation", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("redirecting")
+                console.log(data)
+                
+                // Hide loader
+                // loadingDiv.style.display = 'none';
+
+                // Check for status of Login
+                if(data.status === "success"){
+                    console.log("success")
+                    // Extract the redirect URL from the JSON response
+                    const redirectUrl = data.redirect_url;
+
+                    // Extract the message from the JSON response
+                    // const message = data.message;
+                    // setNotificationMessage(message.category, message.text);
+
+                    // Set item in local to display message in next page
+                    localStorage.setItem("action","success_signup")
+                    
+                    // Redirect to the extracted URL
+                    window.location.href = redirectUrl;
+
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+                    
+                } else if(data.status === "fail"){
+                    console.log("fail")
+                    
+                    // Hide loader
+                    // loadingDiv.style.display = "none";
+
+                    // Display Error notification if code confirmation fails
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        confirmButtonColor:"#3BB77E",
+                        text: "Code is invalid or has expired, Please try again",
+                        // footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                }
+
+                
+            })
+            .catch(error => {
+                console.error("Error:", error);
+               
+            });
+            // End: Send form data using Fetch API
+            
+        })
+
+    })
+</script>
+
+{% endblock %}
+
+
+
+

@@ -31,6 +31,7 @@ import os
 from dotenv import load_dotenv
 from botocore.exceptions import ClientError
 from pydantic import BaseModel
+import qrcode
 # import hmac
 # import hashlib
 # import base64
@@ -77,6 +78,8 @@ class ExistingUser(BaseModel):
 
 class SignUpConfirmation(BaseModel):
     Code: str
+
+
     
 
 # Creates a session for authenticated user
@@ -117,8 +120,57 @@ def authenticate_user(username: str,password: str):
         print(e)
 
 # First time MFA setup ( optional )
-def mfa_setup(username:str,session:str,access_token:str,code:str):
+@authentication_router.post("/mfa")
+def mfa_setup(request:Request) -> ORJSONResponse:
     try:
+        # set mfa preference 
+        response = client.set_user_mfa_preference(
+            SMSMfaSettings={
+                'Enabled': True|False,
+                'PreferredMfa': True|False
+            },
+            SoftwareTokenMfaSettings={
+                'Enabled': True|False,
+                'PreferredMfa': True|False
+            },
+            #TODO Store token in Redis
+            AccessToken=request.session.get("access_token")
+        )
+
+        session = request.session.get("session")["session_id"]
+
+        # generate associate token to verify later
+        associate = client.associate_software_token(Session=session)
+        
+        session = associate["Session"]
+        access_token = associate["SecretCode"]
+        # request.session["mfa_setup_key"] = access_token
+
+        # generate a qr code and store token data in it
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(access_token)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        img.save(f'assets/imgs/{request.session.get("session")["user_id"]}_mfa_qr.png')
+                                    
+        print(associate)
+
+        return ORJSONResponse(
+            content={"qr_code": f'assets/imgs/{request.session.get("session")["user_id"]}_mfa_qr.png',"status":"success"}
+        )
+    except Exception as e:
+        print(e)
+        return "Unsuccessful"
+    
+@authentication_router.post("/mfa-confirmation")
+def mfa_setup_confirmation(request:Request,username:str,session:str,access_token:str,code:str) -> ORJSONResponse:
+    try:
+
         print("verify token")
         verify = client.verify_software_token(AccessToken=access_token,Session=session,UserCode=code)
 
@@ -147,6 +199,7 @@ def multifactor_auth(username:str,code:str,session:str):
 
 @authentication_router.get("/signup")
 async def signup_get(request: Request) -> RedirectResponse:
+    return RedirectResponse(url="/login",status_code=303)
     try:
         # checks for current session
         if request.session.get("session") is None:
@@ -158,6 +211,7 @@ async def signup_get(request: Request) -> RedirectResponse:
                 },
             )
         else:
+        
             return RedirectResponse(url="/foodshare/addMyListing", status_code=303)
     except Exception as e:
         print(e)
@@ -166,6 +220,7 @@ async def signup_get(request: Request) -> RedirectResponse:
 @authentication_router.post("/signup")
 async def signup(request:Request, formData:NewUser ) -> ORJSONResponse:
     # username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str,Form()], role: Annotated[str,Form()]
+    
     try:
         response = client.sign_up(
             ClientId = COGNITO_CLIENT_ID,
@@ -191,7 +246,7 @@ async def signup(request:Request, formData:NewUser ) -> ORJSONResponse:
 
         # return RedirectResponse(url="/authentication/confirmation",status_code=303)
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/authentication/confirmation","statys":"success"}
+            content={"redirect_url": "http://127.0.0.1:8000/authentication/confirmation","status":"success"}
         )
     
     except Exception as e: 
@@ -204,6 +259,7 @@ async def signup(request:Request, formData:NewUser ) -> ORJSONResponse:
 
 @authentication_router.get("/signin")
 async def signin_get(request: Request) -> RedirectResponse:
+    return RedirectResponse(url="/login",status_code=303)
     try:
         # Checks for current session
         if request.session.get("session") is None:
@@ -221,7 +277,7 @@ async def signin_get(request: Request) -> RedirectResponse:
 
 @authentication_router.post("/signin")
 async def signin_post(request:Request,formData:ExistingUser) -> ORJSONResponse:
-    
+    return RedirectResponse(url="/login",status_code=303)
     try:
         print("Authenticating user")
         name = formData.Name
@@ -250,6 +306,9 @@ async def signin_post(request:Request,formData:ExistingUser) -> ORJSONResponse:
         # Retrieve current user information
         get_user = client.get_user(AccessToken=auth_user["AuthenticationResult"]["AccessToken"])
         print(get_user)
+
+        # Store user access token
+        request.session["access_token"] = auth_user["AuthenticationResult"]["AccessToken"]
 
         # Attributes of user
         user_attributes = get_user["UserAttributes"]
@@ -288,6 +347,7 @@ async def signin_post(request:Request,formData:ExistingUser) -> ORJSONResponse:
 # TODO Need to create 2 pages , one for accout and one for MFA
 @authentication_router.get("/confirmation")
 async def confirmation_get(request: Request) -> RedirectResponse:
+    return RedirectResponse(url="/login",status_code=303)
     try:
         if request.session.get("account_confirmation") is None and request.session.get("login_mfa") is None:
             return RedirectResponse(url="/authentication",status_code=303)
@@ -403,9 +463,9 @@ async def logout(request: Request) -> RedirectResponse:
     try:
         # Removes user current session
         if request.session["session"]:
-            username = request.session["session"]["user_id"]
+            # username = request.session["session"]["user_id"]
 
-            request.session.pop("session")
+            request.session.clear()
 
             # redis_conn = await aioredis.create_redis_pool(redis_pool)
 
@@ -424,6 +484,7 @@ async def logout(request: Request) -> RedirectResponse:
 
 @authentication_router.get("/")
 async def index(request: Request) -> RedirectResponse:
+    return RedirectResponse(url="/login",status_code=303)
     try:
         if request.session.get("session") is None:
             
