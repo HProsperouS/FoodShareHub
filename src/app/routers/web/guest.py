@@ -13,7 +13,12 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 import boto3
-from aws.services.Cognito import *
+from aws.services import (
+    register_user,
+    register_confirmation,
+    retreive_user,
+    authenticate_user
+)
 import uuid
 # import local libraries
 from utils.jinja2_helper import (

@@ -10,3 +10,10 @@ from .Rekognition import (
 from .Location import (
     autocomplete_address
 )
+
+from .Cognito import(
+    register_user,
+    register_confirmation,
+    retreive_user,
+    authenticate_user
+)
