@@ -32,11 +32,6 @@ redis_client = Redis.from_url("redis://demo-redis.ampw1p.ng.0001.use1.cache.amaz
 # JWT Authentication
 # auth = JWTBearer(get_jwks())
 
-
-
-# Load Environment Variables
-load_dotenv()
-
 app = FastAPI(
     title="FoodShareHub",
     debug=C.DEBUG_MODE,

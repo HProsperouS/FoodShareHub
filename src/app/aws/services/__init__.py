@@ -6,3 +6,7 @@ from .Rekognition import (
     detect_objects,
     detect_objects_and_moderate
 )
+
+from .Location import (
+    autocomplete_address
+)

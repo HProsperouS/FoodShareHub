@@ -7,6 +7,7 @@ from fastapi import (
 )
 from fastapi.responses import (
     HTMLResponse,
+    RedirectResponse
 )
 from fastapi.encoders import jsonable_encoder
 
@@ -33,6 +34,15 @@ from db import (
     search_donation_by_category,
     search_donation_by_category_and_name
 )
+from utils import constants as C
+from depends import (
+    rbac
+)
+from aws.services import(
+    autocomplete_address
+)
+
+RBAC_DEPENDENCY = Depends(rbac.USER_RBAC, use_cache=False)
 
 foodshare_router = APIRouter(
     include_in_schema=False,
@@ -41,7 +51,11 @@ foodshare_router = APIRouter(
 )
 
 @foodshare_router.get("/addMyListing")
-async def show_add_listing_form(request: Request, db: Session = Depends(get_db) ) -> HTMLResponse:
+async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
+    # if not isinstance(rbac_res, rbac.RBACResults):
+    #     print(rbac_res)
+    #     return rbac_res
+    
     categories = await get_all_FoodItemCategories(db)
     return await render_template(
         name="foodshare/addDonation.html",
@@ -68,6 +82,11 @@ async def show_my_listings_page(request: Request, db: Session = Depends(get_db))
 
 @foodshare_router.get("/editMyListing/{id}")
 async def editMyListing(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+    session = request.session.get(C.SESSION_COOKIE, None)
+
+    # print("Session: ",session)
+    # print("Session Username",session["username"])
+    # print("Session UserId",session["user_id"])
 
     myDonation = await get_donation_by_id(db, id)
     categories = await get_all_FoodItemCategories(db)
@@ -125,3 +144,14 @@ async def process_search(
             "count": count
         },
     )
+
+@foodshare_router.get(
+    path="/autocomplete/{query}",
+    description="Address suggestions based on the input",
+)
+async def get_autocomplete_results(query: str):
+    results = autocomplete_address(query)
+    if results:
+        return {"suggestions": results}
+    else:
+        return {"message": "No suggestion found!"}
