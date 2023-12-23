@@ -3,15 +3,10 @@ from fastapi import (
     APIRouter,
     Request,
     Depends,
-    HTTPException,
-    Form,
-    File,
-    UploadFile
+    Query
 )
 from fastapi.responses import (
     HTMLResponse,
-    RedirectResponse,
-    ORJSONResponse
 )
 from fastapi.encoders import jsonable_encoder
 
@@ -33,6 +28,10 @@ from db import (
     get_all_FoodItemCategories,
     get_all_donations,
     get_donation_by_id,
+    # Search
+    search_donation_by_name,
+    search_donation_by_category,
+    search_donation_by_category_and_name
 )
 
 foodshare_router = APIRouter(
@@ -79,5 +78,50 @@ async def editMyListing(request: Request, id: int, db: Session = Depends(get_db)
             "request": request,
             "donation": myDonation,
             "categories": categories
+        },
+    )
+
+@foodshare_router.get("/donationDetails/{id}")
+async def donationDetails(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
+
+    myDonation = await get_donation_by_id(db, id)
+
+    return await render_template(
+        name="foodshare/donationDetails.html",
+        context={
+            "request": request,
+            "donation": myDonation,
+        },
+    )
+
+@foodshare_router.get(
+    path="/search",
+    description="search for food items avaliable on food share hub",
+)
+async def process_search(
+    request: Request,
+    category: str = Query(None, description="Search based on food item category", alias="category"),
+    name: str = Query(None, description="Search based on food item name", alias="name"),
+    db: Session = Depends(get_db)) -> HTMLResponse:
+
+    # Convert to lowercase
+    category_lower = category.lower() if category else None
+    name_lower = name.lower() if name else None
+
+    if name_lower is None:
+        donations = await search_donation_by_category(db, category_lower)
+    elif category == "All Categories":
+        donations = await search_donation_by_name(db, name_lower)
+    else:
+        donations = await search_donation_by_category_and_name(db, category_lower, name_lower)
+    
+    count = len(donations)
+
+    return await render_template(
+        name="foodshare/searchResult.html",
+        context={
+            "request": request,
+            "donations": donations, 
+            "count": count
         },
     )

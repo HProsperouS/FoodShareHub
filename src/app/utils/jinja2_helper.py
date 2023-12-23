@@ -9,6 +9,7 @@ from fastapi.responses import (
     HTMLResponse,
 )
 from jinja2 import pass_context
+from datetime import datetime, date
 
 # import local libraries
 from .constants import (
@@ -122,3 +123,18 @@ async def render_template(headers: dict[str, str] = None, *args: typing.Any, **k
     """
     jinja2_response: Response = await JINJA2_HANDLER.TemplateResponse(*args, **kwargs)
     return jinja2_response
+
+def format_date(value):
+    if isinstance(value, date):
+        month_names = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        month_name = month_names[value.month]
+
+        formatted_date = "{:02d} {} {}".format(value.day, month_name, value.year)
+
+        return formatted_date
+    else:
+        raise ValueError("Input must be a datetime.date object")
+
+# Register the filter function with the template environment
+JINJA2_HANDLER.env.filters['format_date'] = format_date
+
