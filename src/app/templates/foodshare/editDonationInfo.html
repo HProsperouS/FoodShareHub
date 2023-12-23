@@ -84,6 +84,15 @@
                             <div class="mb-4">
                                 <label class="form-label" for="pickup_location">Pick Up Location</label>
                                 <input placeholder="Please enter your pick-up location" type="text" class="form-control" id="pickup_location" name="pickup_location" value="{{ donation.MeetUpLocation }}"/>
+                                <div id="addressSuggestionCard" class="card mt-10" style="display: none;">
+                                    <div class="card-header">
+                                        Suggestions
+                                    </div>
+                                    <div class="card-body">
+                                        <ul id="addressSuggestionListItem">
+                                        </ul>
+                                    </div>
+                                </div>
                                 <span for="pickup_location" class="text-danger"></span>
                             </div>
                         </div>
@@ -401,6 +410,79 @@
             // Reset the preview image
             var previewImage = document.getElementById('preview');
             previewImage.src = "{{ donation.FoodItem.Attachment.PublicAccessURL }}";
+        }
+    </script>
+    <script>
+        // Script for Address Suggestions
+        let controller = new AbortController();
+
+        document.getElementById('pickup_location').addEventListener('input', function() {
+            controller.abort(); // Cancel the previous request
+
+            controller = new AbortController(); // Create a new controller for the current request
+
+            var searchQuery = document.getElementById('pickup_location').value;
+
+            if(searchQuery.length == 0 ){
+                // Hide the suggestion card and stop the process if searchQuery's length is 0
+                const suggestionCard = document.getElementById('addressSuggestionCard');
+                suggestionCard.style.display = 'none';
+                return;
+            }
+
+            fetch(`/foodshare/autocomplete/${searchQuery}`, { signal: controller.signal })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.suggestions){
+                        // Display the suggestion card
+                        const suggestionCard = document.getElementById('addressSuggestionCard');
+                        suggestionCard.style.display = '';
+
+                        displaySuggestions(data.suggestions, handleSuggestionClick);
+
+                    }else{
+                        // Hide the sugesstion card if no suggeestion return
+                        const suggestionCard = document.getElementById('addressSuggestionCard');
+                        suggestionCard.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    if (error.name === 'AbortError') {
+                        // Request was aborted, ignore
+                    } else {
+                        console.error('Error:', error);
+                    }
+                });
+        });
+
+        function displaySuggestions(suggestions, clickHandler) {
+            const suggestionsList = document.getElementById('addressSuggestionListItem');
+            suggestionsList.innerHTML = ''; 
+
+            if (suggestions.length === 0) {
+                return;
+            }
+
+            suggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.textContent = suggestion;
+                // Bind the click handler to each list item.
+                li.addEventListener('click', clickHandler);
+                li.classList.add("dropdown-item");
+                suggestionsList.appendChild(li);
+            });
+        }
+
+        function handleSuggestionClick(event) {
+            if (event.target.tagName === 'LI') {
+                // Set the address text
+                const pickupLocationInput = document.getElementById('pickup_location');
+                pickupLocationInput.value = event.target.textContent;
+
+                // Hide address suggestion card
+                const addressSuggestionCard = document.getElementById('addressSuggestionCard');
+                addressSuggestionCard.style.display = 'none';
+            }
         }
     </script>
 {% endblock %}

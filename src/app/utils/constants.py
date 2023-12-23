@@ -95,3 +95,8 @@ AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_REGION = os.getenv("S3_REGION")
+
+# For Amazon Location Services
+Location_ACCESS_KEY=os.getenv("Location_ACCESS_KEY")
+Location_SECRET_KEY=os.getenv("Location_SECRET_KEY")
+Location_REGION=os.getenv("Location_REGION")
