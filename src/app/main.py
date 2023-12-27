@@ -86,6 +86,7 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(routers.user_router)
     app.include_router(routers.admin_router)
     app.include_router(routers.authentication_router)
+    app.include_router(routers.chat_router)
     # app.include_router(routers.authentication_router,dependencies=[Depends(auth)])
     # API routers
     # app.include_router(routers.foodshare_api)
