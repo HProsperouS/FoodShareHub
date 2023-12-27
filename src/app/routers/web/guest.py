@@ -17,7 +17,8 @@ from aws.services import (
     register_user,
     register_confirmation,
     retreive_user,
-    authenticate_user
+    authenticate_user,
+    login_mfa
 )
 import uuid
 # import local libraries
@@ -49,18 +50,22 @@ class NewUser(BaseModel):
 
 class RegisterConfirmation(BaseModel):
     Code:str
+
+class LoginMfa(BaseModel):
+    Code:str
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
-def create_session(request:Request, username: str,role:str,user_id:str,email:str):
-    session_id = str(uuid.uuid4())
+def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str):
+    # session_id = str(uuid.uuid4())
 
     request.session["session"] = {
         "session_id" : session_id,
         "username": username,
         "user_id":user_id,
         "email":email,
-        "role": role   
+        "role": role,
+        "mfa": mfa
         }
 
     # TODO Use Redis to store sessions
@@ -95,10 +100,9 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
         # authenticate user
         auth_user = authenticate_user(name,password)
-
-        # retrieve user information
-        accesstoken = auth_user["AuthenticationResult"]["AccessToken"]
-        get_user = retreive_user(accesstoken)
+        print(auth_user)
+        
+        get_user = retreive_user(name)
 
         # retreive user attributes
         user_attributes = get_user["UserAttributes"]
@@ -112,14 +116,23 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
                 attributes["id"] = attribute["Value"]
 
         # create session
-        role = attributes["role"]
-        email= attributes["email"]
-        id = attributes["id"]
-        create_session(username=name,role=role,request=request,email=email,user_id=id) 
+        role = attributes["role"] 
+        email= attributes["email"] 
+        id = attributes["id"] 
+        session = auth_user["Session"]
+        if auth_user.get("ChallengeName") is not None:
+            challengeParams = auth_user["ChallengeName"]
+            if challengeParams == "SOFTWARE_TOKEN_MFA":
+                mfa = "Enabled"
+            elif challengeParams == "MFA_SETUP":
+                mfa = "Disabled"
 
+        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa)
+        print(request.session.get("session"))
+        
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
-        )
+            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","session_data":request.session.get("session")}
+        )     
         
     except Exception as e :
         print(e)
@@ -156,7 +169,11 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
 
         # create user
         create_user = register_user(name,password,email,role)
-
+        print(create_user)
+        if create_user == "fail":
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","message":"User already exists"}
+            )
         # temp store account confirmation
         request.session["account_confirmation"] = name
 
@@ -199,6 +216,10 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
        # account confirmation
        confirmation = register_confirmation(name,code)
 
+       if confirmation == "fail":
+           return ORJSONResponse(
+            content={"status":"fail"}
+           )
        # clear session
        request.session.clear()
 
@@ -208,3 +229,25 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
 
     except Exception as e:
        print(e)
+
+@guest_router.post("/login/mfa")
+async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
+    try:
+        name = request.session.get("session")["username"]
+        session = request.session.get("session")["session_id"]
+        code = formData.Code
+
+        challenge = login_mfa(code,session,name)
+
+        print(challenge)
+
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/foodshare/MyListings","status":"success"}
+        )
+        
+    except Exception as e:
+        print(e)
+
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+        )

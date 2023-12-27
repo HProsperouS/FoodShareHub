@@ -84,9 +84,9 @@ ERROR_TABLE = {
 }
 
 # User Roles
-GUEST = "guest"
-USER = "user"
-ADMIN = "admin"
+GUEST = "Guest"
+USER = "User"
+ADMIN = "Admin"
 ALLROLES = (GUEST, USER, ADMIN)
 
 # AWS S3 Configuration

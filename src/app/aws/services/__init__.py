@@ -15,5 +15,8 @@ from .Cognito import(
     register_user,
     register_confirmation,
     retreive_user,
-    authenticate_user
+    authenticate_user,
+    generate_software_token,
+    verify_software_token,
+    login_mfa
 )

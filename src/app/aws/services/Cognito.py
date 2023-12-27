@@ -20,6 +20,9 @@ def authenticate_user(name:str,password:str):
             },
             ClientId=COGNITO_CLIENT_ID
             )
+        
+        
+
         return login
     except Exception as e:
         print(e)
@@ -36,20 +39,20 @@ def register_user(name:str,password:str,email:str,role:str):
                 {"Name": "custom:role", "Value":role}
             ]
         )
-
+        
         confirmation_mail = client.resend_confirmation_code(
             ClientId= COGNITO_CLIENT_ID,
             Username = name
         )
-
-        return register
+        return "success"
 
     except Exception as e:
         print(e)
+        return "fail"
     
-def retreive_user(accesstoken:str):
+def retreive_user(name:str):
     try:
-        user = client.get_user(AccessToken=accesstoken)
+        user = client.admin_get_user(UserPoolId=COGNITO_USER_POOL_ID,Username=name)
         
         return user
     except Exception as e:
@@ -62,5 +65,41 @@ def register_confirmation(name:str,code:str):
             Username = name,
             ConfirmationCode = code
         )
+        return "success"
     except Exception as e:
         print(e)
+        return "fail"
+    
+def generate_software_token(session:str):
+
+    try:
+        token = client.associate_software_token(Session=session)
+
+        return token
+    except Exception as e:
+        print(e)
+        return token
+    
+def verify_software_token(access_token:str,session:str,code:str):
+    try:
+        verify = client.verify_software_token(AccessToken=access_token,Session=session,UserCode=code)
+        return verify
+    except Exception as e:
+        print(e)
+        return verify
+
+def login_mfa(code:str,session:str,name:str):
+    try:
+        verify = client.respond_to_auth_challenge(
+            ClientId=COGNITO_CLIENT_ID,
+            ChallengeName='SOFTWARE_TOKEN_MFA',
+            ChallengeResponses={
+                'USERNAME': name ,
+                'SOFTWARE_TOKEN_MFA_CODE': code
+            },
+            Session=session  # Include the session obtained from the initiate_auth response
+        )
+        return verify
+    except Exception as e: 
+        print(e)
+        return verify
