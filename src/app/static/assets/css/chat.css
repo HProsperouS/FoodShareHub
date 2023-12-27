@@ -143,19 +143,29 @@ a.add img {
     text-decoration: none;
 }
 
-.chat-list .active {
+
+.chat-list .active,
+.chat-list .inactive {
     display: block;
     content: '';
     clear: both;
     position: absolute;
-    bottom: 3px;
-    left: 34px;
-    height: 12px;
-    width: 12px;
-    background: #00DB75;
+    bottom: 1px; 
+    left: 32px; 
+    height: 16px; 
+    width: 16px; 
     border-radius: 50%;
     border: 2px solid #fff;
 }
+
+.chat-list .active {
+    background: #00DB75; 
+}
+
+.chat-list .inactive {
+    background: #808080; 
+}
+
 
 .msg-head h3 {
     color: #222;
