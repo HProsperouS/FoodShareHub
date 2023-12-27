@@ -104,6 +104,11 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         
         get_user = retreive_user(name)
 
+        if auth_user == "fail" or get_user == "fail":
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+            )
+
         # retreive user attributes
         user_attributes = get_user["UserAttributes"]
         attributes = {"id":"","email":"","role":""}
