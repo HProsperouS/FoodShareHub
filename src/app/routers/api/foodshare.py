@@ -64,6 +64,11 @@ foodshare_api = APIRouter(
     description="Create FoodItem and list donation. ",
 )
 async def process_add_listing_form(request: Request, formData: DonationCreate, db: Session = Depends(get_db)) -> ORJSONResponse:
+    # Get user_id and username from session
+    session = request.session.get(C.SESSION_COOKIE, None)
+    user_id = session["user_id"]
+    username = session["username"]
+
     # Start: Upload image to S3 
     unique_filename = str(uuid.uuid4()) + "_" + formData.FoodItem.Image.FileName
     file = decode_base64_file(formData.FoodItem.Image.Base64)
@@ -93,15 +98,13 @@ async def process_add_listing_form(request: Request, formData: DonationCreate, d
         CategoryID=formData.FoodItem.CategoryID,
         Attachment=new_attachment,
     )
-
-    # Get Session 
-    # session = request.session.get("session")
     
     new_donation = Donation(
         Status=DonationStatus.ACTIVE,
         CreatedDate=datetime.now(),
         MeetUpLocation=formData.MeetUpLocation,
-        Username = "JiaJun Liu",
+        UserId = user_id,
+        Username = username,
         FoodItem = new_fooditem
     )
 

@@ -28,6 +28,7 @@ from db import (
     # DB Query
     get_all_FoodItemCategories,
     get_all_donations,
+    get_all_donations_by_userid,
     get_donation_by_id,
     # Search
     search_donation_by_name,
@@ -52,9 +53,8 @@ foodshare_router = APIRouter(
 
 @foodshare_router.get("/addMyListing")
 async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
-    # if not isinstance(rbac_res, rbac.RBACResults):
-    #     print(rbac_res)
-    #     return rbac_res
+    if not isinstance(rbac_res, rbac.RBACResults):
+        return rbac_res
     
     categories = await get_all_FoodItemCategories(db)
     return await render_template(
@@ -66,11 +66,16 @@ async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | R
     )
 
 @foodshare_router.get("/myListings")
-async def show_my_listings_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
-    # TODO: Modify the method to get donations based on the (User ID or User Name) from the Session once Coginito Login is done
-    donations = get_all_donations(db)
-    count = len(donations)
+async def show_my_listings_page(request: Request, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
+    if not isinstance(rbac_res, rbac.RBACResults):
+        return rbac_res
+    
+    session = request.session.get(C.SESSION_COOKIE, None)
+    user_id = session["user_id"]
 
+    donations = get_all_donations_by_userid(db, user_id)
+    count = len(donations)
+    
     return await render_template(
         name="foodshare/listMyDonations.html",
         context={
@@ -80,14 +85,12 @@ async def show_my_listings_page(request: Request, db: Session = Depends(get_db))
         },
     )
 
+
 @foodshare_router.get("/editMyListing/{id}")
-async def editMyListing(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
-    session = request.session.get(C.SESSION_COOKIE, None)
-
-    # print("Session: ",session)
-    # print("Session Username",session["username"])
-    # print("Session UserId",session["user_id"])
-
+async def editMyListing(request: Request, id: int, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
+    if not isinstance(rbac_res, rbac.RBACResults):
+        return rbac_res
+    
     myDonation = await get_donation_by_id(db, id)
     categories = await get_all_FoodItemCategories(db)
 

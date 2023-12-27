@@ -81,7 +81,7 @@ class Donation(Base):
 
     MeetUpLocation = Column(String, default="")
     
-    # TODO: User, TOBE Replace by Cognito Method Soon
+    UserId = Column(String, default="")
     Username = Column(String, default="Liu JiaJun")
 
     # Relationships
