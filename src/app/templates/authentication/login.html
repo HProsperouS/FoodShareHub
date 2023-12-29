@@ -156,13 +156,13 @@
                         // Hide loader
                         loadingDiv.style.display = "none";
 
-                    }else if(data.mfa === "Disbaled"){
+                    }else if(data.mfa === "Disabled"){
                         mfa = "Disabled"
                         // Set item in local to display message in next page
                         localStorage.setItem("action","success_login")
 
                         // Redirect to the extracted URL
-                        window.location.href = redirectUrl;
+                        window.location.href = data.redirectUrl;
 
                         // Hide loader
                         loadingDiv.style.display = "none";
