@@ -104,4 +104,4 @@ def login_mfa(code:str,session:str,name:str):
         return verify
     except Exception as e: 
         print(e)
-        return verify
+        return "fail"

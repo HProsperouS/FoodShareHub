@@ -52,6 +52,8 @@ class RegisterConfirmation(BaseModel):
     Code:str
 
 class LoginMfa(BaseModel):
+    Name:str
+    Password:str
     Code:str
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
@@ -101,43 +103,53 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         # authenticate user
         auth_user = authenticate_user(name,password)
         print(auth_user)
-        
-        get_user = retreive_user(name)
 
-        if auth_user == "fail" or get_user == "fail":
+        if auth_user == "fail" :
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
             )
+        elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
+            request.session["temp_session"] = auth_user["Session"]
+            return ORJSONResponse(
+                content={"name":name,"password":password,"status":"success","mfa":"Enabled"}
+            )
+        else:
+            get_user = retreive_user(name)
+            if get_user == 'fail':
+                return ORJSONResponse(
+                    content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+                )
+            # retreive user attributes
+            user_attributes = get_user["UserAttributes"]
+            attributes = {"id":"","email":"","role":""}
+            for attribute in user_attributes:
+                if attribute["Name"] == "custom:role":
+                    attributes["role"] = attribute["Value"]
+                if attribute["Name"] == "email":
+                    attributes["email"] = attribute["Value"]
+                if attribute["Name"] == "sub":
+                    attributes["id"] = attribute["Value"]
 
-        # retreive user attributes
-        user_attributes = get_user["UserAttributes"]
-        attributes = {"id":"","email":"","role":""}
-        for attribute in user_attributes:
-            if attribute["Name"] == "custom:role":
-                attributes["role"] = attribute["Value"]
-            if attribute["Name"] == "email":
-                attributes["email"] = attribute["Value"]
-            if attribute["Name"] == "sub":
-                attributes["id"] = attribute["Value"]
+            # create session
+            role = attributes["role"] 
+            email= attributes["email"] 
+            id = attributes["id"] 
+            session = auth_user["Session"]
+            if auth_user.get("ChallengeName") is not None:
+                challengeParams = auth_user["ChallengeName"]
+                if challengeParams == "SOFTWARE_TOKEN_MFA":
+                    mfa = "Enabled"
+                elif challengeParams == "MFA_SETUP":
+                    mfa = "Disabled"
 
-        # create session
-        role = attributes["role"] 
-        email= attributes["email"] 
-        id = attributes["id"] 
-        session = auth_user["Session"]
-        if auth_user.get("ChallengeName") is not None:
-            challengeParams = auth_user["ChallengeName"]
-            if challengeParams == "SOFTWARE_TOKEN_MFA":
-                mfa = "Enabled"
-            elif challengeParams == "MFA_SETUP":
-                mfa = "Disabled"
-
-        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa)
-        print(request.session.get("session"))
+            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa)
+            print(request.session.get("session"))
+            
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","mfa":"Disabled"}
+            ) 
         
-        return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","session_data":request.session.get("session")}
-        )     
+ 
         
     except Exception as e :
         print(e)
@@ -238,18 +250,52 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
 @guest_router.post("/login/mfa")
 async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
-        name = request.session.get("session")["username"]
-        session = request.session.get("session")["session_id"]
+        # name = request.session.get("session")["username"]
+        session = request.session.get("temp_session")
         code = formData.Code
+        name = formData.Name
+        password = formData.Password
 
         challenge = login_mfa(code,session,name)
 
-        print(challenge)
+        if challenge == "fail":
+            new_session = authenticate_user(name,password)["Session"]
+            request.session["temp_session"] = new_session
+            return ORJSONResponse(
+                content={"status":"fail"}
+            ) 
 
-        return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/foodshare/MyListings","status":"success"}
-        )
+
+        get_user = retreive_user(name)
+        # retreive user attributes
+        user_attributes = get_user["UserAttributes"]
+        attributes = {"id":"","email":"","role":""}
+        for attribute in user_attributes:
+            if attribute["Name"] == "custom:role":
+                attributes["role"] = attribute["Value"]
+            if attribute["Name"] == "email":
+                attributes["email"] = attribute["Value"]
+            if attribute["Name"] == "sub":
+                attributes["id"] = attribute["Value"]
+
+        # create session
+        role = attributes["role"] 
+        email= attributes["email"] 
+        id = attributes["id"] 
+        # session = auth_user["Session"]
+        # if auth_user.get("ChallengeName") is not None:
+        #     challengeParams = auth_user["ChallengeName"]
+        #     if challengeParams == "SOFTWARE_TOKEN_MFA":
+        #         mfa = "Enabled"
+        #     elif challengeParams == "MFA_SETUP":
+        #         mfa = "Disabled"
+
+        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa="Enabled")
+        print(request.session.get("session"))
         
+        return ORJSONResponse(
+            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
+        ) 
     except Exception as e:
         print(e)
 

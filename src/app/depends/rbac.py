@@ -155,7 +155,7 @@ class RBACDepends:
         if C.SESSION_COOKIE not in request.session:
             # not logged in
             if C.GUEST in self.__role_arr:
-                
+                print("guest")
                 return RBACResults(user_info=None)
 
             # Not authorised to view the route
@@ -195,7 +195,7 @@ ALLROLES_RBAC = RBACDepends(
 )
 GUEST_RBAC = RBACDepends(
     role_arr=(C.GUEST,),
-    default_endpoint="index",
+    default_endpoint="login",
 )
 USER_RBAC = RBACDepends(
     role_arr=(C.USER,),
