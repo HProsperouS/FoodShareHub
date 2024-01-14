@@ -6,5 +6,6 @@ from .jinja2_helper import (
     render_template,
 )
 from .helper import(
-    decode_base64_file
+    decode_base64_file,
+    get_current_time_in_singapore,
 )

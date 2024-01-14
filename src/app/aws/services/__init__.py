@@ -18,5 +18,6 @@ from .Cognito import(
     authenticate_user,
     generate_software_token,
     verify_software_token,
-    login_mfa
+    login_mfa,
+    list_cognito_user_by_usernames,
 )

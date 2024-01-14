@@ -269,14 +269,14 @@ a.add img {
     font-weight: 500;
 }
 
-.msg-body ul li.repaly {
+.msg-body ul li.receiver {
     display: block;
     width: 100%;
     text-align: right;
     position: relative;
 }
 
-.msg-body ul li.repaly:before {
+.msg-body ul li.receiver:before {
     display: block;
     clear: both;
     content: '';
@@ -293,7 +293,7 @@ a.add img {
     transform: rotate(37deg);
 }
 
-.msg-body ul li.repaly p {
+.msg-body ul li.receiver p {
     color: #fff;
     font-size: 14px;
     line-height: 1.5;
@@ -307,7 +307,7 @@ a.add img {
     margin-bottom: 0;
 }
 
-.msg-body ul li.repaly p b {
+.msg-body ul li.receiver p b {
     display: block;
     color: #061061;
     font-size: 14px;
@@ -315,7 +315,7 @@ a.add img {
     font-weight: 500;
 }
 
-.msg-body ul li.repaly:after {
+.msg-body ul li.receiver:after {
     display: block;
     content: '';
     clear: both;
@@ -329,7 +329,7 @@ a.add img {
     font-weight: 400;
 }
 
-li.repaly .time {
+li.receiver .time {
     margin-right: 20px;
 }
 
@@ -515,7 +515,19 @@ button:focus {
     display: none;
 }
 
-
+#messageText {
+    overflow-y: auto; /* Adds scroll */
+    min-height: 58px; /* Minimum height for three lines */
+    border-radius: 20px !important; /* Makes it more rounded */
+    padding: 12px 16px; /* Adjust padding as needed */
+}
+.input-group-text {
+    background: transparent;
+    border: none;
+}
+.input-group {
+    --bs-input-group-addon-color: #000; /* Change the color of addon icons if needed */
+}
 
 @media (max-width: 767px) {
     .chat-icon {
@@ -566,7 +578,7 @@ button:focus {
         border-top-right-radius: 6px;
         border-bottom-right-radius: 6px;
     }
-    .msg-body ul li.repaly p {
+    .msg-body ul li.receiver p {
         font-size: 13px;
         padding: 8px;
         border-top-left-radius: 6px;

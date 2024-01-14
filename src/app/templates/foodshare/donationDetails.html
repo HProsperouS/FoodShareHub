@@ -47,10 +47,12 @@
                                         </div>
                                         <div class="detail-extralink mb-30">
                                             <div class="product-extra-link2">
-                                                <button type="submit" class="button button-add-to-cart">
-                                                    <i class="fa-regular fa-comment"></i>
-                                                    Chat
-                                                </button>
+                                                <form action="{{ url_for('chat_1_to_1', receiver_id=donation.UserId, receiver_name=donation.Username,) if request.session.get(SESSION_COOKIE) != None else url_for('login') }}">
+                                                    <button id="chatButton"type="submit" class="button button-add-to-cart">
+                                                        <i class="fa-regular fa-comment"></i>
+                                                        Chat
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                         <div class="font-xs">

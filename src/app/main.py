@@ -89,9 +89,14 @@ def add_routers(app: FastAPI) -> None:
     app.include_router(routers.chat_router)
     # app.include_router(routers.authentication_router,dependencies=[Depends(auth)])
     # API routers
-    # app.include_router(routers.foodshare_api)
+    app.include_router(routers.foodshare_api)
+    app.include_router(routers.chat_api)
 
 """--------------------------- End of App Routes ---------------------------"""
+@app.on_event("startup")
+async def startup() -> None:
+    app.state.chat_connected_users = set()
+
 
 add_middlewares(app)
 add_routers(app)

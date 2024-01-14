@@ -1,7 +1,8 @@
 import base64
 import six
 import io
-
+from datetime import datetime
+import pytz
 
 def decode_base64_file(data):
     """
@@ -23,5 +24,9 @@ def decode_base64_file(data):
             TypeError('invalid_image')
 
         return io.BytesIO(decoded_file)
+    
+def get_current_time_in_singapore():
+    singapore_timezone = pytz.timezone("Asia/Singapore")
+    return datetime.now(singapore_timezone)
 
 
