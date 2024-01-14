@@ -177,9 +177,6 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
         chatMsg = "";
     }
 
-    const datetimeString = chat.timestamp;
-    const timestamp = new Date(datetimeString).getTime();
-    console.log("timestamp1111", timestamp);
     return chatHtml = `
         <a id="${chat._id}" href="${chat._id}" class="d-flex align-items-center">
             <div class="flex-shrink-0">
@@ -189,8 +186,8 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
             <div class="flex-grow-1 ms-3">
                 <h3>${chat.username}</h3>
                 <div style="display:flex">
-                <p class="text-muted">${chatMsg} | </p>
-                <p class="ms-2" data-chatlist-timestamp="${timestamp}"></p>
+                <p class="text-muted">${chatMsg}</p>
+                <p class="ms-2" data-chatlist-timestamp="${chat.timestamp}"></p>
                 </div>
             </div>
         </a>
@@ -200,12 +197,13 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
 setInterval(() => {
     const readableTimes = document.querySelectorAll("[data-chatlist-timestamp]");
     for (const readableTime of readableTimes) {
-        const timestamp = parseInt(readableTime.getAttribute("data-chatlist-timestamp"));
-        console.log("readableTimes", timestamp);
-        if (timestamp == 0) {
+        const sendTime = readableTime.getAttribute("data-chatlist-timestamp");
+        if (sendTime === null || sendTime === undefined || sendTime === "") {
             readableTime.innerText = "";
             continue;
         }
+        const timestamp = new Date(sendTime).getTime();
+        console.log("readableTimes", timestamp);  
         readableTime.innerText = getReadableTimeDiff(timestamp);
     }
 }, 500);
