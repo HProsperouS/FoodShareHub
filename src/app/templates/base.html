@@ -407,6 +407,9 @@
         // On load check for actions to be done in local storage
         window.onload = function() {
             try{
+                // Hide loader
+                loadingDiv.style.display = "none";
+                
                 var action = localStorage.getItem("action")
                 console.log(action)
                 // Toast template to use 

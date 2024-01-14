@@ -69,6 +69,7 @@ async def account(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTM
 
 @user_router.post("/logout")
 async def logout(request: Request) -> RedirectResponse:
+    
     try:
         request.session.clear()
 

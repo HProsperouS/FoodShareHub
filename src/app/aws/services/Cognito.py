@@ -104,8 +104,8 @@ def login_mfa(code:str,session:str,name:str):
         return verify
     except Exception as e: 
         print(e)
-        return verify
-    
+        return "fail"    
+
 def list_cognito_user_by_usernames(usernames:list):    
     all_users = []
     for username in usernames:
