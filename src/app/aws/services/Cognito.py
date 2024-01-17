@@ -149,3 +149,18 @@ def disable_account(username):
         print(e)
         return "fail"
     
+        return "fail"    
+
+def list_cognito_user_by_usernames(usernames:list):    
+    all_users = []
+    for username in usernames:
+        filter_string = f"username = \"{username}\""
+        try:
+            response = client.list_users(
+                UserPoolId=COGNITO_USER_POOL_ID,
+                Filter=filter_string
+            )
+            all_users.extend(response['Users'])
+        except client.exceptions.ClientError as error:
+            print(f"An error occurred: {error}")
+    return all_users

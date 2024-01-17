@@ -28,6 +28,16 @@ from .crud.search_crud import(
    search_donation_by_category_and_name
 )
 
+# Chat Related Methods
+from .crud.chat_crud import(
+   get_sendername_of_unread_messages,
+   get_latest_messages_for_user,
+   get_messages_for_user,
+   get_message_by_id_and_sender,
+   delete_message_by_id,
+   insert_message,
+)
+
 # DB Session
 from .dependencies import(
    get_db

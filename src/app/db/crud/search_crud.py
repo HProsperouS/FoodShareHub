@@ -35,7 +35,6 @@ async def search_donation_by_name(db: Session, name: str):
     )
 
 async def search_donation_by_category_and_name(db: Session, category:str, name: str):
-    print("INFUNCTION", category, name)
     return (
         db.query(Donation)
         .join(Donation.FoodItem)  # Join to FoodItem

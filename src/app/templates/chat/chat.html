@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}FoodShareHub{% endblock %}
 {% block head %}
+<!-- Include DOMPurify from CDN -->
 {% endblock %}
 {% block content %}
 <main class="main">
@@ -20,17 +21,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="chat-list">
-                                            <a href="#" class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img">
-                                                    <span class="active"></span>
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <h3>Mehedi Hasan</h3>
-                                                    <p class="text-muted">You sent a text | Just Now</p>
-                                                </div>
-                                            </a>
+                                        <div id="chatList" class="chat-list">
+                                            <!-- Chat List Here-->
                                         </div>
                                     </div>
                                 </div>
@@ -39,19 +31,17 @@
                         <div class="chatbox">
                             <div class="modal-dialog-scrollable">
                                 <div class="modal-content">
+                                    <input type="hidden" id="conversationId">
                                     <div class="msg-head">
                                         <div class="row">
                                             <div class="col-8">
                                                 <div class="d-flex align-items-center">
-                                                    <span class="chat-icon">
-                                                        <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/arroleftt.svg" alt="image title">
-                                                    </span>
                                                     <div class="flex-shrink-0">
                                                         <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img">
+                                                        <span id="receiverOnlineHeader" class="active"></span>
                                                     </div>
                                                     <div class="flex-grow-1 ms-3">
-                                                        <h3>Mehedi Hasan</h3>
-                                                        <p>front end developer</p>
+                                                        <h3 id="receiverUsername">{{ receiver.Username }}</h3>
                                                     </div>
                                                 </div>
                                             </div>
@@ -60,63 +50,27 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-body">
+                                    <div id="mainMsgDiv" class="modal-body">
                                         <div class="msg-body">
-                                            <ul>
+                                            <!-- Message Area Here -->
+                                            <ul id="chatArea">
                                                 <!-- Message List Here -->
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">09/12 10:06 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">09/12 10:16 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>yes!</p>
-                                                    <span class="time">09/12 10:20 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">09/12 10:26 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">09/12 10:32 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>How are you?</p>
-                                                    <span class="time">09/12 10:35 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p> yes, tell me</p>
-                                                    <span class="time">09/12 10:36 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>yes... on it</p>
-                                                    <span class="time">09/12 junt now</span>
-                                                </li>
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="send-box">
-                                        <form action="">
-                                            <input type="text" class="form-control" aria-label="message…" placeholder="Write message…">
-                                            <button type="button">
-                                                <i class="fa fa-paper-plane" aria-hidden="true"></i> Send
-                                            </button>
-                                        </form>
-                                        <div class="send-btns">
-                                            <div class="attach">
-                                                <div class="button-wrapper">
-                                                    <span class="label">
-                                                        <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/upload.svg" alt="image title"> attached file
-                                                    </span>
-                                                    <input type="file" name="upload" id="upload" class="upload-box" placeholder="Upload File" aria-label="Upload File">
-                                                </div>
+                                    <div class="row mb-3"> 
+                                        <div class="col-12">
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-plus"></i> 
+                                                </span>
+                                                <textarea class="form-control" id="messageText" placeholder="Type a message…" spellcheck="true" autofocus></textarea>
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-paper-plane"></i> <!-- FontAwesome paper plane (send) icon -->
+                                                </span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>                     
                                 </div>
                             </div>
                         </div>
@@ -130,4 +84,198 @@
 
 {% block scripts %}
     {{ super() }}
+    <script>        
+        let ws = null;
+        inputMsg.addEventListener("keypress", (event) => {
+            // Check if the key pressed is the Enter key (code "Enter")
+            if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
+                // Prevent the default action (newline character insertion)
+                event.preventDefault();
+                sendMessage(ws, event);
+                resetTextareaHeight(inputMsg);
+            }
+        });
+        
+        let latestRetrievedMsg = new Date(0);
+        const messageIds = new Set();
+        let isProcessingMessage = false; // a mutex to prevent race conditions
+        let oldestMsgId = null;
+        let hasFetchedNewMsgs = false;
+        let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
+        let noMoreOldMsgs = false; // a flag to prevent unnecessary requests to the server
+        const loadingOldMsgAlert = document.getElementById("loadingOldMsgAlert");
+        
+        let retrieveInitialMessages = true;
+        // const scrollFn = () => {
+        //     if (!retrieveInitialMessages && !noMoreOldMsgs && !fetchingMutex && mainMsgDiv.scrollTop === 0 && !isProcessingMessage && ws.readyState === 1) {
+        //         hasFetchedNewMsgs = true;
+        //         fetchingMutex = true;
+        //         loadingOldMsgAlert.classList.remove("hidden");
+    
+        //         // The user has scrolled to the top of the chat window
+        //         // Send a request to the server to retrieve more messages
+        //         ws.send(JSON.stringify({
+        //             "fetch_messages": true,
+        //             "oldest_msg_id": oldestMsgId,
+        //         }));
+        //     }
+        // };
+        // mainMsgDiv.addEventListener("scroll", scrollFn);
+
+        let fetchOnAuthenticate = false;
+        let hasAlreadyFetchedOnLoad = false;
+        const fetchMsgOnLoad = async () => {
+            if (!hasAlreadyFetchedOnLoad) {
+                hasAlreadyFetchedOnLoad = true;
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+                while (authenticatedToChat && mainMsgDiv.scrollTop === 0 && !noMoreOldMsgs) {
+                    scrollFn();
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+                }
+            }
+        }
+            
+        // Get the current scroll position and the scrollable content height
+        let scrollPos = mainMsgDiv.scrollTop;
+        let scrollHeight = mainMsgDiv.scrollHeight;
+        function startWebSocket() {
+            {% with ws_url = url_for("chat_ws", external=True, receiver_uid=receiver.UserId, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
+                ws = new WebSocket("{{ ws_url }}");
+            {% endwith %}
+    
+            ws.onopen = () => {
+                console.log("%c Connection established.", "color: white; background: green;");
+                ws.send(JSON.stringify({
+                    "fetch_initial_messages": retrieveInitialMessages,
+                }));
+                retrieveInitialMessages = false;
+            };
+            
+            ws.onclose = (event) => {
+                fetchingMutex = false;
+                console.log("%c Connection closed, trying to reconnect in 3 seconds...", "color: white; background: red;");
+                if (event.reason) {
+                    console.log(`%c Reason(s): ${event.reason}`, "color: white; background: red;");
+                    if (event.reason == "Not authenticated.") {
+                        window.location.href = "{{ url_for('login') }}";
+                    }
+                }
+    
+                let count = 3;
+                console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
+                const countdown = setInterval(() => {
+                    count--;
+                    console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
+                    if (count === 0) {
+                        clearInterval(countdown);
+                        startWebSocket();
+                    }
+                }, 1000);
+            };
+
+            ws.onmessage = async (event) => {
+                while (isProcessingMessage) {
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                }
+                isProcessingMessage = true;
+                
+                const response = JSON.parse(event.data);
+                console.log(response);
+
+                try {    
+                    if (response.chats) {
+                        // To display the chat list
+                        console.log("Displaying chat list...");
+                        processChats(response.chats, "{{ receiver.Username }}");
+                        
+                        // Update the current Conversation Id
+                        var conversationId = document.getElementById("conversationId");
+                        console.log("Current Conversation Id: " + response.chats[0].conversation_id);
+                        console.log("Current Receiver: " + response.chats[0].conversation_id);
+                        const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
+                        debugger;
+                        if (currentChat) {
+                            conversationId.value = currentChat.conversation_id;
+                            console.log("Conversation Id: " + conversationId.value);
+                        }
+                        return;
+                    }
+                    
+                    if (response.error) {
+                        const errMsg = response.error;
+                        console.error("Error: " + errMsg);
+                        formatTextareaInput(errMsg);
+                        return;
+                    };
+                    
+                    if (response.new_chat_session) {
+                        fetchingMutex = false;
+                        console.log("New chat session started.");
+                        return; // no more messages to fetch
+                    }
+
+                    const messageId = response.Id; // This is null due to the message is not stored into database yet, anyway it cannot be null becuase will be use for the delete button
+                    // if the message is already in the chat window, don't add it again
+                    // this is to prevent duplicate messages caused by race conditions
+                    // when the user scrolls to the top of the chat window to retrieve more messages
+                    hasMsgElement = document.getElementById(messageId);
+                    if (hasMsgElement) {
+                        return;
+                    }
+                    
+                    const responseTimestamp = parseInt(response.SendTime * 1000);
+                    const dateObj = new Date(responseTimestamp);
+                    
+                    const sender = response.Sender;
+                    const receiver = response.Receiver;
+                    const messageType = response.Type;
+                    const isSender = (sender == "{{ sender.Username }}");
+                    const deleteFormBtn = `delete#${messageId}`;
+
+                    // const msgDropdownId = `msgDropdown#${messageId}`;
+                    // const imageViewId = `imageView#${messageId}`;
+                    let msgBodyContent = "";
+                    if (response.Content) {
+                        msgBodyContent = response.Content;
+                    }
+                    
+                    let msgBodyHtml = "";
+                    
+                    if (!isSender) {
+                        msgBodyHtml = `
+                            <li class="sender" id="${messageId}">
+                                <!-- msg content -->
+                                <p>${msgBodyContent}</p>
+                                <span class="time" data-chat-timestamp="${responseTimestamp}">
+                                    ${formatTimestamp(dateObj)}
+                                </span>
+                            </li>
+                        `;
+                    } else {
+                        msgBodyHtml = `
+                            <li class="receiver" id="${messageId}">
+                                <!-- msg content -->
+                                <p>${msgBodyContent}</p>
+                                <span class="time" data-chat-timestamp="${responseTimestamp}">
+                                    ${formatTimestamp(dateObj)}
+                                </span>
+                            </li>
+                        `;
+                    }
+
+                    const newDiv = document.createElement("div");
+                    newDiv.innerHTML = msgBodyHtml;
+                    messageArea.appendChild(newDiv)
+                    messageIds.add(messageId);
+
+                } finally {
+                    isProcessingMessage = false;
+                }
+                if (!hasAlreadyFetchedOnLoad && fetchOnAuthenticate) {
+                    fetchMsgOnLoad();
+                }
+            };
+        };
+        startWebSocket();
+    </script>
 {% endblock %}

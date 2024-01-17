@@ -24,5 +24,6 @@ from .Cognito import(
     login_mfa,
     edit_user_information,
     reset_password,
-    disable_account
+    disable_account,
+    list_cognito_user_by_usernames
 )
