@@ -1,5 +1,8 @@
 from .S3 import (
-    upload_to_s3
+    upload_to_s3,
+    upload_qrcode_to_s3,
+    delete_s3_object,
+    upload_userimage_to_s3
 )
 
 from .Rekognition import (
@@ -18,5 +21,8 @@ from .Cognito import(
     authenticate_user,
     generate_software_token,
     verify_software_token,
-    login_mfa
+    login_mfa,
+    edit_user_information,
+    reset_password,
+    disable_account
 )

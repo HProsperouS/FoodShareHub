@@ -64,7 +64,7 @@ def add_middlewares(app: FastAPI) -> None:
         secret_key="change_me",
         session_cookie=C.SESSION_COOKIE,
         https_only=not C.DEBUG_MODE,
-        max_age=600,
+        max_age=6000,
         # backend_type=BackendType.redis,
         # backend_client=redis_client,
     )

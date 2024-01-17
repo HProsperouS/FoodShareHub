@@ -7,6 +7,9 @@ from argon2 import (
 # import Python's standard libraries
 import pathlib
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DEBUG_MODE = True
 APP_ROOT_PATH = pathlib.Path(__file__).parent.parent.resolve()

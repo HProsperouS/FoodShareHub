@@ -79,17 +79,19 @@
 
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a>
-                                        <img class="svgInject" alt="FSH" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-user.svg') }}" />
-                                    </a>
+                                    
                                     {% if request.session["session"] %}
                                         {% if request.session["session"]["role"] %}
+                                            <a>
+                                                <img id="user_image" style="width:10px;height:10px;" src="">
+                                                <p id="user_image_name" hidden>{{request.session["session"]["image"]}}</p>
+                                            </a>
                                             <a href="#"><span class="lable ml-0">{{request.session["session"]["username"]}}</span></a>
                                             <p id="login_user" style="display: none;">{{request.session["session"]["username"]}}</p>
                                         {% endif %}
                                         <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                             <ul>
-                                                <li><a href="#"><i class="fi fi-rs-user mr-10"></i>My Account</a></li>
+                                                <li><a href="/user/account"><i class="fi fi-rs-user mr-10"></i>My Account</a></li>
                                                 <li><a href="#"><i class="fi fi-rs-bell mr-10"></i>Notification</a></li>
                                                 <li><a href="#"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
                                                 {% if request.session["session"] %}
@@ -396,8 +398,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        const loadingDiv = document.getElementById("loadingDiv");
         // On load check for actions to be done in local storage
         window.onload = function() {
+            try{
+                var user_image_name = document.getElementById("tempHolder");
+                var user_image = document.getElementById("imagePreview");
+                if(user_image_name.innerText === "N/A"){
+                    user_image.style.backgroundImage = "url(https://tse2.mm.bing.net/th?id=OIP.6UhgwprABi3-dz8Qs85FvwHaHa&pid=Api&P=0&h=180)"
+                }else{
+                    user_image.style.backgroundImage = `url(${user_image_name.innerText})`
+                }
+            }catch{
+                console.log("/")
+            }
+
             try{
                 // Hide loader
                 loadingDiv.style.display = "none";
@@ -409,7 +424,7 @@
                         toast: true,
                         position: "top-end",
                         showConfirmButton: false,
-                        timer: 3000,
+                        timer: 1500,
                         timerProgressBar: true,
                         didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;
@@ -536,7 +551,7 @@
             const searchCategory = document.getElementById('searchCategory').value;
             const searchTerm = document.getElementById('searchInput').value;
             if(searchTerm != ""){
-                const loadingDiv = document.getElementById('loadingDiv');
+                // const loadingDiv = document.getElementById('loadingDiv');
                 loadingDiv.style.display = '';
 
                 const searchUrl = `/foodshare/search?category=${encodeURIComponent(searchCategory)}&name=${encodeURIComponent(searchTerm)}`;
@@ -546,7 +561,7 @@
 
         // Perform search by clicking the category
         function performSearchByCategory(category) {
-            const loadingDiv = document.getElementById('loadingDiv');
+            // const loadingDiv = document.getElementById('loadingDiv');
             loadingDiv.style.display = '';
 
             const searchUrl = `/foodshare/search?category=${encodeURIComponent(category)}`;

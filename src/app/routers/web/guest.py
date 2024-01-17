@@ -58,7 +58,7 @@ class LoginMfa(BaseModel):
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
-def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str):
+def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str):
     # session_id = str(uuid.uuid4())
 
     request.session["session"] = {
@@ -67,17 +67,11 @@ def create_session(request:Request, username: str,role:str,user_id:str,email:str
         "user_id":user_id,
         "email":email,
         "role": role,
-        "mfa": mfa
+        "mfa": mfa,
+        "image":image
         }
-
-    # TODO Use Redis to store sessions
-    # redis_conn = await aioredis.create_redis_pool(redis_pool)
-    # await redis_conn.setsetex(username,600,session_id)
-    # redis_conn.close()
-    # await redis_conn.wait_closed()
     
-    return "session created"
-
+    return "success"
 @guest_router.get("/login")
 async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLResponse:
     print(RBACResults)
@@ -92,15 +86,16 @@ async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLR
         },
     )
 
+
 @guest_router.post("/login")
 async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     
     try:
-        # user credentials
+        # User credentials
         name = formData.Name
         password = formData.Password
 
-        # authenticate user
+        # Authenticate user
         auth_user = authenticate_user(name,password)
         print(auth_user)
 
@@ -114,12 +109,13 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
                 content={"name":name,"password":password,"status":"success","mfa":"Enabled"}
             )
         else:
+            # Get user info
             get_user = retreive_user(name)
             if get_user == 'fail':
                 return ORJSONResponse(
                     content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
                 )
-            # retreive user attributes
+            # Retreive user attributes
             user_attributes = get_user["UserAttributes"]
             attributes = {"id":"","email":"","role":""}
             for attribute in user_attributes:
@@ -129,28 +125,23 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
                     attributes["email"] = attribute["Value"]
                 if attribute["Name"] == "sub":
                     attributes["id"] = attribute["Value"]
+                if attribute["Name"] == "custom:image":
+                    attributes["image"] = attribute["Value"]
 
-            # create session
+            # Create session
             role = attributes["role"] 
             email= attributes["email"] 
             id = attributes["id"] 
             session = auth_user["Session"]
-            if auth_user.get("ChallengeName") is not None:
-                challengeParams = auth_user["ChallengeName"]
-                if challengeParams == "SOFTWARE_TOKEN_MFA":
-                    mfa = "Enabled"
-                elif challengeParams == "MFA_SETUP":
-                    mfa = "Disabled"
+            image = attributes["image"]
+            mfa = "Disabled"
 
-            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa)
+            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image)
             print(request.session.get("session"))
             
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","mfa":"Disabled"}
             ) 
-        
- 
-        
     except Exception as e :
         print(e)
 
@@ -178,19 +169,22 @@ async def register(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HT
 async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     
     try:
-        # user credentials
+        # User credentials
         name = formData.Name
         password = formData.Password
         email = formData.Email
         role = formData.Role
+        image = "N/A"
 
-        # create user
-        create_user = register_user(name,password,email,role)
+        # Create user
+        create_user = register_user(name,password,email,role,image)
         print(create_user)
+
         if create_user == "fail":
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","message":"User already exists"}
             )
+
         # temp store account confirmation
         request.session["account_confirmation"] = name
 
@@ -226,18 +220,18 @@ async def confirmation(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -
 @guest_router.post("/register/confirmation")
 async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
-       # credentials
+       # Account confirmation credentials
        code = formData.Code
        name = request.session.get("account_confirmation")
        
-       # account confirmation
+       # Account confirmation
        confirmation = register_confirmation(name,code)
 
        if confirmation == "fail":
            return ORJSONResponse(
             content={"status":"fail"}
            )
-       # clear session
+       
        request.session.clear()
 
        return ORJSONResponse(
@@ -250,7 +244,6 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
 @guest_router.post("/login/mfa")
 async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
-        # name = request.session.get("session")["username"]
         session = request.session.get("temp_session")
         code = formData.Code
         name = formData.Name
@@ -259,7 +252,9 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
         challenge = login_mfa(code,session,name)
 
         if challenge == "fail":
+            # Create a new session to authenticate code again
             new_session = authenticate_user(name,password)["Session"]
+
             request.session["temp_session"] = new_session
             return ORJSONResponse(
                 content={"status":"fail"}
@@ -267,7 +262,7 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
 
 
         get_user = retreive_user(name)
-        # retreive user attributes
+        # Retreive user attributes
         user_attributes = get_user["UserAttributes"]
         attributes = {"id":"","email":"","role":""}
         for attribute in user_attributes:
@@ -277,20 +272,18 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
                 attributes["email"] = attribute["Value"]
             if attribute["Name"] == "sub":
                 attributes["id"] = attribute["Value"]
+            if attribute["Name"] == "custom:image":
+                attributes["image"] = attribute["Value"]
 
-        # create session
+
+        # Create session
         role = attributes["role"] 
         email= attributes["email"] 
         id = attributes["id"] 
-        # session = auth_user["Session"]
-        # if auth_user.get("ChallengeName") is not None:
-        #     challengeParams = auth_user["ChallengeName"]
-        #     if challengeParams == "SOFTWARE_TOKEN_MFA":
-        #         mfa = "Enabled"
-        #     elif challengeParams == "MFA_SETUP":
-        #         mfa = "Disabled"
+        image = attributes["image"]
+        access_token = challenge["AuthenticationResult"]["AccessToken"]
 
-        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa="Enabled")
+        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=access_token,mfa="Enabled",image=image)
         print(request.session.get("session"))
         
         return ORJSONResponse(
