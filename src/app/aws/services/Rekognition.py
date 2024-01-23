@@ -1,7 +1,9 @@
 import boto3
 import botocore
+from utils import constants as C
 
-rekognition_client = boto3.client('rekognition')
+
+rekognition_client = boto3.client('rekognition', region_name=C.RECOGNITION_REGEION)
 
 def detect_objects(image_bytes):
 
