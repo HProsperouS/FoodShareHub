@@ -181,6 +181,7 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
         print(create_user)
 
         if create_user == "fail":
+            # Redirect to register page but the container IP keeps changing every deployment
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","message":"User already exists"}
             )
