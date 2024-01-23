@@ -7,10 +7,10 @@ load_dotenv()
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
 COGNITO_CLIENT_ID = os.environ.get("COGNITO_CLIENT_ID")
 COGNITO_HOSTED_UI = os.environ.get("COGNITO_HOSTED_UI")
-ACCESS_KEY_ID = os.environ.get("ACCESS_KEY_ID")
-SECRET_ACCESS_KEY = os.environ.get("SECRET_ACCESS_KEY")
+# ACCESS_KEY_ID = os.environ.get("ACCESS_KEY_ID")
+# SECRET_ACCESS_KEY = os.environ.get("SECRET_ACCESS_KEY")
 
-client = boto3.client('cognito-idp',region_name = 'us-east-1',aws_access_key_id=ACCESS_KEY_ID,aws_secret_access_key=SECRET_ACCESS_KEY)
+client = boto3.client('cognito-idp',region_name = 'ap-southeast-1')
 
 def authenticate_user(name:str,password:str):
     try:
@@ -28,7 +28,7 @@ def authenticate_user(name:str,password:str):
         return "fail"
         
 
-def register_user(name:str,password:str,email:str,role:str):
+def register_user(name:str,password:str,email:str,role:str,image:str):
     try:
         register = client.sign_up(
             ClientId = COGNITO_CLIENT_ID,
@@ -36,7 +36,8 @@ def register_user(name:str,password:str,email:str,role:str):
             Password = password,
             UserAttributes=[
                 {'Name': 'email', 'Value': email},
-                {"Name": "custom:role", "Value":role}
+                {"Name": "custom:role", "Value":role},
+                {'Name':"custom:image", "Value":image}
             ]
         )
         
@@ -53,7 +54,6 @@ def register_user(name:str,password:str,email:str,role:str):
 def retreive_user(name:str):
     try:
         user = client.admin_get_user(UserPoolId=COGNITO_USER_POOL_ID,Username=name)
-        
         return user
     except Exception as e:
         print(e)
@@ -88,7 +88,7 @@ def verify_software_token(access_token:str,session:str,code:str):
         return verify
     except Exception as e:
         print(e)
-        return verify
+        return "fail"
 
 def login_mfa(code:str,session:str,name:str):
     try:
@@ -104,6 +104,51 @@ def login_mfa(code:str,session:str,name:str):
         return verify
     except Exception as e: 
         print(e)
+        return "fail"
+
+def edit_user_information(name,email,image):
+    try:
+        if image == "N/A":
+            updatedAttributes = [{"Name":"email",'Value':email}]
+        else:
+            updatedAttributes = [{'Name': "custom:image",'Value': image},{'Name': "email",'Value': email}]
+        edit_user = client.admin_update_user_attributes(
+            UserPoolId=COGNITO_USER_POOL_ID,
+            Username=name,
+            UserAttributes=updatedAttributes,
+        )
+        return edit_user
+
+    except Exception as e:
+        print(e)
+        
+        return "fail" 
+    
+def reset_password(current_pass,new_pass,access_token):
+    try:
+        reset = client.change_password(
+            PreviousPassword=current_pass,
+            ProposedPassword=new_pass,
+            AccessToken=access_token
+        )
+
+        return "success"
+    except Exception as e:
+        print(e)
+        return "fail"
+    
+def disable_account(username):
+    try:
+        disable = client.admin_disable_user(
+            UserPoolId=COGNITO_USER_POOL_ID,
+            Username=username
+        )
+
+        return "success"
+    except Exception as e:
+        print(e)
+        return "fail"
+    
         return "fail"    
 
 def list_cognito_user_by_usernames(usernames:list):    
