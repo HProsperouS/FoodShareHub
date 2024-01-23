@@ -1,16 +1,8 @@
 import boto3
 from dotenv import load_dotenv
-import os
+from utils import constants as C
 
-load_dotenv()
-
-COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
-COGNITO_CLIENT_ID = os.environ.get("COGNITO_CLIENT_ID")
-COGNITO_HOSTED_UI = os.environ.get("COGNITO_HOSTED_UI")
-# ACCESS_KEY_ID = os.environ.get("ACCESS_KEY_ID")
-# SECRET_ACCESS_KEY = os.environ.get("SECRET_ACCESS_KEY")
-
-client = boto3.client('cognito-idp',region_name = 'ap-southeast-1')
+client = boto3.client('cognito-idp',region_name = C.COGNITO_REGION)
 
 def authenticate_user(name:str,password:str):
     try:
@@ -20,7 +12,7 @@ def authenticate_user(name:str,password:str):
                 "USERNAME": name,
                 "PASSWORD": password,
             },
-            ClientId=COGNITO_CLIENT_ID
+            ClientId=C.COGNITO_CLIENT_ID
             )
         return login
     except Exception as e:
@@ -31,7 +23,7 @@ def authenticate_user(name:str,password:str):
 def register_user(name:str,password:str,email:str,role:str,image:str):
     try:
         register = client.sign_up(
-            ClientId = COGNITO_CLIENT_ID,
+            ClientId = C.COGNITO_CLIENT_ID,
             Username = name,
             Password = password,
             UserAttributes=[
@@ -42,7 +34,7 @@ def register_user(name:str,password:str,email:str,role:str,image:str):
         )
         
         confirmation_mail = client.resend_confirmation_code(
-            ClientId= COGNITO_CLIENT_ID,
+            ClientId= C.COGNITO_CLIENT_ID,
             Username = name
         )
         return "success"
@@ -53,7 +45,7 @@ def register_user(name:str,password:str,email:str,role:str,image:str):
     
 def retreive_user(name:str):
     try:
-        user = client.admin_get_user(UserPoolId=COGNITO_USER_POOL_ID,Username=name)
+        user = client.admin_get_user(UserPoolId=C.COGNITO_USER_POOL_ID,Username=name)
         return user
     except Exception as e:
         print(e)
@@ -63,7 +55,7 @@ def retreive_user(name:str):
 def register_confirmation(name:str,code:str):
     try:
         confirmation = client.confirm_sign_up(
-            ClientId = COGNITO_CLIENT_ID,
+            ClientId = C.COGNITO_CLIENT_ID,
             Username = name,
             ConfirmationCode = code
         )
@@ -93,7 +85,7 @@ def verify_software_token(access_token:str,session:str,code:str):
 def login_mfa(code:str,session:str,name:str):
     try:
         verify = client.respond_to_auth_challenge(
-            ClientId=COGNITO_CLIENT_ID,
+            ClientId=C.COGNITO_CLIENT_ID,
             ChallengeName='SOFTWARE_TOKEN_MFA',
             ChallengeResponses={
                 'USERNAME': name ,
@@ -113,7 +105,7 @@ def edit_user_information(name,email,image):
         else:
             updatedAttributes = [{'Name': "custom:image",'Value': image},{'Name': "email",'Value': email}]
         edit_user = client.admin_update_user_attributes(
-            UserPoolId=COGNITO_USER_POOL_ID,
+            UserPoolId=C.COGNITO_USER_POOL_ID,
             Username=name,
             UserAttributes=updatedAttributes,
         )
@@ -140,7 +132,7 @@ def reset_password(current_pass,new_pass,access_token):
 def disable_account(username):
     try:
         disable = client.admin_disable_user(
-            UserPoolId=COGNITO_USER_POOL_ID,
+            UserPoolId=C.COGNITO_USER_POOL_ID,
             Username=username
         )
 
@@ -157,7 +149,7 @@ def list_cognito_user_by_usernames(usernames:list):
         filter_string = f"username = \"{username}\""
         try:
             response = client.list_users(
-                UserPoolId=COGNITO_USER_POOL_ID,
+                UserPoolId=C.COGNITO_USER_POOL_ID,
                 Filter=filter_string
             )
             all_users.extend(response['Users'])
