@@ -28,7 +28,8 @@ from aws.services import (
     disable_account,
     upload_qrcode_to_s3,
     delete_s3_object,
-    upload_userimage_to_s3
+    upload_userimage_to_s3,
+    authenticate_user
 )
 from utils import constants as C
 import pyotp
@@ -67,6 +68,9 @@ class EditUser(BaseModel):
 class ResetPassword(BaseModel):
     CurrentPassword: str
     NewPassword: str
+
+class MFAPassword(BaseModel):
+    Password:str
 
 user_router = APIRouter(
     include_in_schema=True,
@@ -110,13 +114,20 @@ async def logout(request: Request) -> RedirectResponse:
         print(e)
 
 @user_router.post("/enablemfa")
-def enablemfa(request:Request) -> ORJSONResponse:
+def enablemfa(request:Request, formData:MFAPassword) -> ORJSONResponse:
     try:
         bucket_name = C.S3_BUCKET_NAME 
         name = request.session.get("session")["username"]
         session = request.session.get("session")["session_id"]
+        password = formData.Password
         # generate associate token to verify later
-        associate = generate_software_token(session=session)
+        try:
+            associate = generate_software_token(session=session)
+        except Exception as e:
+            newsession = authenticate_user(name,password)
+            session =  newsession["Session"]
+            associate = generate_software_token(session=session)
+
         session = associate["Session"]
         verify_access_token = associate["SecretCode"]
 
