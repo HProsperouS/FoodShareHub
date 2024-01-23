@@ -95,3 +95,6 @@ ALLROLES = (GUEST, USER, ADMIN)
 # AWS S3 Configuration
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_REGION = os.getenv("S3_REGION")
+
+# AWS Recognition Configuration
+RECOGNITION_REGEION = os.getenv("AWS_REGION")
