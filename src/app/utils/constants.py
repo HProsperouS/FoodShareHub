@@ -104,6 +104,7 @@ S3_REGION = os.getenv("AWS_DEFAULT_REGION")
 # AWS Cognito Configuration
 COGNITO_USER_POOL_ID = os.getenv("COGNITO_USER_POOL_ID")
 COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
+COGNITO_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 # AWS Recognition Configuration
 RECOGNITION_REGEION = os.getenv("AWS_DEFAULT_REGION")
