@@ -101,12 +101,22 @@ async def startup() -> None:
 add_middlewares(app)
 add_routers(app)
 
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(
+#         "main:app", 
+#         host="localhost", 
+#         port=8080,
+#         reload=True,
+#         log_level="debug",
+#     )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app", 
         host="localhost", 
-        port=8080,
+        port=80,
         reload=True,
         log_level="debug",
     )
