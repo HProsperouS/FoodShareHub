@@ -108,3 +108,6 @@ COGNITO_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 # AWS Recognition Configuration
 RECOGNITION_REGEION = os.getenv("AWS_DEFAULT_REGION")
+
+# AWS Secrets Manager Configuration
+SECRETS_MANAGER_SECRET_NAME = os.getenv("SECRETS_MANAGER_SECRET_NAME")
