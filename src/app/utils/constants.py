@@ -4,6 +4,10 @@ from argon2 import (
     Type as Argon2Type,
 )
 
+import boto3
+import base64
+import json
+
 # import Python's standard libraries
 import pathlib
 import os
@@ -99,15 +103,53 @@ AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 # AWS S3 Configuration
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
-S3_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 # AWS Cognito Configuration
 COGNITO_USER_POOL_ID = os.getenv("COGNITO_USER_POOL_ID")
 COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
-COGNITO_REGION = os.getenv("AWS_DEFAULT_REGION")
-
-# AWS Recognition Configuration
-RECOGNITION_REGEION = os.getenv("AWS_DEFAULT_REGION")
 
 # AWS Secrets Manager Configuration
 SECRETS_MANAGER_SECRET_NAME = os.getenv("SECRETS_MANAGER_SECRET_NAME")
+
+# SSH Tunnel Configuration (for connecting to the database)
+SSH_TUNNEL_HOST = os.getenv("SSH_TUNNEL_HOST")  # Bastion Host IP or DNS
+SSH_TUNNEL_SSH_PORT = 22  
+SSH_TUNNEL_USERNAME = os.getenv("SSH_TUNNEL_USERNAME")
+SSH_TUNNEL_PASSWORD = os.getenv("SSH_TUNNEL_PASSWORD")  
+
+# RDS Configuration (for connecting to the database)
+def retrieve_secret(secret_name, region=AWS_DEFAULT_REGION):
+    """
+    Retrieve a secret from AWS Secrets Manager.
+
+    Parameters:
+    secret_name (str): The name of the secret to retrieve.
+    region (str): The AWS region name, defaults to 'ap-southeast-1'.
+
+    Returns:
+    dict: A dictionary containing the contents of the secret.
+    """
+    # Create a Secrets Manager client
+    client = boto3.client('secretsmanager', region_name=region)
+
+    # Retrieve the secret
+    response = client.get_secret_value(SecretId=secret_name)
+
+    # Parse the secret value
+    if 'SecretString' in response:
+        secret = response['SecretString']
+        secret_dict = json.loads(secret)
+    else:
+        # If the secret is in binary format, you would handle it here
+        # This example assumes it's always a string
+        decoded_binary_secret = base64.b64decode(response['SecretBinary'])
+        secret_dict = json.loads(decoded_binary_secret)
+
+    return secret_dict
+
+secret_dict = retrieve_secret(SECRETS_MANAGER_SECRET_NAME)
+DB_HOST = secret_dict['host']
+DB_PORT = 5432  
+DB_USER = secret_dict['user']
+DB_PASSWORD = secret_dict['password']
+DB_NAME = secret_dict['db']
