@@ -2,7 +2,7 @@ import boto3
 from dotenv import load_dotenv
 from utils import constants as C
 
-client = boto3.client('cognito-idp',region_name = C.COGNITO_REGION)
+client = boto3.client('cognito-idp', region_name = C.AWS_DEFAULT_REGION)
 
 def authenticate_user(name:str,password:str):
     try:
