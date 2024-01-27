@@ -30,6 +30,9 @@ def retrieve_secret(secret_name, region=C.AWS_DEFAULT_REGION):
         decoded_binary_secret = base64.b64decode(response['SecretBinary'])
         secret_dict = json.loads(decoded_binary_secret)
 
+    print("secret: ", secret_dict)
+    print("SecretsName", secret_name)
+    
     return secret_dict
 
 
