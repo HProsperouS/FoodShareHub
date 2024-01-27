@@ -1,6 +1,7 @@
 # import third-party libraries
 from fastapi import (
     APIRouter,
+    HTTPException,
     Request,
     Depends,
     Query
@@ -53,8 +54,9 @@ foodshare_router = APIRouter(
 
 @foodshare_router.get("/addMyListing")
 async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
+    # Check if the user is logged in 
     if not isinstance(rbac_res, rbac.RBACResults):
-        return rbac_res
+        raise HTTPException(status_code=401, detail="Unauthorized")
     
     categories = await get_all_FoodItemCategories(db)
     return await render_template(
@@ -66,9 +68,12 @@ async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | R
     )
 
 @foodshare_router.get("/myListings")
-async def show_my_listings_page(request: Request, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
-    if not isinstance(rbac_res, rbac.RBACResults):
-        return rbac_res
+async def show_my_listings_page(request: Request, db:Session = Depends(get_db)) :
+    # if not isinstance(rbac_res, rbac.RBACResults):
+    #     return rbac_res
+    session = request.session.get(C.SESSION_COOKIE, None)
+    if session is None or "user_id" not in session:
+        return RedirectResponse(url="/login") 
     
     session = request.session.get(C.SESSION_COOKIE, None)
     user_id = session["user_id"]
