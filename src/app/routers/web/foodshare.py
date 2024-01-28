@@ -69,13 +69,10 @@ async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | R
 
 @foodshare_router.get("/myListings")
 async def show_my_listings_page(request: Request, db:Session = Depends(get_db)) :
-    # if not isinstance(rbac_res, rbac.RBACResults):
-    #     return rbac_res
     session = request.session.get(C.SESSION_COOKIE, None)
     if session is None or "user_id" not in session:
         return RedirectResponse(url="/login") 
     
-    session = request.session.get(C.SESSION_COOKIE, None)
     user_id = session["user_id"]
 
     donations = get_all_donations_by_userid(db, user_id)
@@ -92,9 +89,10 @@ async def show_my_listings_page(request: Request, db:Session = Depends(get_db)) 
 
 
 @foodshare_router.get("/editMyListing/{id}")
-async def editMyListing(request: Request, id: int, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db:Session = Depends(get_db)) :
-    if not isinstance(rbac_res, rbac.RBACResults):
-        return rbac_res
+async def editMyListing(request: Request, id: int, db:Session = Depends(get_db)) :
+    session = request.session.get(C.SESSION_COOKIE, None)
+    if session is None or "user_id" not in session:
+        return RedirectResponse(url="/login") 
     
     myDonation = await get_donation_by_id(db, id)
     categories = await get_all_FoodItemCategories(db)
@@ -110,7 +108,10 @@ async def editMyListing(request: Request, id: int, rbac_res: rbac.RBACResults | 
 
 @foodshare_router.get("/donationDetails/{id}")
 async def donationDetails(request: Request, id: int, db: Session = Depends(get_db)) -> HTMLResponse:
-
+    session = request.session.get(C.SESSION_COOKIE, None)
+    if session is None or "user_id" not in session:
+        return RedirectResponse(url="/login") 
+    
     myDonation = await get_donation_by_id(db, id)
 
     return await render_template(
@@ -130,7 +131,7 @@ async def process_search(
     category: str = Query(None, description="Search based on food item category", alias="category"),
     name: str = Query(None, description="Search based on food item name", alias="name"),
     db: Session = Depends(get_db)) -> HTMLResponse:
-
+    
     # Convert to lowercase
     category_lower = category.lower() if category else None
     name_lower = name.lower() if name else None
