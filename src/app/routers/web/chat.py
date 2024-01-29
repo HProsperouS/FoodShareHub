@@ -47,8 +47,8 @@ chat_router = APIRouter(
     tags=["Chat"],
 )
 
-@chat_router.get("/{receiver_id}/{receiver_name}")
-async def chat_1_to_1(request: Request, receiver_id: str, receiver_name: str, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY , db: Session = Depends(get_db)):
+@chat_router.get("/{receiver_name}")
+async def chat_1_to_1(request: Request, receiver_name: str, rbac_res: rbac.RBACResults | RedirectResponse = RBAC_DEPENDENCY, db: Session = Depends(get_db)):
     if not isinstance(rbac_res, rbac.RBACResults):
         return rbac_res
 
