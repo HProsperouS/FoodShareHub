@@ -156,7 +156,7 @@
                         console.log("Current Conversation Id: " + response.chats[0].conversation_id);
                         console.log("Current Receiver: " + response.chats[0].conversation_id);
                         const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
-                        debugger;
+                        
                         if (currentChat) {
                             conversationId.value = currentChat.conversation_id;
                             console.log("Conversation Id: " + conversationId.value);
