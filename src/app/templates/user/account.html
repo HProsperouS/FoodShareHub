@@ -1,0 +1,993 @@
+{% extends "base.html" %}
+{% block title %}Add Donation{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+
+{% endblock %}
+
+{% block content %}
+<style>
+    .avatar-upload {
+    position: relative;
+    max-width: 205px;
+    margin: 10px auto;
+    .avatar-edit {
+        position: absolute;
+        display: none;
+        right: 12px;
+        z-index: 1;
+        top: 10px;
+        input {
+            display: none;
+            + label {
+                display: inline-block;
+                width: 34px;
+                height: 34px;
+                margin-bottom: 0;
+                border-radius: 100%;
+                background: #FFFFFF;
+                border: 1px solid transparent;
+                box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+                cursor: pointer;
+                font-weight: normal;
+                transition: all .2s ease-in-out;
+                &:hover {
+                    background: #f1f1f1;
+                    border-color: #d6d6d6;
+                }
+                &:after {
+                    content: "\f040";
+                    font-family: 'FontAwesome';
+                    color: #757575;
+                    position: absolute;
+                    top: 10px;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    margin: auto;
+                }
+            }
+        }
+    }
+    .avatar-preview {
+        width: 192px;
+        height: 192px;
+        position: relative;
+        border-radius: 100%;
+        border: 6px solid #F8F8F8;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    }
+}
+</style>
+<main>
+<div class="page-content pt-150 pb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 m-auto">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="dashboard-menu">
+                            <ul class="nav flex-column" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link " id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="page-login.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="tab-content account dashboard-content pl-50">
+                            <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="mb-0">Hello Rosie!</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>
+                                            From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>,<br />
+                                            manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="mb-0">Your Orders</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order</th>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                        <th>Total</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>#1357</td>
+                                                        <td>March 45, 2020</td>
+                                                        <td>Processing</td>
+                                                        <td>$125.00 for 2 item</td>
+                                                        <td><a href="#" class="btn-small d-block">View</a></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#2468</td>
+                                                        <td>June 29, 2020</td>
+                                                        <td>Completed</td>
+                                                        <td>$364.00 for 5 item</td>
+                                                        <td><a href="#" class="btn-small d-block">View</a></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#2366</td>
+                                                        <td>August 02, 2020</td>
+                                                        <td>Completed</td>
+                                                        <td>$280.00 for 3 item</td>
+                                                        <td><a href="#" class="btn-small d-block">View</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="mb-0">Orders tracking</h3>
+                                    </div>
+                                    <div class="card-body contact-from-area">
+                                        <p>To track your order please enter your OrderID in the box below and press "Track" button. This was given to you on your receipt and in the confirmation email you should have received.</p>
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <form class="contact-form-style mt-30 mb-50" action="#" method="post">
+                                                    <div class="input-style mb-20">
+                                                        <label>Order ID</label>
+                                                        <input name="order-id" placeholder="Found in your order confirmation email" type="text" />
+                                                    </div>
+                                                    <div class="input-style mb-20">
+                                                        <label>Billing email</label>
+                                                        <input name="billing-email" placeholder="Email you used during checkout" type="email" />
+                                                    </div>
+                                                    <button class="submit submit-auto-width" type="submit">Track</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="card mb-3 mb-lg-0">
+                                            <div class="card-header">
+                                                <h3 class="mb-0">Billing Address</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <address>
+                                                    3522 Interstate<br />
+                                                    75 Business Spur,<br />
+                                                    Sault Ste. <br />Marie, MI 49783
+                                                </address>
+                                                <p>New York</p>
+                                                <a href="#" class="btn-small">Edit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Shipping Address</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <address>
+                                                    4299 Express Lane<br />
+                                                    Sarasota, <br />FL 34249 USA <br />Phone: 1.941.227.4444
+                                                </address>
+                                                <p>Sarasota</p>
+                                                <a href="#" class="btn-small">Edit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade active show" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                                <div class="card">
+                                    
+                                        <div class="card-header">
+                                            <h3 class="mb-0">Account Details</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>
+                                                <form id="edit-information-form" >
+                                                    <div class="row">
+                                                        <div class="col-11" id="personal-information">
+                                                            Personal Information
+                                                        </div>
+                                                        <div class="col-1" id="edit-before">
+                                                            
+                                                            <button type="button" class="btn btn-fill-out btn-sm " name="edit" onclick="editInformationButton()">Edit</button>
+                                            
+                                                        
+                                                        </div>
+                                                        <div class="col-3" id="edit-after" style="display: none;">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <button type="submit" class="btn btn-fill-out btn-sm " name="submit-edit" style="border-radius: 5px;">Confirm</button>                                       
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <button type="button" class="btn btn-sm" style="background-color:red" name="cancel-edit" onclick="editInformationCancel()">Cancel</button>
+                                                                </div>
+                                                                
+                                                            
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="avatar-upload" >
+                                                                <div class="avatar-edit" id="avatar-edit">
+                                                                    <input type='file' id="imageUpload" accept="image/jpeg, image/png" onchange="imagePreview(this); updateBase64Value()" name="image" />
+                                                                    <label for="imageUpload"></label>
+                                                                </div>
+                                                                <div class="avatar-preview">
+                                                                    <!-- <img id="imagePreview" src="http://i.pravatar.cc/500?img=7" alt=""> -->
+                                                                    <div id="imagePreview" style="background-image: url();" >
+                                                                    <div id="tempHolder" hidden>{{request.session["session"]["image"]}}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label>Name</label>
+                                                                <input type="text" name="name" id="name" placeholder="Username" disabled value="{{request.session['session']['username']}}" style="background-color: #F5F7F8;"/>
+                                                                <span for="name" class="text-danger"></span>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Email</label>
+                                                                <input type="text" name="email" id="email" placeholder="Email" disabled value="{{request.session['session']['email']}}" style="background-color: #F5F7F8;"/>
+                                                                <span for="email" class="text-danger"></span>
+                                                            </div>
+                                                            <!-- <div class="form-group">
+                                                                <label>Password</label>
+                                                                <input type="password" name="password" id="password" placeholder="Password" value="123123" disabled/>
+                                                                <span for="password" class="text-danger"></span>
+                                                            </div> -->
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </p>
+                                        </div>
+                                  
+
+                                    <div class="login_footer mb-3">
+                                        <div class="chek-form">
+                                            <h5>Multi-Factor Authentication</h5>
+                                            <!-- <input type="text" id="code" name="code" placeholder="Confirmation code *" /> -->
+                                        </div>
+                                        <div class="form-group">
+                                            {% if request.session["session"]["mfa"] == "Enabled" %}
+                                                <button type="button" class="btn btn-heading btn-block" disabled name="login" >MFA Enabled</button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-heading btn-block" name="login" onclick="enableMFA()" style="background-color: red;">MFA Disabled</button>
+                                                <p id="user_id" hidden>{{request.session["session"]["user_id"]}}</p>
+                                            {% endif %}
+                                    
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="login_footer mb-3">
+                                        <div class="chek-form">
+                                            <h5>Change Password </h5>
+                                            <!-- <input type="text" id="code" name="code" placeholder="Confirmation code *" /> -->
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-heading btn-block" onclick="resetPassword()">Change</button>
+                                        </div>
+                                    </div>
+                                    <div class="login_footer mb-3">
+                                        <div class="chek-form">
+                                            <h5>Disable Account </h5>
+                                            <!-- <input type="text" id="code" name="code" placeholder="Confirmation code *" /> -->
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-heading btn-block" style="background-color: red;" onclick="disableAccount()">Disable</button>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script> 
+    var _base64;
+
+    function disableAccount(){
+        Swal.fire({
+            title: 'Do you want to continue ?',
+            icon: 'info',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText:"Confirm",
+            cancelButtonText:"Cancel",
+            confirmButtonColor: "#1F8A70",
+            cancelButtonColor: "#FF004D",
+            buttonsStyling: true,
+            focusConfirm: false,
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/user/account/disable", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // If code is correct
+                    if(data.status === "success"){
+                        loadingDiv.style.display = "none";
+                        
+                        window.location.href = "http://127.0.0.1:8000/"
+                        
+
+                    // If code is incorrect
+                    }else if(data.status === "fail"){
+                        console.log("code fail")
+                        // Hide loader
+                        loadingDiv.style.display = "none";
+                        
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                        });
+                    }
+                })
+            } 
+        });
+    }
+    function resetPassword(){
+        Swal.fire({
+            title: "Reset Password",
+            html: `
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" name="password" id="password" placeholder="Current password" />
+                    <span for="password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" name="newpassword" id="newpassword" placeholder="New password" />
+                    <span for="newpassword" class="text-danger"></span>
+                </div>
+            `,
+            confirmButtonText: "Reset",
+            showCloseButton: true,
+            focusConfirm: false,
+            preConfirm: () => {
+                return [
+                document.getElementById("password").value,
+                document.getElementById("newpassword").value
+                ];
+            }
+        }).then((result) => {
+
+            // Show loader
+            loadingDiv.style.display = "";
+
+            try{
+                var current_pass = result["value"][0];
+                var new_pass = result["value"][1];
+
+                console.log(current_pass);
+                console.log(new_pass);
+
+                var isValid = validatePassword(current_pass,new_pass)
+
+                if(isValid){
+                    
+                    console.log("Starting reset password");
+                    // Verify code with Cognito
+                    passwordReset(current_pass,new_pass)
+                    console.log("Finish reset password");
+
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+                }
+            }
+            catch{
+                // Hide loader
+                loadingDiv.style.display = "none";
+            }
+            
+            // Hide loader
+            loadingDiv.style.display = "none";
+        })
+    }
+
+    function passwordReset(current_pass,new_pass){
+         // Data to send in the post request
+        const formData = {CurrentPassword:current_pass,NewPassword:new_pass};
+        loadingDiv.style.display = "";
+        // Verify code with Cognito
+        fetch("/user/password/reset", {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // If code is correct
+            if(data.status === "success"){
+                loadingDiv.style.display = "none";
+
+                const SuccessToast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                
+                SuccessToast.fire({
+                    icon: "success",
+                    title: `Password change successfully`
+                });
+
+            // If code is incorrect
+            }else if(data.status === "fail"){
+                console.log("code fail")
+                // Hide loader
+                loadingDiv.style.display = "none";
+                
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                });
+                // Re enter code
+                
+            }
+        })
+    }
+
+    function validatePassword(current_pass,new_pass){
+        if (current_pass === new_pass) {
+            isValid = false;
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Current Passowrd and New Password cannot be the same",
+            });
+            return false
+        }else if(new_pass < 6){
+            isValid = false
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Password needs to have at least 6 characters",
+            });
+            return false
+        }
+
+        return true
+    }
+    // Password validation
+
+    document.getElementById("edit-information-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var isValid = validateForm();
+        console.log(isValid)
+
+        if (isValid) {
+            // Show loader
+            loadingDiv.style.display = "";
+            
+            // Start: Retrieve image input
+            const fileInput = document.getElementById("imageUpload");
+
+            const file = fileInput.files[0];
+            var formData = {}
+            // End: Retrieve image input
+
+            var imageInput = $("input[name='image']");
+            if (imageInput.val() === "") {
+                var formData = {
+                    Email: document.getElementById("email").value,
+                    Image:{
+                        FileName: "",
+                        ContentType: "",
+                        Size: "",
+                        Base64: ""
+                    }
+                    
+                };
+            }else{
+                var formData = {
+                    Email: document.getElementById("email").value,
+                    Image:{
+                        FileName: fileInput.files[0].name,
+                        ContentType: fileInput.files[0].type,
+                        Size: fileInput.files[0].size,
+                        Base64: _base64
+                    }
+                    
+                };
+            }
+
+            // Start: Send form data using Fetch API
+            fetch("/user/account/editInformation", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loader
+                loadingDiv.style.display = 'none';
+                editInformationCancel()
+                if(data.status === "success"){
+                    
+                    const SuccessToast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    }); 
+
+                    SuccessToast.fire({
+                        icon: "success",
+                        title: `Profile has been updated successfully`
+                    });
+
+                    var image_preview = document.getElementById("imagePreview")
+                    image_preview.style.backgroundImage = `url(${data.image})`
+                }
+                else if(data.status === "fail"){
+                    
+                    const SuccessToast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    }); 
+
+                    SuccessToast.fire({
+                        icon: "error",
+                        title: `Failed to update profile`
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        // End: Send form data using Fetch API
+        }
+    });
+
+    function validateForm() {
+        var isValid = true;
+        var emailInput = $("#email");
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        var emailMatch = regex.test(emailInput.val())
+        console.log(emailMatch)
+        if (emailInput.val().length === 0) {
+            isValid = false;
+            showError(emailInput, "Email cannot be empty");
+        }else if(emailMatch === false){
+            isValid = false;
+            showError(emailInput,"Email format is incorrect. Ex: 123@mail.com")
+        }else{
+            hideError(emailInput)
+        }
+
+        return isValid
+    }
+
+    // Function to show error message and highlight input
+    function showError(input, message) {
+        var errorSpan = input.siblings(".text-danger");
+        errorSpan.text(message);
+        input.addClass("is-invalid");
+    }
+
+    // Function to hide error message and remove highlighting
+    function hideError(input) {
+        var errorSpan = input.siblings(".text-danger");
+        errorSpan.text("");
+        input.removeClass("is-invalid");
+    }
+
+    // Set the image for preview
+    function imagePreview(input) {
+        console.log("change")
+        // if (input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#imagePreview').css('background-image', "url("+ e.target.result + ")");
+        }
+        reader.readAsDataURL(input.files[0]);
+        // }
+    }
+
+    // Get the base64 of the profile image
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Update the base64 of the image and run it through image detector
+    function updateBase64Value(){
+        const fileInput = document.getElementById("imageUpload");
+        const file = fileInput.files[0];
+        getBase64(file)
+            .then(base64Value => {
+                _base64 = base64Value;
+                detectProfileImage();
+            })
+            .catch(error => {
+                console.error("Error converting file to base64:", error);
+            });
+    } 
+
+    // Detect for offensive images
+    function detectProfileImage(){
+        loadingDiv.style.display = '';
+
+        const image_data = {
+            base64_data: _base64
+        }
+
+        // Start: Send image data using Fetch API
+        fetch("/api/foodshare/detectobject", {
+            method: "POST",
+            body: JSON.stringify(image_data),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loader
+            loadingDiv.style.display = 'none';
+            // If inappropriate imaged uploaded
+            if(data.message){
+                // Display SweetAlert
+                Swal.fire({
+                    title: 'warning!',
+                    text: data.message,
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+                // Reset the image input and image preview
+                resetImageInput();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+    // Rest image if current image is offensive
+    function resetImageInput() {
+        // Reset the file input
+        var imageInput = document.getElementById('imageUpload');
+        imageInput.value = null;
+
+        // Reset the preview image
+        var previewImage = document.getElementById('imagePreview');
+        var current_image = document.getElementById('tempHolder').innerText
+        console.log(current_image)
+        previewImage.style.backgroundImage = `url(${current_image})`
+        
+    }
+
+    
+    function editInformationButton(){
+        var personalInformation = document.getElementById("personal-information");
+        var editBefore = document.getElementById("edit-before");
+        var editAfter = document.getElementById("edit-after");
+        var avatarEdit = document.getElementById("avatar-edit");
+        var name = document.getElementById("name");
+        var email = document.getElementById("email");
+
+        avatarEdit.style.display = "block";
+        // name.removeAttribute("disabled");
+        // name.style.backgroundColor = "white"
+        email.removeAttribute("disabled");
+        email.style.backgroundColor = "white"
+        personalInformation.classList.remove("col-11");
+        personalInformation.classList.add("col-9")
+        editBefore.style.display = "none";
+        editAfter.style.display = "";
+    }
+    function editInformationCancel(){
+        var personalInformation = document.getElementById("personal-information");
+        var editBefore = document.getElementById("edit-before");
+        var editAfter = document.getElementById("edit-after");
+        var avatarEdit = document.getElementById("avatar-edit");
+        var name = document.getElementById("name");
+        var email = document.getElementById("email");
+        var previewImage = document.getElementById('imagePreview');
+        var current_image = document.getElementById('tempHolder').innerText
+        
+
+        avatarEdit.style.display = "none";
+        // name.setAttribute("disabled","");
+        // name.style.backgroundColor = "#F5F7F8"
+        email.setAttribute("disabled","");
+        email.style.backgroundColor = "#F5F7F8"
+        personalInformation.classList.remove("col-9");
+        personalInformation.classList.add("col-11");
+        editBefore.style.display = "";
+        editAfter.style.display = "none";
+        previewImage.style.backgroundImage = `url(${current_image})`
+    }
+
+
+    // Verify Password
+    function verifyPassword(){
+        const { value: email } = Swal.fire({
+            title: "Password",
+            input: "text",
+            inputLabel: "Your password",
+            inputPlaceholder: "Enter password here",
+            preConfirm: (value) => {
+                    return value
+                }   
+            })
+            .then((result) => {
+                enableMFA(result.value)
+            })
+            .catch(error => {
+                console.error("Error:", error);
+               
+            });
+            
+    }
+    // Enable MFA Step 2 : Turn on MFA & Create QR code for Google Auth Setup
+    function enableMFA(password){
+        var fetch_request = true;
+        var post_data = {Password:password}
+        loadingDiv.style.display = "";
+        // Auth user & Create QR code to scan for Google Auth Setup
+        fetch("/enablemfa",{
+            method:"POST",
+            body: post_data,
+            headers:{
+                "Content-Type": "application/json",
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            
+            // If password is correct
+            if(data.status === "success"){
+                fetch_request = true;
+                post_data = {"access_token":data.access_token,"session":data.session}
+                console.log(data.access_token)
+
+                // Hide loader
+                loadingDiv.style.display = "none";
+
+                // User id of current auth user
+                const user_id = document.getElementById("user_id").innerHTML
+                
+                // Shows a pop up of qr code to scan & enter code generated by Google Auth
+                Swal.fire({
+                    title: "",
+                    text: "Scan this with Google Authenticator",
+                    allowOutsideClick: false,
+                    imageUrl: `${data.qr_code}`,
+                    imageWidth: 400,
+                    imageHeight: 200,
+                    imageAlt: "Custom image",
+                    input: "text",
+                    inputLabel: "Authenticator Code",
+                    inputPlaceholder: "Enter your code here",
+                    inputAttributes: {
+                        maxlength: "10",
+                        autocapitalize: "off",
+                        autocorrect: "off"
+                    },
+                    preConfirm: (value) => {
+                        return value
+                    }
+
+                })
+                .then((result) => {
+                    var access_token = post_data["access_token"];
+                    var session = post_data["session"]
+                    var qr_code = data.qr_code
+                    console.log(access_token)
+
+                    // Show loader
+                    loadingDiv.style.display = "";
+                    
+                    console.log("Starting Auth Code");
+                    // Verify code with Cognito
+                    console.log(result.value)
+                    mfaAuthCode(result.value,access_token,session,qr_code)
+                    console.log("Finish Auth Code");
+
+                    // Hide loader
+                    loadingDiv.style.display = "none";
+                })
+
+            // If password is incorrect
+            }else if(data.status === "fail"){
+                fetch_request= false;
+                // Show loader
+                loadingDiv.style.display = "none";
+
+                // Failed toast of MFA enabled
+                const SuccessToast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                }); 
+                SuccessToast.fire({
+                    icon:"error",
+                    title:"MFA not Enabled"
+                });
+                
+                
+    
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+               
+        });
+    }
+  
+    // Enable MFA Step 3 : Check w/ Cognito if code is correct
+    function mfaAuthCode(code,access_token,session,qr_code){
+        // Data to send in the post request
+        const formData = {AccessToken:access_token,Session:session,Code:code};
+
+        // Verify code with Cognito
+        fetch("/verifymfa", {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // If code is correct
+            if(data.status === "success"){
+                // Hide loader
+                loadingDiv.style.display = "none";
+                
+                // Successful toast of MFA enabled
+                const SuccessToast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                }); 
+                SuccessToast.fire({
+                    icon:"success",
+                    title:"MFA Enabled Successfully"
+                });
+
+
+
+
+
+            // If code is incorrect
+            }else if(data.success === "fail"){
+                // Hide loader
+                loadingDiv.style.display = "none";
+
+                // Re enter code
+                mfaCode(session,access_token.qr_code)
+            }
+        })
+    };
+   
+    // Re enter code
+    function mfaCode(session,access_token,qr_code){
+        const user_id= document.getElementById("user_id").text
+        const {value: code} = Swal.fire({
+            title: "",
+            text: "Scan this with Google Authenticator",
+            imageUrl: `${qr_code}`,
+            imageWidth: 400,
+            imageHeight: 200,
+            imageAlt: "Custom image",
+            input: "text",
+            inputLabel: "Authenticator Code",
+            inputPlaceholder: "Enter your code here",
+            inputAttributes: {
+                maxlength: "10",
+                autocapitalize: "off",
+                autocorrect: "off"
+            }
+
+        });
+        if(code){
+            var access_token = data.access_token
+            var session = data.session
+            // Show loader
+            loadingDiv.style.display = "";
+
+            mfaAuthCode(code,access_token,session)
+        }
+    }
+  
+</script>
+{% endblock %}
