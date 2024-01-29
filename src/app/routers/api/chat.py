@@ -64,8 +64,8 @@ chat_api = APIRouter(
 RBAC_DEPENDENCY = Depends(rbac.USER_RBAC, use_cache=False)
 
 
-@chat_api.websocket("/ws/{receiver_uid}/{receiver_name}")
-async def chat_ws(websocket: WebSocket, receiver_uid: str, receiver_name: str, db: Session = Depends(get_db)):
+@chat_api.websocket("/ws/{receiver_name}")
+async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depends(get_db)):
     """
         Step 1: Check if the receiver is exist
         Step 2: Check if the sender is the same as receiver
@@ -76,7 +76,7 @@ async def chat_ws(websocket: WebSocket, receiver_uid: str, receiver_name: str, d
     # Extracting Sender Username, UserId, and EmailAddress
     sender_doc = await get_info_from_session(websocket)
     print(sender_doc)
-    if sender_doc['UserId'] == receiver_uid:
+    if sender_doc['Username'] == receiver_name:
         return await websocket.close(reason="Sorry! You can't chat with yourself even if you're that lonely.")
 
     receiver = retreive_user(receiver_name)
