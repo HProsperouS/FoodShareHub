@@ -2,6 +2,57 @@
 let userList = [];
 let prevChats = [];
 const chatList = document.getElementById("chatList");
+// const userSearchInput = document.getElementById("userSearchInput");
+// const resetSearch = document.getElementById("resetSearch");
+
+// function searchUsers(value) {
+//     searchNoResults.classList.add("hidden");
+//     if (value == "") {
+//         for (const user of userList) {
+//             chatElement = document.getElementById(user._id);
+//             chatElement.classList.remove("hidden");
+//         }
+
+//         resetSearch.classList.add("hidden");
+//         return;
+//     }
+//     resetSearch.classList.remove("hidden");
+
+//     // filter the chats (client-side)
+//     const filteredUsers = userList.filter((user) => {
+//         return user.username.toLowerCase().includes(value.toLowerCase());
+//     });
+//     for (const user of filteredUsers) {
+//         chatElement = document.getElementById(user._id);
+//         chatElement.classList.remove("hidden");
+//     }
+//     for (const user of userList) {
+//         if (!filteredUsers.includes(user)) {
+//             chatElement = document.getElementById(user._id);
+//             chatElement.classList.add("hidden");
+//         }
+//     }
+//     if (filteredUsers.length == 0) {
+//         // no users found, show no results message
+//         searchNoResults.classList.remove("hidden");
+//     }
+// }
+
+// resetSearch.addEventListener("click", () => {
+//     userSearchInput.value = "";
+//     resetSearch.classList.add("hidden");
+//     searchNoResults.classList.add("hidden");
+//     searchUsers("");
+// });
+// const searchNoResults = document.getElementById("searchNoResults");
+// userSearchInput.addEventListener("input", (event) => {
+//     if (event.target.value.trim() == "") {
+//         event.target.value = "";
+//     }
+
+//     const value = event.target.value;
+//     searchUsers(value);
+// });
 
 function processChats(chats, currentReceiverId) {
     console.log("processChats called");
@@ -40,6 +91,12 @@ function processChats(chats, currentReceiverId) {
         let chatListHtml = "";
         for (let i = 0; i < chats.length; i++) {
             const chat = chats[i];
+            // const chatElement = document.getElementById(chat._id);
+            // let filteredFromSearch = false;
+            // if (chatElement ) {
+            //     // if chatElement is hidden due to search, skip it
+            //     filteredFromSearch = chatElement.classList.contains("hidden");
+            // }
             chatListHtml += getChatHtml(chat, currentReceiverId, false);
             displayedChats.add(chat._id);
         }
@@ -66,7 +123,9 @@ function getOnlineStatusColour(online) {
 const receiverOnlineHeader = document.getElementById("receiverOnlineHeader");
 // const userProfileLink = document.getElementById("userProfileLink");
 const receiverProfileImage = document.getElementById("receiverProfileImage");
+// const receiverDisplayName = document.getElementById("receiverDisplayName"); 
 const receiverDisplayName = document.getElementById("receiverUsername"); // Display name is the username
+// const receiverUsername = document.getElementById("receiverUsername");
 
 function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     // TODO - If now no receiver is selected, select the current receiver id
