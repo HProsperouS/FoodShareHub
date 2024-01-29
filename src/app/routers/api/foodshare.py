@@ -102,7 +102,6 @@ async def process_add_listing_form(request: Request, formData: DonationCreate, d
     
     new_donation = Donation(
         Status=DonationStatus.ACTIVE,
-        CreatedDate=Helper.get_current_time_in_singapore(),
         MeetUpLocation=formData.MeetUpLocation,
         UserId = user_id,
         Username = username,
