@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from enum import Enum as PythonEnum
 from datetime import datetime
 from db.base import Base
-import pytz
+from utils.helper import get_current_time_in_singapore
 
 '''SQLAlchemy models'''
 class FoodItemCategory(Base):
@@ -73,10 +73,8 @@ class Donation(Base):
     Status = Column(Enum(DonationStatus), nullable=False)
 
     # Start: Set the timezone to Singapore
-    singapore_timezone = pytz.timezone('Asia/Singapore')
-    current_time_singapore = datetime.now(singapore_timezone)
-    CreatedDate = Column(DateTime(timezone=True), default=current_time_singapore)
-    UpdatedDate = Column(DateTime(timezone=True), default=current_time_singapore)
+    CreatedDate = Column(DateTime, default=datetime.now)
+    UpdatedDate = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     # End: Set the timezone to Singapore
 
     MeetUpLocation = Column(String, default="")

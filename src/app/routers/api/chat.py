@@ -22,6 +22,7 @@ from utils.helper import (
     decode_base64_file
 )
 from utils import constants as C
+from utils import helper as Helper
 from db import (
     # Chat
     get_messages_for_user,
@@ -210,7 +211,6 @@ async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depend
                 Receiver=receiver_doc['Username'],
                 Content=msg,
                 Type="text",
-                SendTime=datetime.now(),
                 IsRead=False,
                 ConversationId=conversation_id
             )

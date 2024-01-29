@@ -18,6 +18,7 @@ from utils.helper import (
     decode_base64_file
 )
 from utils import constants as C
+from utils import helper as Helper
 from db import (
     # FoodItem Section
     add_fooditem, 
@@ -101,7 +102,7 @@ async def process_add_listing_form(request: Request, formData: DonationCreate, d
     
     new_donation = Donation(
         Status=DonationStatus.ACTIVE,
-        CreatedDate=datetime.now(),
+        CreatedDate=Helper.get_current_time_in_singapore(),
         MeetUpLocation=formData.MeetUpLocation,
         UserId = user_id,
         Username = username,
@@ -175,7 +176,6 @@ async def process_update_listing_form(
         Status=DonationStatus.ACTIVE,
         MeetUpLocation=formData.MeetUpLocation,
         Username="JiaJun Liu",
-        UpdatedDate=datetime.now(),
         FoodItem=updated_food_item
     )
 
