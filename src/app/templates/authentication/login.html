@@ -1,238 +1,242 @@
-{% extends "base.html" %}
-{% block title %}Add Donation{% endblock %}
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+{% extends "base.html" %} {% block title %}Add Donation{% endblock %} {% block
+head %} {{ super() }}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}"
+/>
 
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <main>
-    <div class="page-content pt-100 pb-100">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
-                    <div class="row">
-                        <div class="col-lg-6 pr-30 d-none d-lg-block">
-                            <img class="border-radius-15" src="{{ url_for('static', path='assets/imgs/page/login-1.png') }}" alt="" />
-                        </div>
-                        <div class="col-lg-6 col-md-8">
-                            <div class="login_wrap widget-taber-content background-white">
-                                <div class="padding_eight_all bg-white">
-                                    <div class="heading_s1">
-                                        <h1 class="mb-5">Login</h1>
-                                        <p class="mb-30">Don't have an account? <a href="/register">Register Here</a></p>
-                                    </div>
-                                    <form id="signin_form">
-                                        <div class="mb-3">
-                                            <input type="text"  id="name" name="name" placeholder="Username" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <input  type="password" id="password" name="password" placeholder="Your password *" />
-                                        </div>
-                                        <div class="login_footer form-group mb-50">
-                                            <div class="form-group">
-                                            <button type="submit" class="btn btn-heading btn-block hover-up" name="login">Log in</button>
-                                        </div>
-                                            <a class="text-muted" href="#">Forgot password?</a>
-                                        </div>
-                                        
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="page-content pt-100 pb-100">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
+          <div class="row">
+            <div class="col-lg-6 pr-30 d-none d-lg-block">
+              <img
+                class="border-radius-15"
+                src="{{ url_for('static', path='assets/imgs/page/login-1.png') }}"
+                alt=""
+              />
             </div>
+            <div class="col-lg-6 col-md-8">
+              <div class="login_wrap widget-taber-content background-white">
+                <div class="padding_eight_all bg-white">
+                  <div class="heading_s1">
+                    <h1 class="mb-5">Login</h1>
+                    <p class="mb-30">
+                      Don't have an account?
+                      <a href="/register">Register Here</a>
+                    </p>
+                  </div>
+                  <form id="signin_form">
+                    <div class="mb-3">
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Username"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Your password *"
+                      />
+                    </div>
+                    <div class="login_footer form-group mb-50">
+                      <div class="form-group">
+                        <button
+                          type="submit"
+                          class="btn btn-heading btn-block hover-up"
+                          name="login"
+                        >
+                          Log in
+                        </button>
+                      </div>
+                      <a class="text-muted" href="#">Forgot password?</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </main>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("signin_form").addEventListener("submit", function(event) {
-            event.preventDefault();
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("signin_form")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            // Show loader
-            loadingDiv.style.display = "block";
+        // Show loader
+        loadingDiv.style.display = "block";
 
-            const formData = {
-                Name: document.getElementById("name").value,
-                Password: document.getElementById("password").value,
-            };
-        
-            console.log("fetching api")
-            // Start: Send form data using Fetch API
-            fetch("/login", {
-                method: "POST",
-                body: JSON.stringify(formData),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("redirecting")
-                console.log(data)
+        const formData = {
+          Name: document.getElementById("name").value,
+          Password: document.getElementById("password").value,
+        };
 
-                // Check for status of Login
-                if(data.status === "success"){
-                    // Extract the redirect URL from the JSON response
-                    const redirectUrl = data.redirect_url;
-                    if(data.mfa === "Enabled"){
-                        
-                        mfaCode(data.name,data.password)
-
-                        // Hide loader
-                        loadingDiv.style.display = "none";
-
-                    }else if(data.mfa === "Disabled"){
-
-                        // Set item in local to display message in next page
-                        localStorage.setItem("action","success_login")
-
-                        // Redirect to the extracted URL
-                        window.location.href = data.redirectUrl;
-
-                        // Hide loader
-                        loadingDiv.style.display = "none";
-                    }
-
-                } else if(data.status === "fail"){
-                    console.log("fail")
-                    
-                    // Hide loader
-                    loadingDiv.style.display = "none";
-
-                    // Display Error notification if authentication fails
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        confirmButtonColor:"#3BB77E",
-                        text: "Invalid username or password, Please try again",
-                    });
-                }
-
-                
-            })
-            .catch(error => {
-                console.error("Error:", error);
-               
-            });
-            // End: Send form data using Fetch API
-
+        console.log("fetching api");
+        // Start: Send form data using Fetch API
+        fetch("/login", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
         })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("redirecting");
+            console.log(data);
 
+            // Check for status of Login
+            if (data.status === "success") {
+              // Extract the redirect URL from the JSON response
+              const redirectUrl = data.redirect_url;
+              if (data.mfa === "Enabled") {
+                mfaCode(data.name, data.password);
 
-    })
-
-    function mfaAuthCode(name,password,code){
-        const formData = {Name:name,Password:password,Code:code};
-
-        // Verify code with Cognito
-        fetch("/login/mfa", {
-            method: "POST",
-            body: JSON.stringify(formData),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            // If code is correct
-            if(data.status === "success"){
-
-                // Show loader
-                loadingDiv.style.display = "";
-
-                console.log("code pass")
-               // Set item in local to display message in next page
-                localStorage.setItem("action","success_login")
-
-                // Redirect to the extracted URL
-                window.location.href = data.redirect_url ;
-
-                // Hide loader
-                // loadingDiv.style.display = "";
-
-            // If code is incorrect
-            }else if(data.status === "fail"){
                 // Hide loader
                 loadingDiv.style.display = "none";
+              } else if (data.mfa === "Disabled") {
+                // Set item in local to display message in next page
+                localStorage.setItem("action", "success_login");
 
-                // Re enter code
-                mfaCodeRetry(name,password)
+                // Redirect to the extracted URL
+                window.location.href = data.redirect_url;
+
+                // Hide loader
+                loadingDiv.style.display = "none";
+              }
+            } else if (data.status === "fail") {
+              console.log("fail");
+
+              // Hide loader
+              loadingDiv.style.display = "none";
+
+              // Display Error notification if authentication fails
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                confirmButtonColor: "#3BB77E",
+                text: "Invalid username or password, Please try again",
+              });
             }
-        })
-    };
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+        // End: Send form data using Fetch API
+      });
+  });
 
-    function mfaCode(name,password){
-        
-        Swal.fire({
-            title: "",
-            text: "Google Authentication",
-            allowOutsideClick: false,
-            input: "text",
-            inputPlaceholder: "Enter your code here",
-            inputAttributes: {
-                maxlength: "10",
-                autocapitalize: "off",
-                autocorrect: "off"
-            },
-            preConfirm: (value) => {
-                return value
-            }
+  function mfaAuthCode(name, password, code) {
+    const formData = { Name: name, Password: password, Code: code };
 
-        })
-        .then((result) => {
+    // Verify code with Cognito
+    fetch("/login/mfa", {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // If code is correct
+        if (data.status === "success") {
+          // Show loader
+          loadingDiv.style.display = "";
 
-            // Show loader
-            loadingDiv.style.display = "";
-            
-            console.log("Starting Auth Code");
+          console.log("code pass");
+          // Set item in local to display message in next page
+          localStorage.setItem("action", "success_login");
 
-            // Verify code with Cognito
-            mfaAuthCode(name,password,result.value)
+          // Redirect to the extracted URL
+          window.location.href = data.redirect_url;
 
-            console.log("Finish Auth Code");
+          // Hide loader
+          // loadingDiv.style.display = "";
 
-            // Hide loader
-            loadingDiv.style.display = "none";
-        })
-    }
+          // If code is incorrect
+        } else if (data.status === "fail") {
+          // Hide loader
+          loadingDiv.style.display = "none";
 
-    function mfaCodeRetry(name,password){
-        
-        Swal.fire({
-            icon: "error",
-            title: "Google Authentication",
-            text: "Invalid Code, Please try again",
-            allowOutsideClick: false,
-            input: "text",
-            inputPlaceholder: "Enter your code here",
-            inputAttributes: {
-                maxlength: "10",
-                autocapitalize: "off",
-                autocorrect: "off"
-            },
-            preConfirm: (value) => {
-                return value
-            }
+          // Re enter code
+          mfaCodeRetry(name, password);
+        }
+      });
+  }
 
-        })
-        .then((result) => {
+  function mfaCode(name, password) {
+    Swal.fire({
+      title: "",
+      text: "Google Authentication",
+      allowOutsideClick: false,
+      input: "text",
+      inputPlaceholder: "Enter your code here",
+      inputAttributes: {
+        maxlength: "10",
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+      preConfirm: (value) => {
+        return value;
+      },
+    }).then((result) => {
+      // Show loader
+      loadingDiv.style.display = "";
 
-            // Show loader
-            loadingDiv.style.display = "";
-            
-            console.log("Starting Auth Code");
-            // Verify code with Cognito
-            mfaAuthCode(name,password,result.value)
-            
-            console.log("Finish Auth Code");
+      console.log("Starting Auth Code");
 
-            // Hide loader
-            loadingDiv.style.display = "none";
-        })
-    }
+      // Verify code with Cognito
+      mfaAuthCode(name, password, result.value);
+
+      console.log("Finish Auth Code");
+
+      // Hide loader
+      loadingDiv.style.display = "none";
+    });
+  }
+
+  function mfaCodeRetry(name, password) {
+    Swal.fire({
+      icon: "error",
+      title: "Google Authentication",
+      text: "Invalid Code, Please try again",
+      allowOutsideClick: false,
+      input: "text",
+      inputPlaceholder: "Enter your code here",
+      inputAttributes: {
+        maxlength: "10",
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+      preConfirm: (value) => {
+        return value;
+      },
+    }).then((result) => {
+      // Show loader
+      loadingDiv.style.display = "";
+
+      console.log("Starting Auth Code");
+      // Verify code with Cognito
+      mfaAuthCode(name, password, result.value);
+
+      console.log("Finish Auth Code");
+
+      // Hide loader
+      loadingDiv.style.display = "none";
+    });
+  }
 </script>
 {% endblock %}
