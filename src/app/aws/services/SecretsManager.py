@@ -32,8 +32,3 @@ def retrieve_secret(secret_name, region=C.AWS_DEFAULT_REGION):
     
     return secret_dict
 
-
-# Example usage
-# secret_info = retrieve_secret("FoodShareHubSecrets")
-# print(secret_info)
-
