@@ -14,6 +14,10 @@ from .Location import (
     autocomplete_address
 )
 
+from .SecretsManager import (
+    retrieve_secret
+)
+
 from .Cognito import(
     register_user,
     register_confirmation,

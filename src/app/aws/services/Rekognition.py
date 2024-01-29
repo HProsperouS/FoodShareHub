@@ -3,7 +3,7 @@ import botocore
 from utils import constants as C
 
 
-rekognition_client = boto3.client('rekognition', region_name=C.RECOGNITION_REGEION)
+rekognition_client = boto3.client('rekognition', region_name=C.AWS_DEFAULT_REGION)
 
 def detect_objects(image_bytes):
 
