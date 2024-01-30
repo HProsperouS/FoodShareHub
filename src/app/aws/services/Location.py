@@ -2,7 +2,7 @@
 import boto3
 from utils import constants as C
 
-def autocomplete_address(query_text, max_results=10):
+def autocomplete_address(query_text, max_results=10, region=C.AWS_DEFAULT_REGION):
     client = boto3.client('location')
     
     response = client.search_place_index_for_suggestions(

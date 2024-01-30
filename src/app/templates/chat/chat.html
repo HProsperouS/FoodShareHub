@@ -96,50 +96,13 @@
             }
         });
         
-        let latestRetrievedMsg = new Date(0);
         const messageIds = new Set();
         let isProcessingMessage = false; // a mutex to prevent race conditions
-        let oldestMsgId = null;
-        let hasFetchedNewMsgs = false;
         let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
-        let noMoreOldMsgs = false; // a flag to prevent unnecessary requests to the server
-        const loadingOldMsgAlert = document.getElementById("loadingOldMsgAlert");
-        
         let retrieveInitialMessages = true;
-        // const scrollFn = () => {
-        //     if (!retrieveInitialMessages && !noMoreOldMsgs && !fetchingMutex && mainMsgDiv.scrollTop === 0 && !isProcessingMessage && ws.readyState === 1) {
-        //         hasFetchedNewMsgs = true;
-        //         fetchingMutex = true;
-        //         loadingOldMsgAlert.classList.remove("hidden");
-    
-        //         // The user has scrolled to the top of the chat window
-        //         // Send a request to the server to retrieve more messages
-        //         ws.send(JSON.stringify({
-        //             "fetch_messages": true,
-        //             "oldest_msg_id": oldestMsgId,
-        //         }));
-        //     }
-        // };
-        // mainMsgDiv.addEventListener("scroll", scrollFn);
 
-        let fetchOnAuthenticate = false;
-        let hasAlreadyFetchedOnLoad = false;
-        const fetchMsgOnLoad = async () => {
-            if (!hasAlreadyFetchedOnLoad) {
-                hasAlreadyFetchedOnLoad = true;
-                await new Promise((resolve) => setTimeout(resolve, 3000));
-                while (authenticatedToChat && mainMsgDiv.scrollTop === 0 && !noMoreOldMsgs) {
-                    scrollFn();
-                    await new Promise((resolve) => setTimeout(resolve, 1500));
-                }
-            }
-        }
-            
-        // Get the current scroll position and the scrollable content height
-        let scrollPos = mainMsgDiv.scrollTop;
-        let scrollHeight = mainMsgDiv.scrollHeight;
         function startWebSocket() {
-            {% with ws_url = url_for("chat_ws", external=True, receiver_uid=receiver.UserId, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
+            {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
                 ws = new WebSocket("{{ ws_url }}");
             {% endwith %}
     
@@ -193,7 +156,7 @@
                         console.log("Current Conversation Id: " + response.chats[0].conversation_id);
                         console.log("Current Receiver: " + response.chats[0].conversation_id);
                         const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
-                        debugger;
+                        
                         if (currentChat) {
                             conversationId.value = currentChat.conversation_id;
                             console.log("Conversation Id: " + conversationId.value);
@@ -271,9 +234,7 @@
                 } finally {
                     isProcessingMessage = false;
                 }
-                if (!hasAlreadyFetchedOnLoad && fetchOnAuthenticate) {
-                    fetchMsgOnLoad();
-                }
+                
             };
         };
         startWebSocket();

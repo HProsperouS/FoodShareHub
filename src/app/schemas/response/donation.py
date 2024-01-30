@@ -15,6 +15,6 @@ class FoodItemResponse(BaseModel):
 class DonationResponse(BaseModel):
     id: int
     status: DonationStatus
-    date: datetime = datetime.now()
+    date: datetime
     location: str = ''
     fooditem: FoodItemResponse

@@ -15,9 +15,13 @@ from utils.jinja2_helper import (
     url_for,
     render_template,
 )
+import redis
+import os
 
 # import Python's standard libraries
 from typing import Any # TODO: to remove
+# session management
+cache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
 
 async def verify_access(
     request: Request | WebSocket,
@@ -177,6 +181,14 @@ class RBACDepends:
                 # admin_db=admin_db,
             )
             if isinstance(response, dict):
+                # cache can only access on ec2 not local
+                # session = response["session_id"]
+                # name = response["username"]
+                # value = cache.get(name)
+                # decoded_value = value.decode("utf-8")
+                # if decoded_value != session:
+                #     return RBACResults(user_info=None)
+               
                 return RBACResults(
                     user_info=response,
                 

@@ -9,7 +9,7 @@ from starlette.types import (
 )
 
 # import Python's standard libraries
-from typing import (
+from typing_extensions import (
     Any, 
     Self,
 )

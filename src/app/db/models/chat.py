@@ -24,7 +24,7 @@ class Message(Base):
     Receiver = Column(String, nullable=False)
     Content = Column(String(1000), nullable=False)
     Type = Column(String, nullable=False)
-    SendTime = Column(DateTime, default=get_current_time_in_singapore)
+    SendTime = Column(DateTime, default=datetime.now())
     IsRead = Column(Boolean, default=False)
 
     ConversationId = Column(Integer, ForeignKey('Conversations.Id'), nullable=False)
@@ -39,7 +39,7 @@ class Conversation(Base):
     Participant1 = Column(String, nullable=False)
     Participant2 = Column(String, nullable=False)
     LastMessageId = Column(Integer, nullable=True)
-    StartTime = Column(DateTime, default=get_current_time_in_singapore)
+    StartTime = Column(DateTime, default=datetime.now())
     LastMessageTime = Column(DateTime, nullable=True)
     
     Messages = relationship("Message", backref="conversation")

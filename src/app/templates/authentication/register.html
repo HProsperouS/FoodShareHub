@@ -1,215 +1,285 @@
-{% extends "base.html" %}
-{% block title %}Add Donation{% endblock %}
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}" />
+{% extends "base.html" %} {% block title %}Add Donation{% endblock %} {% block
+head %} {{ super() }}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', path='assets/css/plugins/slider-range.css') }}"
+/>
 
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <main>
-    <div class="page-content pt-100 pb-100">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
-                        <div class="row">
-                            <div class="col-lg-6 col-md-8">
-                                <div class="login_wrap widget-taber-content background-white">
-                                    <div class="padding_eight_all bg-white">
-                                        <div class="heading_s1">
-                                            <h1 class="mb-5">Create an Account</h1>
-                                            <p class="mb-30">Already have an account? <a href="/login">Log In Here</a></p>
-                                        </div>
-                                        <form id="signup_form">
-                                            <div class="form-group">
-                                                <input type="text" name="name" id="name" placeholder="Username" />
-                                                <span for="name" class="text-danger"></span>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" name="email" id="email" placeholder="Email" />
-                                                <span for="email" class="text-danger"></span>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="password" name="password" id="password" placeholder="Password" />
-                                                <span for="password" class="text-danger"></span>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="password" name="confirmpassword" id="confirmpassword" placeholder="Confirm password" />
-                                                <span for="confirmpassword" class="text-danger"></span>
-                                            </div>
-                                            <div class="login_footer form-group mb-50">
-                                                <div class="chek-form">
-                                                    <div class="custome-checkbox">
-                                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox12" value="" />
-                                                        <label class="form-check-label" for="exampleCheckbox12"><span>I agree to terms &amp; Policy.</span></label>
-                                                    </div>
-                                                </div>
-                                                <!-- <a href="page-privacy-policy.html"><i class="fi-rs-book-alt mr-5 text-muted"></i>Lean more</a> -->
-                                            </div>
-                                            <div class="form-group mb-30">
-                                                <button type="submit" class="btn btn-fill-out btn-block hover-up font-weight-bold" name="signup">Register</button>
-                                            </div>
-                                            <p class="font-xs text-muted"><strong>Note:</strong>Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy</p>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 pr-30 d-none d-lg-block">
-                                <div class="card-login mt-115">
-                                    <a href="#" class="social-login facebook-login">
-                                        <img src="{{ url_for('static', path='assets/imgs/theme/icons/logo-facebook.svg') }}" alt="" />
-                                        <span>Continue with Facebook</span>
-                                    </a>
-                                    <a href="#" class="social-login google-login">
-                                        <img src="{{ url_for('static', path='assets/imgs/theme/icons/logo-google.svg') }}" alt="" />
-                                        <span>Continue with Google</span>
-                                    </a>
-                                    <a href="#" class="social-login apple-login">
-                                        <img src="{{ url_for('static', path='assets/imgs/theme/icons/logo-apple.svg') }}" alt="" />
-                                        <span>Continue with Apple</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+  <div class="page-content pt-100 pb-100">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
+          <div class="row">
+            <div class="col-lg-6 col-md-8">
+              <div class="login_wrap widget-taber-content background-white">
+                <div class="padding_eight_all bg-white">
+                  <div class="heading_s1">
+                    <h1 class="mb-5">Create an Account</h1>
+                    <p class="mb-30">
+                      Already have an account? <a href="/login">Log In Here</a>
+                    </p>
+                  </div>
+                  <form id="signup_form">
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        placeholder="Username"
+                      />
+                      <span for="name" class="text-danger"></span>
                     </div>
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        name="email"
+                        id="email"
+                        placeholder="Email"
+                      />
+                      <span for="email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="Password"
+                      />
+                      <span for="password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                      <input
+                        type="password"
+                        name="confirmpassword"
+                        id="confirmpassword"
+                        placeholder="Confirm password"
+                      />
+                      <span for="confirmpassword" class="text-danger"></span>
+                    </div>
+                    <div class="login_footer form-group mb-50">
+                      <div class="chek-form">
+                        <div class="custome-checkbox">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="checkbox"
+                            id="exampleCheckbox12"
+                            value=""
+                          />
+                          <label
+                            class="form-check-label"
+                            for="exampleCheckbox12"
+                            ><span>I agree to terms &amp; Policy.</span></label
+                          >
+                        </div>
+                      </div>
+                      <!-- <a href="page-privacy-policy.html"><i class="fi-rs-book-alt mr-5 text-muted"></i>Lean more</a> -->
+                    </div>
+                    <div class="form-group mb-30">
+                      <button
+                        type="submit"
+                        class="btn btn-fill-out btn-block hover-up font-weight-bold"
+                        name="signup"
+                      >
+                        Register
+                      </button>
+                    </div>
+                    <p class="font-xs text-muted">
+                      <strong>Note:</strong>Your personal data will be used to
+                      support your experience throughout this website, to manage
+                      access to your account, and for other purposes described
+                      in our privacy policy
+                    </p>
+                  </form>
                 </div>
+              </div>
             </div>
+            <div class="col-lg-6 pr-30 d-none d-lg-block">
+              <div class="card-login mt-115">
+                <a href="#" class="social-login facebook-login">
+                  <img
+                    src="{{ url_for('static', path='assets/imgs/theme/icons/logo-facebook.svg') }}"
+                    alt=""
+                  />
+                  <span>Continue with Facebook</span>
+                </a>
+                <a href="#" class="social-login google-login">
+                  <img
+                    src="{{ url_for('static', path='assets/imgs/theme/icons/logo-google.svg') }}"
+                    alt=""
+                  />
+                  <span>Continue with Google</span>
+                </a>
+                <a href="#" class="social-login apple-login">
+                  <img
+                    src="{{ url_for('static', path='assets/imgs/theme/icons/logo-apple.svg') }}"
+                    alt=""
+                  />
+                  <span>Continue with Apple</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
 </main>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("signup_form").addEventListener("submit", function(event) {
-            event.preventDefault();
-            
-            // Show loader
-            loadingDiv.style.display = '';
-
-            // Validate input fields
-            if (validateForm()) {
-                console.log("validation pass")
-
-                const formData = {
-                    Name: document.getElementById("name").value,
-                    Email: document.getElementById("email").value,
-                    Password: document.getElementById("password").value,
-                    Role: "User",
-                };
-            
-                console.log("fetching api")
-
-                // Start: Send form data using Fetch API
-                fetch("/register", {
-                    method: "POST",
-                    body: JSON.stringify(formData),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("redirecting")
-                    console.log(data)
-
-                    if(data.status === "success"){
-                        // Hide loader
-                        loadingDiv.style.display = "none";
-
-                        // Extract the redirect URL from the JSON response
-                        const redirectUrl = data.redirect_url;
-
-                        // store action in local storage
-                        localStorage.setItem("action","signup_confirmation")
-                        localStorage.setItem("data",document.getElementById("email").value)
-
-                        // Redirect to the extracted URL
-                        window.location.href = redirectUrl;
-
-                        // Hide loader
-                        loadingDiv.style.display = 'none';
-                    }else if(data.status === "fail"){
-                        // Hide loader
-                        loadingDiv.style.display = "none";
-                        
-                        // Extract the redirect URL from the JSON response
-                        const redirectUrl = data.redirect_url;
-
-                        // Store action in local storage
-                        localStorage.setItem("action","signup_error")
-                        localStorage.setItem("data",data.message)
-
-                        // Redirect to the extracted URL
-                        window.location.href = redirectUrl;
-
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                });
-                // End: Send form data using Fetch API
-            }
-            // Hide loader
-            loadingDiv.style.display = 'none';
-        })
-    })  
     
-    function validateForm() {
-            var isValid = true;
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("signup_form")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            // Username validation
-            var nameInput = $("#name");
-            if (nameInput.val().length < 3 ) {
-                isValid = false;
-                
-                showError(nameInput, "Username needs to be 3 or more characters");
-            }else{
-                hideError(nameInput)
-            }
+        // Show loader
+        loadingDiv.style.display = "";
 
-            // Email validation
-            var emailInput = $("#email");
-            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            var emailMatch = regex.test(emailInput.val())
-            console.log(emailMatch)
-            if (emailInput.val().length === 0) {
-                isValid = false;
-                showError(emailInput, "Email cannot be empty");
-            }else if(emailMatch === false){
-                isValid = false;
-                showError(emailInput,"Email format is incorrect. Ex: 123@mail.com")
-            }else{
-                hideError(emailInput)
-            }
+        // Validate input fields
+        if (validateForm()) {
+          console.log("validation pass");
 
-            // Password validation
-            var passwordInput = $("#password");
-            var confirmpasswordInput = $("#confirmpassword")
-            if (passwordInput.val() != confirmpasswordInput.val()) {
-                isValid = false;
-                showError(confirmpasswordInput, "Password & Confirm Password does not match")
-                showError(passwordInput, "Password & Confirm Password does not match");
-            }else if(passwordInput.val().length < 6){
-                isValid = false
-                showError(passwordInput, "Password needs to have 6 or more characters")
-            }else{
-                hideError(confirmpasswordInput)
-                hideError(passwordInput)
-            }
+          const formData = {
+            Name: document.getElementById("name").value,
+            Email: document.getElementById("email").value,
+            Password: document.getElementById("password").value,
+            Role: "User",
+          };
 
-            return isValid;
+          console.log("fetching api");
+
+          // Start: Send form data using Fetch API
+          fetch("/register", {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("redirecting");
+              console.log(data);
+
+              if (data.status === "success") {
+                // Hide loader
+                loadingDiv.style.display = "none";
+
+                // Extract the redirect URL from the JSON response
+                const redirectUrl = data.redirect_url;
+
+                // store action in local storage
+                localStorage.setItem("action", "signup_confirmation");
+                localStorage.setItem(
+                  "data",
+                  document.getElementById("email").value
+                );
+
+                // Redirect to the extracted URL
+                window.location.href = redirectUrl;
+
+                // Hide loader
+                loadingDiv.style.display = "none";
+              } else if (data.status === "fail") {
+                if (data.text_analysis === "NEGATIVE") {
+                  // Hide loader
+                  loadingDiv.style.display = "none";
+                  var nameInput = $("#name");
+                  showError(nameInput, "Username is not acceptable");
+                } else if (data.language_analysis !== "en") {
+                  loadingDiv.style.display = "none";
+                  var nameInput = $("#name");
+                  showError(nameInput, "Only english is allowed");
+                } else {
+                  // Hide loader
+                  loadingDiv.style.display = "none";
+
+                  // Extract the redirect URL from the JSON response
+                  const redirectUrl = data.redirect_url;
+
+                  // Store action in local storage
+                  localStorage.setItem("action", "signup_error");
+                  localStorage.setItem("data", data.message);
+
+                  // Redirect to the extracted URL
+                  window.location.href = redirectUrl;
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+          // End: Send form data using Fetch API
+        }
+        // Hide loader
+        loadingDiv.style.display = "none";
+      });
+  });
+
+  function validateForm() {
+    var isValid = true;
+
+    // Username validation
+    var nameInput = $("#name");
+    if (nameInput.val().length < 3) {
+      isValid = false;
+
+      showError(nameInput, "Username needs to be 3 or more characters");
+    } else {
+      hideError(nameInput);
     }
 
-    // Function to show error message and highlight input
-    function showError(input, message) {
-        var errorSpan = input.siblings(".text-danger");
-        errorSpan.text(message);
-        input.addClass("is-invalid");
+    // Email validation
+    var emailInput = $("#email");
+    var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var emailMatch = regex.test(emailInput.val());
+    console.log(emailMatch);
+    if (emailInput.val().length === 0) {
+      isValid = false;
+      showError(emailInput, "Email cannot be empty");
+    } else if (emailMatch === false) {
+      isValid = false;
+      showError(emailInput, "Email format is incorrect. Ex: 123@mail.com");
+    } else {
+      hideError(emailInput);
     }
 
-    // Function to hide error message and remove highlighting
-    function hideError(input) {
-        var errorSpan = input.siblings(".text-danger");
-        errorSpan.text("");
-        input.removeClass("is-invalid");
+    // Password validation
+    var passwordInput = $("#password");
+    var confirmpasswordInput = $("#confirmpassword");
+    if (passwordInput.val() != confirmpasswordInput.val()) {
+      isValid = false;
+      showError(
+        confirmpasswordInput,
+        "Password & Confirm Password does not match"
+      );
+      showError(passwordInput, "Password & Confirm Password does not match");
+    } else if (passwordInput.val().length < 6) {
+      isValid = false;
+      showError(passwordInput, "Password needs to have 6 or more characters");
+    } else {
+      hideError(confirmpasswordInput);
+      hideError(passwordInput);
     }
+
+    return isValid;
+  }
+
+  // Function to show error message and highlight input
+  function showError(input, message) {
+    var errorSpan = input.siblings(".text-danger");
+    errorSpan.text(message);
+    input.addClass("is-invalid");
+  }
+
+  // Function to hide error message and remove highlighting
+  function hideError(input) {
+    var errorSpan = input.siblings(".text-danger");
+    errorSpan.text("");
+    input.removeClass("is-invalid");
+  }
 </script>
 {% endblock %}

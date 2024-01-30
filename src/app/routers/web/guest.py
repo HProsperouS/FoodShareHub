@@ -13,6 +13,7 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 import boto3
+import redis
 from aws.services import (
     register_user,
     register_confirmation,
@@ -58,6 +59,8 @@ class LoginMfa(BaseModel):
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
+elasticache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
+
 def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str):
     # session_id = str(uuid.uuid4())
 
@@ -72,9 +75,10 @@ def create_session(request:Request, username: str,role:str,user_id:str,email:str
         }
     
     return "success"
+
 @guest_router.get("/login")
 async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLResponse:
-    print(RBACResults)
+    # print(RBACResults)
     if not isinstance(rbac_res, RBACResults):
         print(rbac_res.headers)
         return rbac_res
@@ -105,6 +109,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             )
         elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
             request.session["temp_session"] = auth_user["Session"]
+            
             return ORJSONResponse(
                 content={"name":name,"password":password,"status":"success","mfa":"Enabled"}
             )
@@ -137,11 +142,23 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             mfa = "Disabled"
 
             create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image)
+            
+            # caching session ( works with ec2 not local )
+            # print(elasticache)
+            # elasticache.set(name,session)
+            # elasticache.expire(name, 300)
+            # value = elasticache.get(name)
+            # decode = value.decode("utf-8")
+            # print(decode)
+
             print(request.session.get("session"))
             
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","mfa":"Disabled"}
             ) 
+        # return ORJSONResponse(
+        #     content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
+        # ) 
     except Exception as e :
         print(e)
 
@@ -157,6 +174,7 @@ async def register(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HT
     if not isinstance(rbac_res, RBACResults):
         return rbac_res
 
+
     return await render_template( 
         name="authentication/register.html",
         context={
@@ -167,8 +185,8 @@ async def register(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HT
         
 @guest_router.post("/register")
 async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
-    
     try:
+
         # User credentials
         name = formData.Name
         password = formData.Password
@@ -176,11 +194,29 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
         role = formData.Role
         image = "N/A"
 
+        # detect type of language and offensive language
+        client = boto3.client("comprehend",region_name = "ap-southeast-1")
+        detect_text = client.detect_sentiment(Text=name, LanguageCode="en")
+        detect_language = client.detect_dominant_language(Text=name)
+        
+        if detect_text["Sentiment"] == "NEGATIVE":
+            print(detect_text)
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","text_analysis":detect_text["Sentiment"]}
+            )
+        if detect_language["Languages"][0]["LanguageCode"] != "en":
+            language_type = detect_language["Languages"][0]["LanguageCode"]
+            print(detect_language)
+            return ORJSONResponse(
+                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","language_analysis":language_type}
+            )
+
         # Create user
         create_user = register_user(name,password,email,role,image)
         print(create_user)
 
         if create_user == "fail":
+            # Redirect to register page but the container IP keeps changing every deployment
             return ORJSONResponse(
                 content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","message":"User already exists"}
             )

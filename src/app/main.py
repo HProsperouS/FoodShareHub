@@ -26,9 +26,6 @@ load_dotenv()
 from redis import Redis
 # from starlette_session.backends import BackendType
 
-# redis cached endpoint
-redis_client = Redis.from_url("redis://demo-redis.ampw1p.ng.0001.use1.cache.amazonaws.com:6379")
-
 # JWT Authentication
 # auth = JWTBearer(get_jwks())
 
@@ -65,8 +62,6 @@ def add_middlewares(app: FastAPI) -> None:
         session_cookie=C.SESSION_COOKIE,
         https_only=not C.DEBUG_MODE,
         max_age=6000,
-        # backend_type=BackendType.redis,
-        # backend_client=redis_client,
     )
     add_app_exception_handlers(app)
 

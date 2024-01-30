@@ -1,368 +1,615 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ url_for('static', path='assets/imgs/theme/FSH-Browser-Logo.jpeg') }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', path='assets/imgs/theme/FSH-Browser-Logo.jpeg') }}"
+    />
     <title>{% block title %}{% endblock %} - Web</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/main.css') }}?v=5.6" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='assets/css/main.css') }}?v=5.6"
+    />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/plugins/animate.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/main.css') }}?v=1.1" />
-    
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='assets/css/plugins/animate.min.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='assets/css/main.css') }}?v=1.1"
+    />
+
     <!-- Custom Site CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/site.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='assets/css/site.css') }}"
+    />
 
     <!-- Font Awesome kit -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
     <!-- Boostrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">   
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"
+    />
 
     <!-- Toastr -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+    />
 
     <!-- Chat CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', path='assets/css/chat/chat.css') }}" />
-</head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='assets/css/chat/chat.css') }}"
+    />
+  </head>
 
-<body >
+  <body>
     <!-- Start header -->
     <header class="header-area header-style-1 header-height-2">
-        <div class="mobile-promotion">
-            <span>Share More, Waste Less</span>
-        </div>
-        <div class="header-middle header-middle-ptb-1 d-none d-lg-block">
-            <div class="container">
-                <div class="header-wrap">
-                    <div class="logo logo-width-1">
-                        <!-- logo-width-1 -->
-                        <a href="/" class=""><img style="border:100px;" src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
-                    </div>
-                    <div class="header-right">
-                        <div class="search-style-2">
-                            <div id="search" class="form">
-                                <select id="searchCategory" class="select-active">
-                                    <option>All Categories</option>
-                                    <option>Milks & Dairies</option>
-                                    <option>Fresh Fruits</option>
-                                    <option>Vegetables</option>
-                                    <option>Wine & Drinks</option>
-                                    <option>Baking Material</option>
-                                    <option>Pet Foods</option>
-                                    <option>Noodles & Rice</option>
-                                    <option>Snacks</option>
-                                    <option>Others</option>
-                                </select>
-                                <input id="searchInput" type="text" placeholder="Search for items..."/>
-                            </div>
-                        </div>
-                        <div class="header-action-right">
-                            <div class="header-action-2">
-                                <div class="search-location">
-                                    <form>
-                                        <select class="select-active">
-                                            <option>Your Location</option>
-                                            <option>Singapore</option>
-                                        </select>
-                                    </form>
-                                </div>
-                                <div class="header-action-icon-2">
-                                    <a href="#">
-                                        <img class="svgInject" alt="FSH" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notification.svg') }}" />
-                                        <span class="pro-count blue" id="notificationCount">3</span>
-                                    </a>
-                                    <a href="#"><span class="lable ml-0">Notifications</span></a>
+      <div class="mobile-promotion">
+        <span>Share More, Waste Less</span>
+      </div>
+      <div class="header-middle header-middle-ptb-1 d-none d-lg-block">
+        <div class="container">
+          <div class="header-wrap">
+            <div class="logo logo-width-1">
+              <!-- logo-width-1 -->
+              <a href="/" class=""
+                ><img
+                  style="border: 100px"
+                  src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}"
+                  alt="logo"
+              /></a>
+            </div>
+            <div class="header-right">
+              <div class="search-style-2">
+                <div id="search" class="form">
+                  <select id="searchCategory" class="select-active">
+                    <option>All Categories</option>
+                    <option>Milks & Dairies</option>
+                    <option>Fresh Fruits</option>
+                    <option>Vegetables</option>
+                    <option>Wine & Drinks</option>
+                    <option>Baking Material</option>
+                    <option>Pet Foods</option>
+                    <option>Noodles & Rice</option>
+                    <option>Snacks</option>
+                    <option>Others</option>
+                  </select>
+                  <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search for items..."
+                  />
+                </div>
+              </div>
+              <div class="header-action-right">
+                <div class="header-action-2">
+                  <div class="search-location">
+                    {% if location %}
+                    <form>
+                      <select
+                        class="select-active"
+                        onchange="getItemLocation()"
+                        id="location_options"
+                      >
+                        <option value="Marina Bay Sands">
+                          Marina Bay Sands
+                        </option>
+                        <option value="Hougang Mall">Hougang Mall</option>
+                        <option value="Chinatown Street Market">
+                          Chinatown Street Market
+                        </option>
+                        <option value="Jewel Changi Airport">
+                          Jewel Changi Airport
+                        </option>
+                      </select>
+                    </form>
+                    {% else %}
+                    <form>
+                      <select class="select-active">
+                        <option value="Singapore">Singapore</option>
+                      </select>
+                    </form>
+                    {% endif %}
+                  </div>
+                  <div class="header-action-icon-2">
+                    <a href="#">
+                      <img
+                        class="svgInject"
+                        alt="FSH"
+                        src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notification.svg') }}"
+                      />
+                      <span class="pro-count blue" id="notificationCount"
+                        >3</span
+                      >
+                    </a>
+                    <a href="#"
+                      ><span class="lable ml-0">Notifications</span></a
+                    >
+                  </div>
+                  <div class="header-action-icon-2">
+                    {% if request.session["session"] %} {% if
+                    request.session["session"]["role"] %}
+                    <a>
+                      <img
+                        id="user_image"
+                        style="width: 30px; height: 30px"
+                        src=""
+                      />
+                      <p id="user_image_name" hidden>
+                        {{request.session["session"]["image"]}}
+                      </p>
+                    </a>
+                    <a href="#"
+                      ><span class="lable ml-0"
+                        >{{request.session["session"]["username"]}}</span
+                      ></a
+                    >
 
-                                </div>
-                                <div class="header-action-icon-2">
-                                    
-                                    {% if request.session["session"] %}
-                                        {% if request.session["session"]["role"] %}
-                                            <a>
-                                                <img id="user_image" style="width:10px;height:10px;" src="">
-                                                <p id="user_image_name" hidden>{{request.session["session"]["image"]}}</p>
-                                            </a>
-                                            <a href="#"><span class="lable ml-0">{{request.session["session"]["username"]}}</span></a>
-                                            <p id="login_user" style="display: none;">{{request.session["session"]["username"]}}</p>
-                                        {% endif %}
-                                        <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
-                                            <ul>
-                                                <li><a href="/user/account"><i class="fi fi-rs-user mr-10"></i>My Account</a></li>
-                                                <li><a href="#"><i class="fi fi-rs-bell mr-10"></i>Notification</a></li>
-                                                <li><a href="#"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
-                                                {% if request.session["session"] %}
-                                                    <li>
-                                                        <form method="POST" action="/logout" onsubmit="logout()">
-                                                            <button class="btn btn-primary" type="submit">
-                                                                <i class="fi fi-rs-sign-out mr-10"></i>Sign out
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
-                                    {% else %}
-                                        <a href="/login">
-                                            <span class="lable ml-0">Login</span>
-                                        </a>
-                                    {% endif %}
-                                    
-                                </div>
-                            </div>
-                        </div>
+                    {% endif %}
+                    <div
+                      class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown"
+                    >
+                      <ul>
+                        <li>
+                          <a href="/user/account"
+                            ><i class="fi fi-rs-user mr-10"></i>My Account</a
+                          >
+                        </li>
+                        <li>
+                          <a href="#"
+                            ><i class="fi fi-rs-bell mr-10"></i>Notification</a
+                          >
+                        </li>
+                        <li>
+                          <a href="#"
+                            ><i class="fi fi-rs-settings-sliders mr-10"></i
+                            >Setting</a
+                          >
+                        </li>
+                        {% if request.session["session"] %}
+                        <li>
+                          <form
+                            method="POST"
+                            action="/logout"
+                            onsubmit="logout()"
+                          >
+                            <button class="btn btn-primary" type="submit">
+                              <i class="fi fi-rs-sign-out mr-10"></i>Sign out
+                            </button>
+                          </form>
+                        </li>
+                        {% endif %}
+                      </ul>
                     </div>
+                    {% else %}
+                    <a href="/login">
+                      <span class="lable ml-0">Login</span>
+                    </a>
+                    {% endif %}
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div class="header-bottom header-bottom-bg-color sticky-bar">
-            <div class="container">
-                <div class="header-wrap header-space-between position-relative">
-                    <div class="logo logo-width-1 d-block d-lg-none">
-                        <a href="/"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
-                    </div>
-                    
-                    <div class="header-nav d-none d-lg-flex">
-                        
-                        <div class="main-categori-wrap d-none d-lg-block">
-                            <a class="categories-button-active" href="#">
-                                <span class="fi-rs-apps"></span> <span class="et">Browse</span> All Categories
-                                <i class="fi-rs-angle-down"></i>
-                            </a>
-                            <div class="categories-dropdown-wrap categories-dropdown-active-large font-heading">
-                                <div class="d-flex categori-dropdown-inner">
-                                    <ul>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Milks & Dairies')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Milks & Dairies</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Vegetables')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-8.svg') }}" alt="" />Vegetables</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Baking Material')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}" alt="" />Baking Material</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Noodles & Rice')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-9.svg') }}" alt="" />Noodles & Rice</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Others')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-4.svg') }}" alt="" />Others</a>
-                                        </li>  
-                                    </ul>
-                                    <ul class="end">
-                                        <li>
-                                            <a onclick="performSearchByCategory('Fresh Fruits')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-7.svg') }}" alt="" />Fresh Fruits</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Wine & Drinks')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-2.svg') }}" alt="" />Wine & Drinks</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Pet Foods')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-4.svg') }}" alt="" />Pet Foods</a>
-                                        </li>
-                                        <li>
-                                            <a onclick="performSearchByCategory('Snacks')"><img src="{{ url_for('static', path='assets/imgs/theme/icons/category-5.svg') }}" alt="" />Snacks</a>
-                                        </li>                                 
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block font-heading">
-                            <nav>
-                                <ul>
-                                    <li class="hot-deals">
-                                        <img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-hot.svg') }}" alt="hot deals" />
-                                        <a href="/">Home</a>
-                                    </li>
-                                    <li>
-                                        <a>Food Share<i class="fi-rs-angle-down"></i></a>
-                                        <ul class="sub-menu">
-                                            <li><a href="{{ url_for('show_my_listings_page') }}">My Listings</a></li>
-                                            <li><a href="{{ url_for('show_add_listing_form') }}">Add FoodItems</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                    
-                    <div class="header-action-icon-2 d-block d-lg-none">
-                        <div class="burger-icon burger-icon-white">
-                            <span class="burger-icon-top"></span>
-                            <span class="burger-icon-mid"></span>
-                            <span class="burger-icon-bottom"></span>
-                        </div>
-                    </div>
+      </div>
+      <div class="header-bottom header-bottom-bg-color sticky-bar">
+        <div class="container">
+          <div class="header-wrap header-space-between position-relative">
+            <div class="logo logo-width-1 d-block d-lg-none">
+              <a href="/"
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}"
+                  alt="logo"
+              /></a>
+            </div>
+
+            <div class="header-nav d-none d-lg-flex">
+              <div class="main-categori-wrap d-none d-lg-block">
+                <a class="categories-button-active" href="#">
+                  <span class="fi-rs-apps"></span>
+                  <span class="et">Browse</span> All Categories
+                  <i class="fi-rs-angle-down"></i>
+                </a>
+                <div
+                  class="categories-dropdown-wrap categories-dropdown-active-large font-heading"
+                >
+                  <div class="d-flex categori-dropdown-inner">
+                    <ul>
+                      <li>
+                        <a onclick="performSearchByCategory('Milks & Dairies')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}"
+                            alt=""
+                          />Milks & Dairies</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Vegetables')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-8.svg') }}"
+                            alt=""
+                          />Vegetables</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Baking Material')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-1.svg') }}"
+                            alt=""
+                          />Baking Material</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Noodles & Rice')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-9.svg') }}"
+                            alt=""
+                          />Noodles & Rice</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Others')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/icon-4.svg') }}"
+                            alt=""
+                          />Others</a
+                        >
+                      </li>
+                    </ul>
+                    <ul class="end">
+                      <li>
+                        <a onclick="performSearchByCategory('Fresh Fruits')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-7.svg') }}"
+                            alt=""
+                          />Fresh Fruits</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Wine & Drinks')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-2.svg') }}"
+                            alt=""
+                          />Wine & Drinks</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Pet Foods')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-4.svg') }}"
+                            alt=""
+                          />Pet Foods</a
+                        >
+                      </li>
+                      <li>
+                        <a onclick="performSearchByCategory('Snacks')"
+                          ><img
+                            src="{{ url_for('static', path='assets/imgs/theme/icons/category-5.svg') }}"
+                            alt=""
+                          />Snacks</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
                 </div>
+              </div>
+
+              <div
+                class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block font-heading"
+              >
+                <nav>
+                  <ul>
+                    <li class="hot-deals">
+                      <img
+                        src="{{ url_for('static', path='assets/imgs/theme/icons/icon-hot.svg') }}"
+                        alt="hot deals"
+                      />
+                      <a href="/">Home</a>
+                    </li>
+                    <li>
+                      <a>Food Share<i class="fi-rs-angle-down"></i></a>
+                      <ul class="sub-menu">
+                        <li>
+                          <a href="{{ url_for('show_my_listings_page') }}"
+                            >My Listings</a
+                          >
+                        </li>
+                        <li>
+                          <a href="{{ url_for('show_add_listing_form') }}"
+                            >Add FoodItems</a
+                          >
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
             </div>
+
+            <div class="header-action-icon-2 d-block d-lg-none">
+              <div class="burger-icon burger-icon-white">
+                <span class="burger-icon-top"></span>
+                <span class="burger-icon-mid"></span>
+                <span class="burger-icon-bottom"></span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </header>
 
-    
-    <div class="mobile-header-active mobile-header-wrapper-style" >
-        <div class="mobile-header-wrapper-inner">
-            <div class="mobile-header-top">
-                <div class="mobile-header-logo">
-                    <a href="#"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
-                </div>
-                <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
-                    <button class="close-style search-close">
-                        <i class="icon-top"></i>
-                        <i class="icon-bottom"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="mobile-header-content-area">
-                <div class="mobile-search search-style-3 mobile-header-border">
-                    <form action="#">
-                        <input type="text" placeholder="Search for items…" />
-                        <button type="submit"><i class="fi-rs-search"></i></button>
-                    </form>
-                </div>
-                <div class="mobile-menu-wrap mobile-header-border">
-                    <!-- mobile menu start -->
-                    <nav>
-                        <ul class="mobile-menu font-heading">
-                            <li class="menu-item-has-children">
-                                <a href="/">Home</a>
-                            </li>
-                            <li class="menu-item-has-children">
-                                <a href="#">Food Share</a>
-                                <ul class="dropdown">
-                                    <li><a href="{{ url_for('show_my_listings_page') }}">My Listings</a></li>
-                                    <li><a href="{{ url_for('show_add_listing_form') }}">Add FoodItems</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </nav>
-                    <!-- mobile menu end -->
-                </div>
-                <div class="mobile-header-info-wrap">
-                    <div class="single-mobile-header-info">
-                        <a><i class="fi-rs-marker"></i> 180 Ang Mo Kio Ave 8, Singapore 569830 </a>
-                    </div>
-                    <div class="single-mobile-header-info">
-                        <a><i class="fi-rs-user"></i>Log In / Sign Up </a>
-                    </div>
-                    <div class="single-mobile-header-info">
-                        <a><i class="fi-rs-headphones"></i>(+65) - 8183 - 8227 </a>
-                    </div>
-                </div>
-                <div class="mobile-social-icon mb-50">
-                    <h6 class="mb-15">Follow Us</h6>
-                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
-                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
-                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
-                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
-                    <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
-                </div>
-                <div class="site-copyright">Copyright 2024 © FoodShareHub. All rights reserved. </div>
-            </div>
+    <div class="mobile-header-active mobile-header-wrapper-style">
+      <div class="mobile-header-wrapper-inner">
+        <div class="mobile-header-top">
+          <div class="mobile-header-logo">
+            <a href="#"
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}"
+                alt="logo"
+            /></a>
+          </div>
+          <div
+            class="mobile-menu-close close-style-wrap close-style-position-inherit"
+          >
+            <button class="close-style search-close">
+              <i class="icon-top"></i>
+              <i class="icon-bottom"></i>
+            </button>
+          </div>
         </div>
+        <div class="mobile-header-content-area">
+          <div class="mobile-search search-style-3 mobile-header-border">
+            <form action="#">
+              <input type="text" placeholder="Search for items…" />
+              <button type="submit"><i class="fi-rs-search"></i></button>
+            </form>
+          </div>
+          <div class="mobile-menu-wrap mobile-header-border">
+            <!-- mobile menu start -->
+            <nav>
+              <ul class="mobile-menu font-heading">
+                <li class="menu-item-has-children">
+                  <a href="/">Home</a>
+                </li>
+                <li class="menu-item-has-children">
+                  <a href="#">Food Share</a>
+                  <ul class="dropdown">
+                    <li>
+                      <a href="{{ url_for('show_my_listings_page') }}"
+                        >My Listings</a
+                      >
+                    </li>
+                    <li>
+                      <a href="{{ url_for('show_add_listing_form') }}"
+                        >Add FoodItems</a
+                      >
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+            <!-- mobile menu end -->
+          </div>
+          <div class="mobile-header-info-wrap">
+            <div class="single-mobile-header-info">
+              <a
+                ><i class="fi-rs-marker"></i> 180 Ang Mo Kio Ave 8, Singapore
+                569830
+              </a>
+            </div>
+            <div class="single-mobile-header-info">
+              <a><i class="fi-rs-user"></i>Log In / Sign Up </a>
+            </div>
+            <div class="single-mobile-header-info">
+              <a><i class="fi-rs-headphones"></i>(+65) - 8183 - 8227 </a>
+            </div>
+          </div>
+          <div class="mobile-social-icon mb-50">
+            <h6 class="mb-15">Follow Us</h6>
+            <a
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}"
+                alt=""
+            /></a>
+            <a
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}"
+                alt=""
+            /></a>
+            <a
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}"
+                alt=""
+            /></a>
+            <a
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}"
+                alt=""
+            /></a>
+            <a
+              ><img
+                src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}"
+                alt=""
+            /></a>
+          </div>
+          <div class="site-copyright">
+            Copyright 2024 © FoodShareHub. All rights reserved.
+          </div>
+        </div>
+      </div>
     </div>
     <!--End header-->
 
     <div class="container">
-        {% for message in get_flashed_messages() %}
-            {% if message.category and message.category.strip() %}
-                <div class="alert alert-{{ message.category }} alert-dismissible fade show" role="alert">
-                    <strong>{{ message.message }}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-        {% endfor %}
-        <!-- Alert Modal -->
-        <div id="alertModal" class="modal fade" >
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="alertModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="alertModalBody">
-                        <!-- Message content will be inserted here -->
-                    </div>
-                </div>
+      {% for message in get_flashed_messages() %} {% if message.category and
+      message.category.strip() %}
+      <div
+        class="alert alert-{{ message.category }} alert-dismissible fade show"
+        role="alert"
+      >
+        <strong>{{ message.message }}</strong>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endif %} {% endfor %}
+      <!-- Alert Modal -->
+      <div id="alertModal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="alertModalLabel"></h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
+            <div class="modal-body" id="alertModalBody">
+              <!-- Message content will be inserted here -->
+            </div>
+          </div>
         </div>
-    </div> 
-    <div>
-        {% block content %}
-        {% endblock %}
-    </div> 
-    <hr>
+      </div>
+    </div>
+    <div>{% block content %} {% endblock %}</div>
+    <hr />
 
     <footer class="main">
-        <section class="section-padding footer-mid">
-            <div class="container pt-15 pb-20">
-                <div class="row">
-                    <div class="col">
-                        <div class="widget-about font-md mb-md-3 mb-lg-3 mb-xl-0">
-                            <div class="logo mb-30">
-                                <a href="#" class="mb-15"><img src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}" alt="logo" /></a>
-                                <p class="font-lg text-heading">Share More, Waste Less</p>
-                            </div>
-                            <ul class="contact-infor">
-                                <li><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-location.svg') }}" alt="" /><strong>Address:</strong> <span>180 Ang Mo Kio Ave 8, Singapore 569830</span></li>
-                                <li><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-contact.svg') }}" alt="" /><strong>Call Us:</strong> <span>(+65) - 8183-8227</span></li>
-                                <li><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-email-2.svg') }}" alt="" /><strong>Email:</strong> <span>support@FoodShareHub.com</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="footer-link-widget col">
-                        <h4 class="widget-title">Company</h4>
-                        <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a>About Us</a></li>
-                            <li><a>Privacy Policy</a></li>
-                            <li><a >Terms &amp; Conditions</a></li>
-                            <li><a>Contact Us</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-link-widget col">
-                        <h4 class="widget-title">Account</h4>
-                        <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a>Sign In</a></li>
-                            <li><a>Sign Up</a></li>
-                        </ul>
-                    </div>
+      <section class="section-padding footer-mid">
+        <div class="container pt-15 pb-20">
+          <div class="row">
+            <div class="col">
+              <div class="widget-about font-md mb-md-3 mb-lg-3 mb-xl-0">
+                <div class="logo mb-30">
+                  <a href="#" class="mb-15"
+                    ><img
+                      src="{{ url_for('static', path='assets/imgs/theme/FSH4-Logo.png') }}"
+                      alt="logo"
+                  /></a>
+                  <p class="font-lg text-heading">Share More, Waste Less</p>
                 </div>
+                <ul class="contact-infor">
+                  <li>
+                    <img
+                      src="{{ url_for('static', path='assets/imgs/theme/icons/icon-location.svg') }}"
+                      alt=""
+                    /><strong>Address:</strong>
+                    <span>180 Ang Mo Kio Ave 8, Singapore 569830</span>
+                  </li>
+                  <li>
+                    <img
+                      src="{{ url_for('static', path='assets/imgs/theme/icons/icon-contact.svg') }}"
+                      alt=""
+                    /><strong>Call Us:</strong> <span>(+65) - 8183-8227</span>
+                  </li>
+                  <li>
+                    <img
+                      src="{{ url_for('static', path='assets/imgs/theme/icons/icon-email-2.svg') }}"
+                      alt=""
+                    /><strong>Email:</strong>
+                    <span>support@FoodShareHub.com</span>
+                  </li>
+                </ul>
+              </div>
             </div>
-        </section>
-        <div class="container pb-30">
-            <div class="row align-items-center">
-                <div class="col-12 mb-30">
-                    <div class="footer-bottom"></div>
-                </div>
-                <div class="col-xl-4 col-lg-6 col-md-6">
-                    <p class="font-sm mb-0">&copy; 2023, <strong class="text-brand">FoodShareHub</strong> - A Food Sharing Platform <br />All rights reserved</p>
-                </div>
-                <div class="col-xl-4 col-lg-6 text-center d-none d-xl-block">
-                </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 text-end d-none d-md-block">
-                    <div class="mobile-social-icon">
-                        <h6>Follow Us</h6>
-                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}" alt="" /></a>
-                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}" alt="" /></a>
-                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}" alt="" /></a>
-                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}" alt="" /></a>
-                        <a><img src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}" alt="" /></a>
-                    </div>
-                </div>
+            <div class="footer-link-widget col">
+              <h4 class="widget-title">Company</h4>
+              <ul class="footer-list mb-sm-5 mb-md-0">
+                <li><a>About Us</a></li>
+                <li><a>Privacy Policy</a></li>
+                <li><a>Terms &amp; Conditions</a></li>
+                <li><a>Contact Us</a></li>
+              </ul>
             </div>
+            <div class="footer-link-widget col">
+              <h4 class="widget-title">Account</h4>
+              <ul class="footer-list mb-sm-5 mb-md-0">
+                <li><a>Sign In</a></li>
+                <li><a>Sign Up</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
+      </section>
+      <div class="container pb-30">
+        <div class="row align-items-center">
+          <div class="col-12 mb-30">
+            <div class="footer-bottom"></div>
+          </div>
+          <div class="col-xl-4 col-lg-6 col-md-6">
+            <p class="font-sm mb-0">
+              &copy; 2023, <strong class="text-brand">FoodShareHub</strong> - A
+              Food Sharing Platform <br />All rights reserved
+            </p>
+          </div>
+          <div class="col-xl-4 col-lg-6 text-center d-none d-xl-block"></div>
+          <div class="col-xl-4 col-lg-6 col-md-6 text-end d-none d-md-block">
+            <div class="mobile-social-icon">
+              <h6>Follow Us</h6>
+              <a
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/icons/icon-facebook-white.svg') }}"
+                  alt=""
+              /></a>
+              <a
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/icons/icon-twitter-white.svg') }}"
+                  alt=""
+              /></a>
+              <a
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/icons/icon-instagram-white.svg') }}"
+                  alt=""
+              /></a>
+              <a
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/icons/icon-pinterest-white.svg') }}"
+                  alt=""
+              /></a>
+              <a
+                ><img
+                  src="{{ url_for('static', path='assets/imgs/theme/icons/icon-youtube-white.svg') }}"
+                  alt=""
+              /></a>
+            </div>
+          </div>
+        </div>
+      </div>
     </footer>
 
     <!-- Preloader Start -->
-    <div id="loadingDiv"  style="display: none;">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="text-center">
-                    <img src="{{ url_for('static', path='assets/imgs/theme/loading-transparent.gif') }}" alt="" />
-                </div>
-            </div>
+    <div id="loadingDiv" style="display: none">
+      <div class="preloader d-flex align-items-center justify-content-center">
+        <div class="preloader-inner position-relative">
+          <div class="text-center">
+            <img
+              src="{{ url_for('static', path='assets/imgs/theme/loading-transparent.gif') }}"
+              alt=""
+            />
+          </div>
         </div>
+      </div>
     </div>
 
     {% block scripts %}
@@ -386,7 +633,7 @@
     <script src="{{ url_for('static', path='assets/js/plugins/jquery.vticker-min.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/plugins/jquery.theia.sticky.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/plugins/jquery.elevatezoom.js') }}"></script>
-    
+
     <!-- Template  JS -->
     <script src="{{ url_for('static', path='assets/js/main.js') }}?v=5.6"></script>
     <script src="{{ url_for('static', path='assets/js/shop.js') }}?v=5.6"></script>
@@ -396,7 +643,7 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <!-- DOMPurify -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@2/dist/purify.min.js"></script>
 
@@ -406,186 +653,245 @@
     <script src="{{ url_for('static', path='assets/js/chat/time.js') }}"></script>
 
     <script>
-        const loadingDiv = document.getElementById("loadingDiv");
-        // On load check for actions to be done in local storage
-        window.onload = function() {
-            try{
-                var user_image_name = document.getElementById("tempHolder");
-                var user_image = document.getElementById("imagePreview");
-                if(user_image_name.innerText === "N/A"){
-                    user_image.style.backgroundImage = "url(https://tse2.mm.bing.net/th?id=OIP.6UhgwprABi3-dz8Qs85FvwHaHa&pid=Api&P=0&h=180)"
-                }else{
-                    user_image.style.backgroundImage = `url(${user_image_name.innerText})`
-                }
-            }catch{
-                console.log("/")
-            }
+      function getItemLocation() {
+        // Get the <select> element by its ID
+        var selectElement = document.getElementById("location_options");
 
-            try{
-                // Hide loader
-                loadingDiv.style.display = "none";
-                
-                var action = localStorage.getItem("action")
-                console.log(action)
-                // Toast template to use 
-                const SuccessToast = Swal.mixin({
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
-                // For successful login
-                if(action === "success_login"){
-                    console.log("trigger login toast")
-                    var login_user = document.getElementById("login_user").innerHTML
-                    SuccessToast.fire({
-                        icon: "success",
-                        title: `Welcome back ${login_user}`
-                    });
-                    localStorage.removeItem("action")
-                }
-                // For successful logout
-                else if(action === "success_logout"){
-                    console.log("trigger logout toast")
-                    SuccessToast.fire({
-                        icon: "success",
-                        title: "Logout Successfully"
-                    });
-                    localStorage.removeItem("action")
-                // For signup confirmation
-                }else if(action === "signup_confirmation"){
-                    console.log("trigger signup confirmation toast")
-                    var email = localStorage.getItem("data")
-                    SuccessToast.fire({
-                        icon:"success",
-                        title:`A confirmation code has been sent to ${email}`
-                    })
-                    localStorage.removeItem("action")
-                    localStorage.removeItem("data")
-                }else if(action === "success_signup"){
-                    console.log("success account activated toast")
-                    SuccessToast.fire({
-                        icon:"success",
-                        title:`Successfully activated account`
-                    })
-                    localStorage.removeItem("action")
-                }else if(action === "signup_error"){
-                    console.log("signup error toast")
-                    var message = localStorage.getItem("data")
-                    SuccessToast.fire({
-                        icon:"error",
-                        title:message
-                    })
-                    localStorage.removeItem("action")
+        // Get the selected option
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
 
-                }
-            }catch(error){
-                console.log(error)
-            }
+        // Get the value and text of the selected option
+        var selectedValue = selectedOption.value;
+        var selectedText = selectedOption.text;
 
-        }
-        
-        // Triggers logout action to store in local storage
-        function logout(){
-            console.log("logout")
-            localStorage.setItem("action","success_logout")
+        console.log(selectedValue);
+        var item_location = document.getElementById("item_location").innerText;
+        console.log(item_location);
+        var formData = {
+          TargetLocation: item_location,
+          CurrentLocation: selectedValue,
+        };
+        console.log(formData);
+        // Start: Send image data using Fetch API
+        fetch("/user/filteritems", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Need to loop through here once have alot of items
+            var distance = document.getElementById("item_distance");
+            var time = document.getElementById("item_travel_time");
+            console.log(data);
+            distance.innerHTML = data.distance + "km";
+            time.innerHTML = data.duration;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+      const loadingDiv = document.getElementById("loadingDiv");
+      // On load check for actions to be done in local storage
+      window.onload = function () {
+        try {
+          var user_image_name = document.getElementById("tempHolder");
+          var user_image = document.getElementById("imagePreview");
+          if (user_image_name.innerText === "N/A") {
+            user_image.style.backgroundImage =
+              "url(https://tse2.mm.bing.net/th?id=OIP.6UhgwprABi3-dz8Qs85FvwHaHa&pid=Api&P=0&h=180)";
+          } else {
+            user_image.style.backgroundImage = `url(${user_image_name.innerText})`;
+          }
+        } catch (error) {
+          console.log(error);
         }
 
-        // Set notification in local storage
-        function setNotificationMessage(category, text) {
-            const notificationObject = { category, text };
-            localStorage.setItem('notificationMessage', JSON.stringify(notificationObject));
+        try {
+          var user_image_name = document.getElementById("user_image_name");
+          var user_image = document.getElementById("user_image");
+          user_image.src = user_image_name.innerText;
+        } catch (error) {
+          console.log(error);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Start: Toastr, Check if there is a notification message in local storage
-            const storedNotification = JSON.parse(localStorage.getItem('notificationMessage'));
-    
-            if (storedNotification) {
-                // Extract category and text from the stored object
-                const { category, text } = storedNotification;
+        try {
+          // Hide loader
+          loadingDiv.style.display = "none";
 
-                // Display the notification message using Toastr based on the category
-                if (category === 'success') {
-                    toastr.success(text);
-                } else if (category === 'error') {
-                    toastr.error(text);
-                } else if (category === 'info') {
-                    toastr.info(text);
-                }
+          var action = localStorage.getItem("action");
+          console.log(action);
+          // Toast template to use
+          const SuccessToast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          // For successful login
+          if (action === "success_login") {
+            console.log("trigger login toast");
+            var login_user = document.getElementById("login_user").innerHTML;
+            SuccessToast.fire({
+              icon: "success",
+              title: `Welcome back ${login_user}`,
+            });
+            localStorage.removeItem("action");
+          }
+          // For successful logout
+          else if (action === "success_logout") {
+            console.log("trigger logout toast");
+            SuccessToast.fire({
+              icon: "success",
+              title: "Logout Successfully",
+            });
+            localStorage.removeItem("action");
+            // For signup confirmation
+          } else if (action === "signup_confirmation") {
+            console.log("trigger signup confirmation toast");
+            var email = localStorage.getItem("data");
+            SuccessToast.fire({
+              icon: "success",
+              title: `A confirmation code has been sent to ${email}`,
+            });
+            localStorage.removeItem("action");
+            localStorage.removeItem("data");
+          } else if (action === "success_signup") {
+            console.log("success account activated toast");
+            SuccessToast.fire({
+              icon: "success",
+              title: `Successfully activated account`,
+            });
+            localStorage.removeItem("action");
+          } else if (action === "signup_error") {
+            console.log("signup error toast");
+            var message = localStorage.getItem("data");
+            SuccessToast.fire({
+              icon: "error",
+              title: message,
+            });
+            localStorage.removeItem("action");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
 
-                // Clear the notification message from local storage
-                localStorage.removeItem('notificationMessage');
-            }
-            // End: Toastr, Check if there is a notification message in local storage
+      // Triggers logout action to store in local storage
+      function logout() {
+        console.log("logout");
+        localStorage.setItem("action", "success_logout");
+      }
 
-            // Start: Get URL parameters and populate the search box and category selected when the search results page loads
-            const searchInput = document.getElementById('searchInput');
-            const searchCategory = document.getElementById('searchCategory');
-            const categoryRender = document.getElementById("select2-searchCategory-container");
+      // Set notification in local storage
+      function setNotificationMessage(category, text) {
+        const notificationObject = { category, text };
+        localStorage.setItem(
+          "notificationMessage",
+          JSON.stringify(notificationObject)
+        );
+      }
 
-            const searchCategoryFromUrl = getParameterByName('category');
-            const searchInputFromUrl = getParameterByName('name');
+      document.addEventListener("DOMContentLoaded", function () {
+        // Start: Toastr, Check if there is a notification message in local storage
+        const storedNotification = JSON.parse(
+          localStorage.getItem("notificationMessage")
+        );
 
-            const decodedCategory = decodeURIComponent(searchCategoryFromUrl);
-            const decodedSerchInput = decodeURIComponent(searchInputFromUrl);
+        if (storedNotification) {
+          // Extract category and text from the stored object
+          const { category, text } = storedNotification;
 
-            if (searchCategoryFromUrl) {
-                searchCategory.value = decodedCategory;
-                categoryRender.title = decodedCategory;
-                categoryRender.textContent  = decodedCategory;
-            }
-            if (searchInputFromUrl) {
-                searchInput.value = decodedSerchInput;
-            }
-            // End: Get URL parameters and populate the search box and category selected when the search results page loads
+          // Display the notification message using Toastr based on the category
+          if (category === "success") {
+            toastr.success(text);
+          } else if (category === "error") {
+            toastr.error(text);
+          } else if (category === "info") {
+            toastr.info(text);
+          }
+
+          // Clear the notification message from local storage
+          localStorage.removeItem("notificationMessage");
+        }
+        // End: Toastr, Check if there is a notification message in local storage
+
+        // Start: Get URL parameters and populate the search box and category selected when the search results page loads
+        const searchInput = document.getElementById("searchInput");
+        const searchCategory = document.getElementById("searchCategory");
+        const categoryRender = document.getElementById(
+          "select2-searchCategory-container"
+        );
+
+        const searchCategoryFromUrl = getParameterByName("category");
+        const searchInputFromUrl = getParameterByName("name");
+
+        const decodedCategory = decodeURIComponent(searchCategoryFromUrl);
+        const decodedSerchInput = decodeURIComponent(searchInputFromUrl);
+
+        if (searchCategoryFromUrl) {
+          searchCategory.value = decodedCategory;
+          categoryRender.title = decodedCategory;
+          categoryRender.textContent = decodedCategory;
+        }
+        if (searchInputFromUrl) {
+          searchInput.value = decodedSerchInput;
+        }
+        // End: Get URL parameters and populate the search box and category selected when the search results page loads
+      });
+
+      // Add an event listener to trigger the search on pressing 'Enter'
+      document
+        .getElementById("searchInput")
+        .addEventListener("keyup", function (event) {
+          if (event.key === "Enter") {
+            performSearch();
+          }
         });
-        
-        // Add an event listener to trigger the search on pressing 'Enter'
-        document.getElementById('searchInput').addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        });
 
-        // Perform search by using the search bar
-        function performSearch() {
-            const searchCategory = document.getElementById('searchCategory').value;
-            const searchTerm = document.getElementById('searchInput').value;
-            if(searchTerm != ""){
-                // const loadingDiv = document.getElementById('loadingDiv');
-                loadingDiv.style.display = '';
+      // Perform search by using the search bar
+      function performSearch() {
+        const searchCategory = document.getElementById("searchCategory").value;
+        const searchTerm = document.getElementById("searchInput").value;
+        if (searchTerm != "") {
+          // const loadingDiv = document.getElementById('loadingDiv');
+          loadingDiv.style.display = "";
 
-                const searchUrl = `/foodshare/search?category=${encodeURIComponent(searchCategory)}&name=${encodeURIComponent(searchTerm)}`;
-                window.location.href = searchUrl;
-            }
+          const searchUrl = `/foodshare/search?category=${encodeURIComponent(
+            searchCategory
+          )}&name=${encodeURIComponent(searchTerm)}`;
+          window.location.href = searchUrl;
         }
+      }
 
-        // Perform search by clicking the category
-        function performSearchByCategory(category) {
-            // const loadingDiv = document.getElementById('loadingDiv');
-            loadingDiv.style.display = '';
+      // Perform search by clicking the category
+      function performSearchByCategory(category) {
+        // const loadingDiv = document.getElementById('loadingDiv');
+        loadingDiv.style.display = "";
 
-            const searchUrl = `/foodshare/search?category=${encodeURIComponent(category)}`;
-            window.location.href = searchUrl;
-        }
+        const searchUrl = `/foodshare/search?category=${encodeURIComponent(
+          category
+        )}`;
+        window.location.href = searchUrl;
+      }
 
-        // Get URL Parameter
-        function getParameterByName(name, url = window.location.href) {
-            name = name.replace(/[\[\]]/g, "\\$&");
-            const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return results[2].replace(/\+/g, " ");
-        }
+      // Get URL Parameter
+      function getParameterByName(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, "\\$&");
+        const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return "";
+        return results[2].replace(/\+/g, " ");
+      }
     </script>
     {% endblock %}
-</body>
-
+  </body>
 </html>

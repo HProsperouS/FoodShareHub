@@ -143,6 +143,7 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
             # else:
             #     formatted_dict["message"] = f"{receiver_username} sent {'a file' if len(chat['files']) == 1 else 'multiple files'}."
 
+        # Things to include is the user online status and profile image
         formatted_dict["_id"] = str(chat.Sender)
         formatted_dict["display_name"] = opposite_user["Username"]
         formatted_dict["username"] = opposite_user["Username"]
@@ -152,10 +153,9 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
         formatted_dict["message_id"] = str(chat.Id)
         formatted_dict["conversation_id"] = chat.ConversationId
         formatted_dict["is_read"] = chat.IsRead
-        # print("formatted_dict", formatted_dict)
         formatted_chats.append(format_json_response(formatted_dict))
 
-    print("formatted_chats", formatted_chats)
+    # print("formatted_chats", formatted_chats)
     # Step 4： Send the data
     await ws.send_json({"chats": formatted_chats})
 

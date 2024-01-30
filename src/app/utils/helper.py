@@ -27,6 +27,7 @@ def decode_base64_file(data):
     
 def get_current_time_in_singapore():
     singapore_timezone = pytz.timezone("Asia/Singapore")
+    print(datetime.now(singapore_timezone))
     return datetime.now(singapore_timezone)
 
 
