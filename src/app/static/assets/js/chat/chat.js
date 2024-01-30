@@ -12,21 +12,24 @@ function processChats(chats, currentReceiverId) {
     
     // Check if the chats array has changed
     let chatsChanged = false;
+    console.log("Chats Compared", chats.length, prevChats.length);
+
     if (chats.length !== prevChats.length) {
         chatsChanged = true;
+        console.log("chats.length !== prevChats.length || Chat Changes" );
     } else {
         for (let i = 0; i < chats.length; i++) {
             const chat = chats[i];
             const prevChat = prevChats[i];
             if (
+                // TODO Compare the last messaege here to see if it has changed
                 chat._id !== prevChat._id ||
-                // chat.chat_id !== prevChat.chat_id ||
                 chat.conversation_id !== prevChat.conversation_id ||
                 chat.online !== prevChat.online ||
                 chat.read !== prevChat.read ||
                 chat.username !== prevChat.username ||
-                // chat.display_name !== prevChat.display_name ||
-                chat.profile !== prevChat.profile
+                chat.profile !== prevChat.profile ||
+                chat.message_id !== prevChat.message_id
             ) {
                 chatsChanged = true;
                 break;
@@ -36,6 +39,7 @@ function processChats(chats, currentReceiverId) {
 
     // Update the DOM if the chats array has changed
     if (chatsChanged) {
+        console.log("chatsChanged, Updating DOM");
         // Update the chat list HTML
         let chatListHtml = "";
         for (let i = 0; i < chats.length; i++) {

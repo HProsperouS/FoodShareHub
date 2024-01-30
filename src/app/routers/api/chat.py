@@ -219,7 +219,6 @@ async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depend
             
             new_message_dict = model_to_dict(new_message)
             await websocket.send_json(format_json_response(new_message_dict, escape=False))
-            await insert_message(db, new_message)
             
     except (WebSocketDisconnect, WebSocketException):
         print("ERROR.FOUND IN WEBSOCKET")
