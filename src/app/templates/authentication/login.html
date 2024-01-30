@@ -83,7 +83,7 @@ head %} {{ super() }}
           Password: document.getElementById("password").value,
         };
 
-        console.log("fetching api");
+        // console.log("fetching api");
         // Start: Send form data using Fetch API
         fetch("/login", {
           method: "POST",
@@ -94,8 +94,8 @@ head %} {{ super() }}
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("redirecting");
-            console.log(data);
+            // console.log("redirecting");
+            // console.log(data);
 
             // Check for status of Login
             if (data.status === "success") {
@@ -117,7 +117,7 @@ head %} {{ super() }}
                 loadingDiv.style.display = "none";
               }
             } else if (data.status === "fail") {
-              console.log("fail");
+              // console.log("fail");
 
               // Hide loader
               loadingDiv.style.display = "none";
@@ -156,7 +156,7 @@ head %} {{ super() }}
           // Show loader
           loadingDiv.style.display = "";
 
-          console.log("code pass");
+          // console.log("code pass");
           // Set item in local to display message in next page
           localStorage.setItem("action", "success_login");
 
@@ -196,12 +196,12 @@ head %} {{ super() }}
       // Show loader
       loadingDiv.style.display = "";
 
-      console.log("Starting Auth Code");
+      // console.log("Starting Auth Code");
 
       // Verify code with Cognito
       mfaAuthCode(name, password, result.value);
 
-      console.log("Finish Auth Code");
+      // console.log("Finish Auth Code");
 
       // Hide loader
       loadingDiv.style.display = "none";
@@ -228,11 +228,11 @@ head %} {{ super() }}
       // Show loader
       loadingDiv.style.display = "";
 
-      console.log("Starting Auth Code");
+      // console.log("Starting Auth Code");
       // Verify code with Cognito
       mfaAuthCode(name, password, result.value);
 
-      console.log("Finish Auth Code");
+      // console.log("Finish Auth Code");
 
       // Hide loader
       loadingDiv.style.display = "none";

@@ -140,7 +140,7 @@ head %} {{ super() }}
 
         // Validate input fields
         if (validateForm()) {
-          console.log("validation pass");
+          // console.log("validation pass");
 
           const formData = {
             Name: document.getElementById("name").value,
@@ -149,7 +149,7 @@ head %} {{ super() }}
             Role: "User",
           };
 
-          console.log("fetching api");
+          // console.log("fetching api");
 
           // Start: Send form data using Fetch API
           fetch("/register", {
@@ -236,7 +236,7 @@ head %} {{ super() }}
     var emailInput = $("#email");
     var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     var emailMatch = regex.test(emailInput.val());
-    console.log(emailMatch);
+    // console.log(emailMatch);
     if (emailInput.val().length === 0) {
       isValid = false;
       showError(emailInput, "Email cannot be empty");

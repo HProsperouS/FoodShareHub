@@ -63,7 +63,7 @@ elasticache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
 
 def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str):
     # session_id = str(uuid.uuid4())
-
+    
     request.session["session"] = {
         "session_id" : session_id,
         "username": username,
@@ -95,6 +95,7 @@ async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLR
 async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     
     try:
+        base_url = str(request.base_url)
         # User credentials
         name = formData.Name
         password = formData.Password
@@ -105,7 +106,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
         if auth_user == "fail" :
             return ORJSONResponse(
-                content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+                content={"redirect_url": f"{base_url}/login","status":"fail"}
             )
         elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
             request.session["temp_session"] = auth_user["Session"]
@@ -118,7 +119,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             get_user = retreive_user(name)
             if get_user == 'fail':
                 return ORJSONResponse(
-                    content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+                    content={"redirect_url": f"{base_url}/login","status":"fail"}
                 )
             # Retreive user attributes
             user_attributes = get_user["UserAttributes"]
@@ -152,9 +153,8 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             # print(decode)
 
             print(request.session.get("session"))
-            
             return ORJSONResponse(
-                content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success","mfa":"Disabled"}
+                content={"redirect_url": f"{base_url}foodshare/myListings","status":"success","mfa":"Disabled"}
             ) 
         # return ORJSONResponse(
         #     content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
@@ -163,7 +163,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         print(e)
 
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+            content={"redirect_url": f"{base_url}/login","status":"fail"}
         )
 
 
@@ -186,7 +186,7 @@ async def register(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HT
 @guest_router.post("/register")
 async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
-
+        base_url = str(request.base_url)
         # User credentials
         name = formData.Name
         password = formData.Password
@@ -202,13 +202,13 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
         if detect_text["Sentiment"] == "NEGATIVE":
             print(detect_text)
             return ORJSONResponse(
-                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","text_analysis":detect_text["Sentiment"]}
+                content={"redirect_url": f"{base_url}register","status":"fail","text_analysis":detect_text["Sentiment"]}
             )
         if detect_language["Languages"][0]["LanguageCode"] != "en":
             language_type = detect_language["Languages"][0]["LanguageCode"]
             print(detect_language)
             return ORJSONResponse(
-                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","language_analysis":language_type}
+                content={"redirect_url": f"{base_url}/register","status":"fail","language_analysis":language_type}
             )
 
         # Create user
@@ -218,14 +218,14 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
         if create_user == "fail":
             # Redirect to register page but the container IP keeps changing every deployment
             return ORJSONResponse(
-                content={"redirect_url": "http://127.0.0.1:8000/register","status":"fail","message":"User already exists"}
+                content={"redirect_url": f"{base_url}/register","status":"fail","message":"User already exists"}
             )
 
         # temp store account confirmation
         request.session["account_confirmation"] = name
 
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/register/confirmation","status":"success"}
+            content={"redirect_url": f"{base_url}/register/confirmation","status":"success"}
         )
     
     except Exception as e :
@@ -256,6 +256,7 @@ async def confirmation(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -
 @guest_router.post("/register/confirmation")
 async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
+       base_url = str(request.base_url)
        # Account confirmation credentials
        code = formData.Code
        name = request.session.get("account_confirmation")
@@ -271,7 +272,7 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
        request.session.clear()
 
        return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/login","status":"success"}
+            content={"redirect_url": f"{base_url}/login","status":"success"}
        )
 
     except Exception as e:
@@ -280,6 +281,7 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
 @guest_router.post("/login/mfa")
 async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
+        base_url = str(request.base_url)
         session = request.session.get("temp_session")
         code = formData.Code
         name = formData.Name
@@ -323,11 +325,11 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
         print(request.session.get("session"))
         
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
+            content={"redirect_url": f"{base_url}/foodshare/myListings","status":"success"}
         ) 
     except Exception as e:
         print(e)
 
         return ORJSONResponse(
-            content={"redirect_url": "http://127.0.0.1:8000/login","status":"fail"}
+            content={"redirect_url": f"{base_url}/login","status":"fail"}
         )

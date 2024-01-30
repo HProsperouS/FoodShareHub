@@ -664,14 +664,14 @@
         var selectedValue = selectedOption.value;
         var selectedText = selectedOption.text;
 
-        console.log(selectedValue);
+        // console.log(selectedValue);
         var item_location = document.getElementById("item_location").innerText;
-        console.log(item_location);
+        // console.log(item_location);
         var formData = {
           TargetLocation: item_location,
           CurrentLocation: selectedValue,
         };
-        console.log(formData);
+        // console.log(formData);
         // Start: Send image data using Fetch API
         fetch("/user/filteritems", {
           method: "POST",
@@ -685,7 +685,7 @@
             // Need to loop through here once have alot of items
             var distance = document.getElementById("item_distance");
             var time = document.getElementById("item_travel_time");
-            console.log(data);
+            // console.log(data);
             distance.innerHTML = data.distance + "km";
             time.innerHTML = data.duration;
           })
@@ -722,7 +722,7 @@
           loadingDiv.style.display = "none";
 
           var action = localStorage.getItem("action");
-          console.log(action);
+          // console.log(action);
           // Toast template to use
           const SuccessToast = Swal.mixin({
             toast: true,
@@ -737,7 +737,7 @@
           });
           // For successful login
           if (action === "success_login") {
-            console.log("trigger login toast");
+            // console.log("trigger login toast");
             var login_user = document.getElementById("login_user").innerHTML;
             SuccessToast.fire({
               icon: "success",
@@ -747,7 +747,7 @@
           }
           // For successful logout
           else if (action === "success_logout") {
-            console.log("trigger logout toast");
+            // console.log("trigger logout toast");
             SuccessToast.fire({
               icon: "success",
               title: "Logout Successfully",
@@ -755,7 +755,7 @@
             localStorage.removeItem("action");
             // For signup confirmation
           } else if (action === "signup_confirmation") {
-            console.log("trigger signup confirmation toast");
+            // console.log("trigger signup confirmation toast");
             var email = localStorage.getItem("data");
             SuccessToast.fire({
               icon: "success",
@@ -764,14 +764,14 @@
             localStorage.removeItem("action");
             localStorage.removeItem("data");
           } else if (action === "success_signup") {
-            console.log("success account activated toast");
+            // console.log("success account activated toast");
             SuccessToast.fire({
               icon: "success",
               title: `Successfully activated account`,
             });
             localStorage.removeItem("action");
           } else if (action === "signup_error") {
-            console.log("signup error toast");
+            // console.log("signup error toast");
             var message = localStorage.getItem("data");
             SuccessToast.fire({
               icon: "error",
@@ -786,7 +786,7 @@
 
       // Triggers logout action to store in local storage
       function logout() {
-        console.log("logout");
+        // console.log("logout");
         localStorage.setItem("action", "success_logout");
       }
 

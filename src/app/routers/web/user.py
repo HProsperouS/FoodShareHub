@@ -138,7 +138,7 @@ async def filteritems(request: Request, formData: LocationDistanceTime) -> ORJSO
         print(e)
 
 @user_router.get("/user")
-async def defaultpage(request:Request,rbac_res: RBAC_TYPING=RBAC_DEPENDS) -> HTMLResponse:
+async def defaultuserpage(request:Request,rbac_res: RBAC_TYPING=RBAC_DEPENDS) -> HTMLResponse:
 
     # Find location
     client = boto3.client('location', region_name='ap-southeast-1')
