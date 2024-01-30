@@ -120,7 +120,7 @@ async def filteritems(request: Request, formData: LocationDistanceTime) -> ORJSO
 
         # Extract distance and duration from the response
         distance = response['Summary']['Distance']
-        duration = response['Summary']['DurationSeconds']
+        duration = response['Summary']['DurationSeconds'] 
         minutes, seconds = divmod(duration, 60)
         formatted_duration = f"{int(minutes)} mins {int(seconds)} seconds"
         print(distance)
