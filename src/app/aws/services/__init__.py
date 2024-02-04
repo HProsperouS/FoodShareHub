@@ -29,5 +29,6 @@ from .Cognito import(
     edit_user_information,
     reset_password,
     disable_account,
-    list_cognito_user_by_usernames
+    list_cognito_user_by_usernames,
+    edit_google_user_information
 )
