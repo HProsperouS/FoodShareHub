@@ -97,9 +97,9 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
             receiverOnlineHeader.innerHTML = online;
         }
 
-        if (receiverProfileImage.src != chat.profile) {
-            receiverProfileImage.src = chat.profile;
-        }
+        // if (receiverProfileImage.src != chat.profile) {
+        //     receiverProfileImage.src = chat.profile;
+        // }
         
         if (receiverDisplayName.innerText != chat.display_name) {
             // NOTE: We can use innerHtml here as it is already escaped by the server
@@ -125,7 +125,7 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     return chatHtml = `
         <a id="${chat._id}" href="${chat._id}" class="d-flex align-items-center">
             <div class="flex-shrink-0">
-                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img">
+                <img class="img-fluid" src="${chat.profile}" alt="user img" style="width: 40px; height 40px;">
                 <span class="active"></span>
             </div>
             <div class="flex-grow-1 ms-3">

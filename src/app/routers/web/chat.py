@@ -65,11 +65,13 @@ async def chat_1_to_1(request: Request, receiver_name: str, rbac_res: rbac.RBACR
         # TODO Redirect to error page
         return RedirectResponse(url="/")
 
+    
     # Extracting Receiver Username, UserId, and EmailAddress
     receiver_doc = {
         'Username': receiver['Username'],
         'UserId': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'sub'), None),
-        'EmailAddress': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'email'), None)
+        'EmailAddress': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'email'), None),
+        'ProfileImage':  next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'custom:image'), None)
     }
 
     # Extracting Sender Username, UserId, and EmailAddress
@@ -77,7 +79,7 @@ async def chat_1_to_1(request: Request, receiver_name: str, rbac_res: rbac.RBACR
     sender_doc = {
         'Username': session["username"],
         'UserId': session["user_id"],
-        'EmailAddress': session["email"]
+        'EmailAddress': session["email"],
     }
 
     # Check if the sender is the same as receiver
