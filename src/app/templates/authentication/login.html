@@ -59,6 +59,20 @@ head %} {{ super() }}
                       <a class="text-muted" href="#">Forgot password?</a>
                     </div>
                   </form>
+
+                  <div
+                    class="card-login"
+                    style="border: none"
+                    onclick="googleLogin()"
+                  >
+                    <a class="social-login google-login" id="google_url">
+                      <img
+                        src="{{ url_for('static', path='assets/imgs/theme/icons/logo-google.svg') }}"
+                        alt=""
+                      />
+                      <span> Continue with Google </span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -69,6 +83,23 @@ head %} {{ super() }}
   </div>
 </main>
 <script>
+  function googleLogin() {
+    fetch("/googleurl", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        
+        window.location.href = data.redirect_url;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document
       .getElementById("signin_form")

@@ -697,6 +697,32 @@
       // On load check for actions to be done in local storage
       window.onload = function () {
         try {
+          const fragment = window.location.hash.substring(1);
+          const access_token = new URLSearchParams(fragment).get(
+            "access_token"
+          );
+          const formData = { Token: access_token };
+          if (access_token) {
+            fetch("/googlelogin", {
+              method: "POST",
+              body: JSON.stringify(formData),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                window.location.href = data.redirect_url;
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+
+        try {
           var user_image_name = document.getElementById("tempHolder");
           var user_image = document.getElementById("imagePreview");
           if (user_image_name.innerText === "N/A") {

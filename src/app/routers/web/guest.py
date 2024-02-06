@@ -3,6 +3,7 @@ from fastapi import (
     APIRouter,
     Request,
     Depends,
+    Query
 )
 from fastapi.responses import (
     HTMLResponse,
@@ -19,9 +20,10 @@ from aws.services import (
     register_confirmation,
     retreive_user,
     authenticate_user,
-    login_mfa
+    login_mfa,
+    edit_google_user_information
 )
-import uuid
+import jwt
 # import local libraries
 from utils.jinja2_helper import (
     flash, 
@@ -56,14 +58,17 @@ class LoginMfa(BaseModel):
     Name:str
     Password:str
     Code:str
+
+class AccessToken(BaseModel):
+    Token:str
+
+import uuid
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
 elasticache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
 
 def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str):
-    # session_id = str(uuid.uuid4())
-    
     request.session["session"] = {
         "session_id" : session_id,
         "username": username,
@@ -75,6 +80,14 @@ def create_session(request:Request, username: str,role:str,user_id:str,email:str
         }
     
     return "success"
+@guest_router.post("/googleurl")
+async def googleurl(request: Request) -> ORJSONResponse:
+
+    google_login_url = 'https://foodsharehub.auth.ap-southeast-1.amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=http://localhost:8000/login&response_type=TOKEN&client_id=7uq1jl7tbrcg525aeddpg0hhev&scope=email openid profile'
+
+    return ORJSONResponse(
+        content={"redirect_url": google_login_url}
+    ) 
 
 @guest_router.get("/login")
 async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLResponse:
@@ -90,6 +103,73 @@ async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLR
         },
     )
 
+@guest_router.post("/googlelogin")
+async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
+
+    try:
+        base_url = str(request.base_url)
+        # decode token
+        # response = requests.get("https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_HceZH2hQv/.well-known/jwks.json")
+        # json = response.json()
+
+        # TODO Need a way to get the info for google , missing secret key
+        # TODO Need a way to revoke access token
+        decoded_jwt = jwt.decode(formData.Token,algorithms=['RS256'],options={"verify_signature": False})  
+        print(decoded_jwt)
+        username = decoded_jwt["username"]
+        get_user = retreive_user(username)
+        user_attr = {}
+        print(get_user)
+
+        # Just check whether attributes have been added
+        check_counter = 0 
+        for attr in get_user["UserAttributes"]:
+            if attr["Name"] == "email":
+                user_attr["temp_username"] = attr["Value"].split('@')[0]
+                user_attr["email"] = attr['Value']
+            if attr["Name"] == "sub":
+                user_attr["id"] = attr['Value']
+            if attr["Name"] == "custom:image":
+                check_counter += 1
+                user_attr["image"] = attr['Value']
+            if attr["Name"] == "custom:role":
+                check_counter += 1
+                user_attr["role"] = attr['Value']
+        if check_counter < 2:
+            edit_google_user_information(username,"N/A","User")
+
+            # Create session
+            temp_username = user_attr["temp_username"]
+            role = "User"
+            email= user_attr["email"]
+            id = user_attr["id"]
+            session = str(uuid.uuid4())
+            image = 'N/A'
+            mfa = "Enabled"
+
+        else:
+
+            # Create session
+            temp_username = user_attr["temp_username"]
+            role = user_attr["role"]
+            email= user_attr["email"]
+            id = user_attr["id"]
+            session = str(uuid.uuid4())
+            image = user_attr["image"]
+            mfa = "Enabled"
+
+        create_session(username=username,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image)
+        print(request.get("session"))
+        return ORJSONResponse(
+            content={"redirect_url": f"{base_url}","status":"success"}
+            
+        ) 
+    except Exception as e :
+        print(e)
+
+        return ORJSONResponse(
+            content={"redirect_url": f"{base_url}","status":"fail"}
+        )
 
 @guest_router.post("/login")
 async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:

@@ -115,6 +115,17 @@ def edit_user_information(name,email,image):
         print(e)
         
         return "fail" 
+def edit_google_user_information(name,image,role):
+    try:
+        updatedAttributes = [{'Name': "custom:image",'Value': image},{'Name': "custom:role",'Value': role}]
+        edit_user = client.admin_update_user_attributes(
+            UserPoolId=C.COGNITO_USER_POOL_ID,
+            Username=name,
+            UserAttributes=updatedAttributes,
+        )
+    except Exception as e:
+        print(e)
+        
     
 def reset_password(current_pass,new_pass,access_token):
     try:
