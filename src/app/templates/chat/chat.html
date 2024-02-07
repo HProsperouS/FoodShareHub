@@ -228,10 +228,7 @@
                     newDiv.innerHTML = msgBodyHtml;
                     messageArea.appendChild(newDiv)
                     messageIds.add(messageId);
-                    if (isSender) {
-                        // scroll to the very bottom if the current user had sent a new message
-                        mainMsgDiv.scrollTop = mainMsgDiv.scrollHeight;
-                    }
+                    mainMsgDiv.scrollTop = mainMsgDiv.scrollHeight;
                 }
                 finally {
                     isProcessingMessage = false;
