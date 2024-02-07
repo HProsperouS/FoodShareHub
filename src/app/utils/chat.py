@@ -191,8 +191,8 @@ def __format_value_for_json(value: Any, escape: bool | None = True) -> Any:
         return html.escape(value)
 
     if isinstance(value, datetime):
-        return datetime_to_unix_time(value)
-
+        return value.isoformat()
+    
     if isinstance(value, bytes):
         return base64.b64encode(value).decode("utf-8")
 

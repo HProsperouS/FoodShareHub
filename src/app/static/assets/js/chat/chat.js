@@ -68,7 +68,6 @@ function getOnlineStatusColour(online) {
 }
 
 const receiverOnlineHeader = document.getElementById("receiverOnlineHeader");
-// const userProfileLink = document.getElementById("userProfileLink");
 const receiverProfileImage = document.getElementById("receiverProfileImage");
 const receiverDisplayName = document.getElementById("receiverUsername"); // Display name is the username
 
@@ -86,12 +85,6 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     // note that _id is the user ID
     if (chat._id == currentReceiverId) {
         bgColour = "bg-light";
-
-        // const lastSlashIndex = userProfileLink.href.lastIndexOf("/") + 1;
-        // const updatedUserProfileLink = userProfileLink.href.substring(0, lastSlashIndex);
-        // if (updatedUserProfileLink != userProfileLink.href) {
-        //     userProfileLink.href = updatedUserProfileLink + chat.username;
-        // }
 
         if (receiverOnlineHeader.innerHTML != online) {
             receiverOnlineHeader.innerHTML = online;
@@ -117,7 +110,7 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     }
 
     // reduce the message to 20 characters
-    var chatMsg = (chat.message.length > 20) ? chat.message.slice(0, 20) + "..." : chat.message;
+    var chatMsg = (chat.message.length > 10) ? chat.message.slice(0, 10) + "..." : chat.message;
     if (chatMsg.trim().split(":")[1].trim() === "") {
         chatMsg = "";
     }
@@ -155,12 +148,11 @@ setInterval(() => {
 setInterval(() => {
     const chatTimestamps = document.querySelectorAll("[data-chat-timestamp]");
     for (const chatTimestamp of chatTimestamps) {
-        const timestamp = parseInt(chatTimestamp.getAttribute("data-chat-timestamp"));
-        console.log("chatTimestamps", timestamp);
-        chatTimestamp.innerText = formatTimestamp(timestamp);
+        const timestamp = chatTimestamp.getAttribute("data-chat-timestamp");
+        console.log("chatTimestamps111", timestamp);
+        chatTimestamp.innerText = formatDateTime(timestamp);
     }
 }, 5000);
-
 /*-------------------- End of Chat list and search logic  --------------------*/
 
 /*-------------------- Start of functions used by the chat websocket  --------------------*/

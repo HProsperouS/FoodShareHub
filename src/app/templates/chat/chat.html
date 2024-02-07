@@ -186,9 +186,8 @@
                         return;
                     }
                     
-                    const responseTimestamp = parseInt(response.SendTime * 1000);
-                    const dateObj = new Date(responseTimestamp);
-                    
+                    const responseTimestamp = response.SendTime;
+                    console.log("Response Timestamp: " + responseTimestamp);
                     const sender = response.Sender;
                     const receiver = response.Receiver;
                     const messageType = response.Type;
@@ -210,7 +209,7 @@
                                 <!-- msg content -->
                                 <p>${msgBodyContent}</p>
                                 <span class="time" data-chat-timestamp="${responseTimestamp}">
-                                    ${formatTimestamp(dateObj)}
+                                    ${formatDateTime(responseTimestamp)}
                                 </span>
                             </li>
                         `;
@@ -220,7 +219,7 @@
                                 <!-- msg content -->
                                 <p>${msgBodyContent}</p>
                                 <span class="time" data-chat-timestamp="${responseTimestamp}">
-                                    ${formatTimestamp(dateObj)}
+                                    ${formatDateTime(responseTimestamp)}
                                 </span>
                             </li>
                         `;
