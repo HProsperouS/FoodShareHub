@@ -17,6 +17,10 @@ def get_all_donations_by_userid(db: Session, user_id: str):
     # Get all donations with status not INACTIVE and user_id = user_id
     return db.query(Donation).filter(Donation.Status != "INACTIVE", Donation.UserId == user_id).order_by(Donation.Id).all()
 
+def get_all_donations_exclude_userid(db: Session, user_id: str):
+    # Get all donations with status not INACTIVE and user_id = user_id
+    return db.query(Donation).filter(Donation.Status != "INACTIVE", Donation.UserId != user_id).order_by(Donation.Id).all()
+
 async def get_donation_by_id(db: Session, donation_id: int):
     return db.query(Donation).filter(Donation.Id == donation_id).first()
 

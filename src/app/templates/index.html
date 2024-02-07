@@ -48,7 +48,7 @@
                         <!-- End Gallery -->
                     </div>
                     <div class="col-md-6 col-sm-12 col-xs-12">
-                        {% if request.session %}
+                        {% if location %}
                             <div class="detail-info pr-30 pl-30">
                                 <span class="stock-status out-stock"> Sale Off </span>
                                 <h3 class="title-detail"><a href="shop-product-right.html" class="text-heading">Seeds of Change Organic Quinoa, Brown</a></h3>
@@ -84,51 +84,14 @@
                                         <li class="mb-5">Vendor: <span class="text-brand">Nest</span></li>
                                         <li class="mb-5">MFG:<span class="text-brand"> Jun 4.2022</span></li>
                                         <li class="mb-5">Location :<span class="text-brand" id="item_location">Ang Mo Kio Hub</span></li>
-                                        {% if location %}
+                                       
                                         <li class="mb-5">Distance :<span class="text-brand" id="item_distance"> {{location["distance"]}}km</span></li>
                                         <li class="mb-5">Travel Time by Bicycle :<span class="text-brand" id="item_travel_time"> {{location["duration"]}}</span></li>
-                                        {% endif %}
+                                        
                                     </ul>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="detail-info pr-30 pl-30">
-                                <span class="stock-status out-stock"> Sale Off </span>
-                                <h3 class="title-detail"><a href="shop-product-right.html" class="text-heading">Seeds of Change Organic Quinoa, Brown</a></h3>
-                                <div class="product-detail-rating">
-                                    <div class="product-rate-cover text-end">
-                                        <div class="product-rate d-inline-block">
-                                            <div class="product-rating" style="width: 90%"></div>
-                                        </div>
-                                        <span class="font-small ml-5 text-muted"> (32 reviews)</span>
-                                    </div>
-                                </div>
-                                <div class="clearfix product-price-cover">
-                                    <div class="product-price primary-color float-left">
-                                        <span class="current-price text-brand">$38</span>
-                                        <span>
-                                            <span class="save-price font-md color3 ml-15">26% Off</span>
-                                            <span class="old-price font-md ml-15">$52</span>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="detail-extralink mb-30">
-                                    <div class="detail-qty border radius">
-                                        <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                        <span class="qty-val">1</span>
-                                        <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                                    </div>
-                                    <div class="product-extra-link2">
-                                        <button type="submit" class="button button-add-to-cart"><i class="fi-rs-shopping-cart"></i>Add to cart</button>
-                                    </div>
-                                </div>
-                                <div class="font-xs">
-                                    <ul>
-                                        <li class="mb-5">Vendor: <span class="text-brand">Nest</span></li>
-                                        <li class="mb-5">MFG:<span class="text-brand"> Jun 4.2022</span></li>
-                                    </ul>
-                                </div>
-                            </div>
+                        
                         {% endif %}
                         <!-- Detail Info -->
                     </div>
@@ -169,44 +132,26 @@
             <div class="col-lg-4-5">
                 <section class="product-tabs section-padding position-relative">
                     <div class="section-title style-2">
-                        <h3>Nearby Products</h3>
+                        <h3 id="recommended_products">Nearby Products</h3>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                Filter
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" onclick="filteritems('Car')">Travel by Car</a></li>
+                                <li><a class="dropdown-item" onclick="filteritems('Bicycle')">Travel by Bicycle</a></li>
+                                <li><a class="dropdown-item" onclick="filteritems('Walking')">Travel by Foot</a></li>
+                            </ul>
+                        </div>
                     </div>
+                    
                     <!--End nav-tabs-->
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
-                            <div class="row product-grid-4">
+                            <div class="row product-grid-4" id="recommended_products_section">
                                 
-                                <div class="col-lg-1-5 col-md-4 col-12 col-sm-6">
-                                    <div class="product-cart-wrap mb-30">
-                                        <div class="product-img-action-wrap">
-                                            <div class="product-img product-img-zoom">
-                                                <a href="shop-product-right.html">
-                                                    <img class="default-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-1.jpg') }}" alt="" />
-                                                    <img class="hover-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-2.jpg') }}" alt="" />
-                                                </a>
-                                            </div>
-                                            <div class="product-action-1">
-                                                <a aria-label="Add To Wishlist" class="action-btn" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                                <a aria-label="Compare" class="action-btn" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                                <a aria-label="Quick view" class="action-btn" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                            </div>
-                                            <div class="product-badges product-badges-position product-badges-mrg">
-                                                <span class="hot">Hot</span>
-                                            </div>
-                                        </div>
-                                        <div class="product-content-wrap">
-                                            <div class="product-category">
-                                                <a href="shop-grid-right.html">Snack</a>
-                                            </div>
-                                            <h2><a href="shop-product-right.html">Seeds of Change Organic Quinoe</a></h2>
-                                            <div>
-                                                <span class="font-small text-muted">By <a href="vendor-details-1.html">Food Share Hub</a></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                           
+                              
+
                                 <!--end product card-->
                             </div>
                             <!--End product-grid-4-->
@@ -374,5 +319,8 @@
 </div>
 {% endblock %}
 {% block scripts %}
+    
+
     {{ super() }}
+    
 {% endblock %}

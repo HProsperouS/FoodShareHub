@@ -98,48 +98,78 @@
               </div>
               <div class="header-action">
                 <div class="header-action-2">
-                  <div class="search-location">
-                    {% if location %}
-                    <form>
-                      <select
-                        class="select-active"
-                        onchange="getItemLocation()"
-                        id="location_options"
+                  {% if location %}
+                  <form>
+                    <select
+                      class="select-active"
+                      onchange="getItemLocation()"
+                      id="location_options"
+                    >
+                      <option value="Marina Bay Sands">Marina Bay Sands</option>
+                      <option value="Hougang Mall">Hougang Mall</option>
+                      <option value="Chinatown Street Market">
+                        Chinatown Street Market
+                      </option>
+                      <option value="Jewel Changi Airport">
+                        Jewel Changi Airport
+                      </option>
+                    </select>
+                  </form>
+                  {% else %}
+                  <!--<form>
+                      
+                      <select class="select-active" >
+                        
+                      </select>
+                      
+                    </form>-->
+                  <div class="mb-4">
+                    <i class="bi bi-geo-alt fa-lg"></i>
+                    <label class="form-label" for="current_location"
+                      >Current Location</label
+                    >
+
+                    <input
+                      placeholder=""
+                      value="Singapore"
+                      type="text"
+                      class="form-control"
+                      id="current_location"
+                      name="current_location"
+                    />
+                    <div
+                      id="currentaddressSuggestionCard"
+                      class="card mt-10"
+                      style="
+                        display: none;
+                        position: absolute;
+                        z-index: 100;
+                        width: 300px;
+                      "
+                    >
+                      <div class="card-header">Suggestions</div>
+                      <div
+                        class="card-body"
+                        style="overflow-y: auto; height: 350px"
                       >
-                        <option value="Marina Bay Sands">
-                          Marina Bay Sands
-                        </option>
-                        <option value="Hougang Mall">Hougang Mall</option>
-                        <option value="Chinatown Street Market">
-                          Chinatown Street Market
-                        </option>
-                        <option value="Jewel Changi Airport">
-                          Jewel Changi Airport
-                        </option>
-                      </select>
-                    </form>
-                    {% else %}
-                    <form>
-                      <select class="select-active">
-                        <option value="Singapore">Singapore</option>
-                      </select>
-                    </form>
-                    {% endif %}
+                        <ul id="currentaddressSuggestionListItem"></ul>
+                      </div>
+                    </div>
+                    <span for="current_location" class="text-danger"></span>
                   </div>
+
+                  {% endif %}
+
                   <div class="header-action-icon-2">
+                    <span
+                      ><i class="bi bi-bell fa-lg" style="align: center"></i
+                    ></span>
+
                     <a href="#">
-                      <img
-                        class="svgInject"
-                        alt="FSH"
-                        src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notification.svg') }}"
-                      />
                       <span class="pro-count blue" id="notificationCount"
                         >3</span
                       >
                     </a>
-                    <a href="#"
-                      ><span class="lable ml-0">Notifications</span></a
-                    >
                   </div>
                   <div class="header-action-icon-2">
                     {% if request.session["session"] %} {% if
@@ -652,50 +682,332 @@
     <script src="{{ url_for('static', path='assets/js/chat/textarea.js') }}"></script>
     <script src="{{ url_for('static', path='assets/js/chat/time.js') }}"></script>
 
+    <!-- Captcha Script-->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
     <script>
-      function getItemLocation() {
-        // Get the <select> element by its ID
-        var selectElement = document.getElementById("location_options");
+      let controller = new AbortController();
 
-        // Get the selected option
-        var selectedOption = selectElement.options[selectElement.selectedIndex];
+      document
+        .getElementById("current_location")
+        .addEventListener("input", function () {
+          controller.abort(); // Cancel the previous request
 
-        // Get the value and text of the selected option
-        var selectedValue = selectedOption.value;
-        var selectedText = selectedOption.text;
+          controller = new AbortController(); // Create a new controller for the current request
 
-        // console.log(selectedValue);
-        var item_location = document.getElementById("item_location").innerText;
-        // console.log(item_location);
-        var formData = {
-          TargetLocation: item_location,
-          CurrentLocation: selectedValue,
-        };
-        // console.log(formData);
-        // Start: Send image data using Fetch API
-        fetch("/user/filteritems", {
+          var searchQuery = document.getElementById("current_location").value;
+
+          if (searchQuery.length == 0) {
+            // Hide the suggestion card and stop the process if searchQuery's length is 0
+            const suggestionCard = document.getElementById(
+              "currentaddressSuggestionCard"
+            );
+            suggestionCard.style.display = "none";
+            return;
+          }
+
+          fetch(`/foodshare/autocomplete/${searchQuery}`, {
+            signal: controller.signal,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.suggestions) {
+                // Display the suggestion card
+                const suggestionCard = document.getElementById(
+                  "currentaddressSuggestionCard"
+                );
+                suggestionCard.style.display = "";
+
+                displaySuggestions(data.suggestions, handleSuggestionClick);
+              } else {
+                // Hide the sugesstion card if no suggeestion return
+                const suggestionCard = document.getElementById(
+                  "currentaddressSuggestionCard"
+                );
+                suggestionCard.style.display = "none";
+              }
+            })
+            .catch((error) => {
+              if (error.name === "AbortError") {
+                // Request was aborted, ignore
+              } else {
+                console.error("Error:", error);
+              }
+            });
+        });
+
+      function displaySuggestions(suggestions, clickHandler) {
+        const suggestionsList = document.getElementById(
+          "currentaddressSuggestionListItem"
+        );
+        suggestionsList.innerHTML = "";
+
+        if (suggestions.length === 0) {
+          return;
+        }
+
+        suggestions.forEach((suggestion) => {
+          const li = document.createElement("li");
+          li.innerHTML =
+            "<p style='white-space: normal;'>" + suggestion + "</p>";
+          // Bind the click handler to each list item.
+          li.addEventListener("click", clickHandler);
+          li.classList.add("dropdown-item");
+          suggestionsList.appendChild(li);
+        });
+      }
+
+      function handleSuggestionClick(event) {
+        if (event.target.tagName === "LI") {
+          // Set the address text
+          const pickupLocationInput =
+            document.getElementById("current_location");
+          pickupLocationInput.value = event.target.textContent;
+          currentLocation = pickupLocationInput.value;
+          filteritems(filter_type);
+
+          // Hide address suggestion card
+          const addressSuggestionCard = document.getElementById(
+            "currentaddressSuggestionCard"
+          );
+          addressSuggestionCard.style.display = "none";
+        }
+      }
+
+      // For captcha
+      function onSubmit(token) {
+        document.getElementById("signin_form").submit();
+      }
+
+      // For list of recommended_products
+      var index_recommended_products = [];
+      // For current location
+      var currentLocation = "Hougang Block 650";
+      // For current filter type by default is bicycle
+      var filter_type = "Bicycle";
+
+      // get donations in / path
+      function getDonations() {
+        fetch("/getdonations", {
           method: "POST",
-          body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json",
           },
         })
           .then((response) => response.json())
           .then((data) => {
+            const recommended_products_section = document.getElementById(
+              "recommended_products_section"
+            );
+
+            data["donations"].forEach((item) => {
+              index_recommended_products.push(item);
+              recommended_products_section.innerHTML += `
+                <div class="col-lg-1-5 col-md-4 col-12 col-sm-6">
+                  <div class="product-cart-wrap mb-30">
+                      <div class="product-img-action-wrap">
+                          <div class="product-img product-img-zoom">
+                              <a href="shop-product-right.html">
+                                  <img class="default-img" src="${
+                                    item["Image"]
+                                  }" alt="" />
+                                  <img class="hover-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-2.jpg') }}" alt="" />
+                              </a>
+                          </div>
+                          <div class="product-action-1">
+                              <a aria-label="Add To Wishlist" class="action-btn" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                              <a aria-label="Compare" class="action-btn" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                              <a aria-label="Quick view" class="action-btn" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                          </div>
+                          <div class="product-badges product-badges-position product-badges-mrg">
+                              <span class="hot">Hot</span>
+                          </div>
+                      </div>
+                      <div class="product-content-wrap">
+                          <div class="product-category">
+                              <a href="shop-grid-right.html">${
+                                item["Category"]
+                              }</a>
+                          </div>
+                          <h2><a href="shop-product-right.html">${
+                            item["Name"]
+                          }</a></h2>
+                          <div>
+                              <span class="font-small text-muted">By <a href="vendor-details-1.html">Food Share Hub</a></span>
+                          </div>
+                          <hr>
+                          <div class="row">
+                            <div class="col-9">
+                              <marquee direction="right" class="font-small text-muted" id="location_${data[
+                                "donations"
+                              ]
+                                .indexOf(item)
+                                .toString()}">${
+                item["MeetUpLocation"]
+              }</marquee>
+                            </div>
+                            <div class="col-3">
+                              <span style="float:right;" id="distance_${data[
+                                "donations"
+                              ]
+                                .indexOf(item)
+                                .toString()}"></span>
+                            </div>
+
+                          </div>
+                          <hr>
+                          <div style="text-align:center;" id="bicycle_${data[
+                            "donations"
+                          ]
+                            .indexOf(item)
+                            .toString()}">
+                              <i class="bi bi-bicycle fa-lg"></i>&nbsp;<span class="font-small text-muted" id="bicycle_time_${data[
+                                "donations"
+                              ]
+                                .indexOf(item)
+                                .toString()}"></span>
+                          </div>
+                          <div style="text-align:center;display:none;" id="walk_${data[
+                            "donations"
+                          ]
+                            .indexOf(item)
+                            .toString()}" >
+                              <i class="bi bi-person-walking fa-lg"></i>&nbsp;<span class="font-small text-muted" id="walk_time_${data[
+                                "donations"
+                              ]
+                                .indexOf(item)
+                                .toString()}"></span>
+                          </div>
+                          <div style="text-align:center;display:none;" id="car_${data[
+                            "donations"
+                          ]
+                            .indexOf(item)
+                            .toString()}" >
+                              <i class="bi bi-car-front-fill fa-lg"></i>&nbsp;<span class="font-small text-muted" id="car_time_${data[
+                                "donations"
+                              ]
+                                .indexOf(item)
+                                .toString()}"></span>
+                          </div>
+
+                      </div>
+                  </div>
+                </div>
+              `;
+            });
+
+            // Filter Recommended Products
+            filteritems(filter_type);
+          });
+      }
+
+      function filteritems(product_filter) {
+        filter_type = product_filter;
+        var list_of_locations = [];
+        for (var i = 0; i < index_recommended_products.length; i++) {
+          var targetLocation = document.getElementById(
+            "location_" + i.toString()
+          ).innerText;
+          list_of_locations.push(targetLocation);
+        }
+
+        const locationData = {
+          TargetLocation: list_of_locations,
+          CurrentLocation: currentLocation,
+          FilterType: filter_type,
+        };
+        // fetch for items location & distances
+        fetch("/filteritems", {
+          method: "POST",
+          body: JSON.stringify(locationData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
             // Need to loop through here once have alot of items
-            var distance = document.getElementById("item_distance");
-            var time = document.getElementById("item_travel_time");
-            // console.log(data);
-            distance.innerHTML = data.distance + "km";
-            time.innerHTML = data.duration;
+            for (var i = 0; i < 2; i++) {
+              var distance = document.getElementById(
+                "distance_" + i.toString()
+              );
+              if (filter_type == "Bicycle") {
+                var bicycle_time = document.getElementById(
+                  "bicycle_time_" + i.toString()
+                );
+                var bicycle = document.getElementById(
+                  "bicycle_" + i.toString()
+                );
+                bicycle.style.display = "block";
+
+                var car = document.getElementById("car_" + i.toString());
+                car.style.display = "none";
+
+                var walk = document.getElementById("walk_" + i.toString());
+                walk.style.display = "none";
+
+                distance.innerHTML = data.distance[i] + "km";
+                bicycle_time.innerHTML = data.time[i];
+              } else if (filter_type == "Walking") {
+                var walk_time = document.getElementById(
+                  "walk_time_" + i.toString()
+                );
+                var bicycle = document.getElementById(
+                  "bicycle_" + i.toString()
+                );
+                bicycle.style.display = "none";
+
+                var car = document.getElementById("car_" + i.toString());
+                car.style.display = "none";
+
+                var walk = document.getElementById("walk_" + i.toString());
+                walk.style.display = "block";
+
+                distance.innerHTML = data.distance[i] + "km";
+                walk_time.innerHTML = data.time[i];
+              } else if (filter_type == "Car") {
+                var car_time = document.getElementById(
+                  "car_time_" + i.toString()
+                );
+                var bicycle = document.getElementById(
+                  "bicycle_" + i.toString()
+                );
+                bicycle.style.display = "none";
+
+                var car = document.getElementById("car_" + i.toString());
+                car.style.display = "block";
+
+                var walk = document.getElementById("walk_" + i.toString());
+                walk.style.display = "none";
+
+                distance.innerHTML = data.distance[i] + "km";
+                car_time.innerHTML = data.time[i];
+              }
+            }
           })
           .catch((error) => {
             console.error("Error:", error);
           });
       }
-      const loadingDiv = document.getElementById("loadingDiv");
-      // On load check for actions to be done in local storage
+
+      // Windows on load will run everything here
       window.onload = function () {
+        if (window.location.pathname.startsWith("/chat/")) {
+          var targetElement = document.getElementById("scrollHere");
+          var chatscrollElement = document.getElementById("chatscrollHere");
+          chatscrollElement.scrollTo(0, document.body.scrollHeight);
+          requestAnimationFrame(function () {
+            targetElement.scrollIntoView({ behavior: "smooth", block: "end" });
+          });
+        }
+        // Check if current path = /
+        if (window.location.pathname == "/") {
+          // Get Donations for Recommended Products
+          getDonations();
+        }
+
+        // Google login
         try {
           const fragment = window.location.hash.substring(1);
           const access_token = new URLSearchParams(fragment).get(
@@ -722,6 +1034,7 @@
           console.log(error);
         }
 
+        // Profile image
         try {
           var user_image_name = document.getElementById("tempHolder");
           var user_image = document.getElementById("imagePreview");
@@ -734,7 +1047,6 @@
         } catch (error) {
           console.log(error);
         }
-
         try {
           var user_image_name = document.getElementById("user_image_name");
           var user_image = document.getElementById("user_image");
@@ -743,6 +1055,7 @@
           console.log(error);
         }
 
+        // On load check for actions to be done in local storage
         try {
           // Hide loader
           loadingDiv.style.display = "none";
@@ -809,6 +1122,8 @@
           console.log(error);
         }
       };
+
+      const loadingDiv = document.getElementById("loadingDiv");
 
       // Triggers logout action to store in local storage
       function logout() {
