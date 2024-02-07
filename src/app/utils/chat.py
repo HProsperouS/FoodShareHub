@@ -115,13 +115,15 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
     user_names.discard(user_doc['Username'])  # remove the current user's Username
     users = list_cognito_user_by_usernames(user_names)
     user_dict = {user["Username"]: user for user in users}
-
+    
     # Step 3: Construct the chat data
     formatted_chats = []
     
     for chat in chats:
         opposite_user = chat.Receiver if chat.Sender == senderUsername else chat.Sender 
         opposite_user = user_dict.get(opposite_user)
+        print("opposite_user", opposite_user)
+
         receiver_username = ""
 
         if chat.Sender == senderUsername:
@@ -149,13 +151,13 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
         formatted_dict["username"] = opposite_user["Username"]
         # formatted_dict["online"] = opposite_user.get("chat", {"online": False})["online"]
         formatted_dict["timestamp"] = chat.SendTime
-        # formatted_dict["profile"] = opposite_user_doc["profile"]["image"]["url"]
+        formatted_dict["profile"] = opposite_user["Attributes"][2]["Value"]
         formatted_dict["message_id"] = str(chat.Id)
         formatted_dict["conversation_id"] = chat.ConversationId
         formatted_dict["is_read"] = chat.IsRead
         formatted_chats.append(format_json_response(formatted_dict))
 
-    # print("formatted_chats", formatted_chats)
+    print("formatted_chats", formatted_chats)
     # Step 4： Send the data
     await ws.send_json({"chats": formatted_chats})
 
@@ -189,8 +191,8 @@ def __format_value_for_json(value: Any, escape: bool | None = True) -> Any:
         return html.escape(value)
 
     if isinstance(value, datetime):
-        return datetime_to_unix_time(value)
-
+        return value.isoformat()
+    
     if isinstance(value, bytes):
         return base64.b64encode(value).decode("utf-8")
 

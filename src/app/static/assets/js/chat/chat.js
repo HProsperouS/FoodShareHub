@@ -68,7 +68,6 @@ function getOnlineStatusColour(online) {
 }
 
 const receiverOnlineHeader = document.getElementById("receiverOnlineHeader");
-// const userProfileLink = document.getElementById("userProfileLink");
 const receiverProfileImage = document.getElementById("receiverProfileImage");
 const receiverDisplayName = document.getElementById("receiverUsername"); // Display name is the username
 
@@ -87,19 +86,13 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     if (chat._id == currentReceiverId) {
         bgColour = "bg-light";
 
-        // const lastSlashIndex = userProfileLink.href.lastIndexOf("/") + 1;
-        // const updatedUserProfileLink = userProfileLink.href.substring(0, lastSlashIndex);
-        // if (updatedUserProfileLink != userProfileLink.href) {
-        //     userProfileLink.href = updatedUserProfileLink + chat.username;
-        // }
-
         if (receiverOnlineHeader.innerHTML != online) {
             receiverOnlineHeader.innerHTML = online;
         }
 
-        if (receiverProfileImage.src != chat.profile) {
-            receiverProfileImage.src = chat.profile;
-        }
+        // if (receiverProfileImage.src != chat.profile) {
+        //     receiverProfileImage.src = chat.profile;
+        // }
         
         if (receiverDisplayName.innerText != chat.display_name) {
             // NOTE: We can use innerHtml here as it is already escaped by the server
@@ -117,7 +110,7 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     }
 
     // reduce the message to 20 characters
-    var chatMsg = (chat.message.length > 20) ? chat.message.slice(0, 20) + "..." : chat.message;
+    var chatMsg = (chat.message.length > 10) ? chat.message.slice(0, 10) + "..." : chat.message;
     if (chatMsg.trim().split(":")[1].trim() === "") {
         chatMsg = "";
     }
@@ -125,7 +118,7 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
     return chatHtml = `
         <a id="${chat._id}" href="${chat._id}" class="d-flex align-items-center">
             <div class="flex-shrink-0">
-                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img">
+                <img class="img-fluid" src="${chat.profile}" alt="user img" style="width: 40px; height 40px;">
                 <span class="active"></span>
             </div>
             <div class="flex-grow-1 ms-3">
@@ -155,12 +148,11 @@ setInterval(() => {
 setInterval(() => {
     const chatTimestamps = document.querySelectorAll("[data-chat-timestamp]");
     for (const chatTimestamp of chatTimestamps) {
-        const timestamp = parseInt(chatTimestamp.getAttribute("data-chat-timestamp"));
-        console.log("chatTimestamps", timestamp);
-        chatTimestamp.innerText = formatTimestamp(timestamp);
+        const timestamp = chatTimestamp.getAttribute("data-chat-timestamp");
+        console.log("chatTimestamps111", timestamp);
+        chatTimestamp.innerText = formatDateTime(timestamp);
     }
 }, 5000);
-
 /*-------------------- End of Chat list and search logic  --------------------*/
 
 /*-------------------- Start of functions used by the chat websocket  --------------------*/

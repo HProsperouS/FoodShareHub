@@ -993,14 +993,7 @@
 
       // Windows on load will run everything here
       window.onload = function () {
-        if (window.location.pathname.startsWith("/chat/")) {
-          var targetElement = document.getElementById("scrollHere");
-          var chatscrollElement = document.getElementById("chatscrollHere");
-          chatscrollElement.scrollTo(0, document.body.scrollHeight);
-          requestAnimationFrame(function () {
-            targetElement.scrollIntoView({ behavior: "smooth", block: "end" });
-          });
-        }
+        
         // Check if current path = /
         if (window.location.pathname == "/") {
           // Get Donations for Recommended Products

@@ -212,6 +212,7 @@ async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depend
                 Content=msg,
                 Type="text",
                 IsRead=False,
+                SendTime=datetime.now(),
                 ConversationId=conversation_id
             )
             messageId = await insert_message(db, new_message, conversation_id)
