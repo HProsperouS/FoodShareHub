@@ -1,6 +1,6 @@
 import boto3
 
-def detect_malicious_content(text):  
+def analyze_comprehend_toxicity(text):  
 
     comprehend = boto3.client(service_name='comprehend', region_name="us-east-1")
 

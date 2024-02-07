@@ -32,3 +32,7 @@ from .Cognito import(
     list_cognito_user_by_usernames,
     edit_google_user_information
 )
+
+from .Comprehend import (
+    analyze_comprehend_toxicity
+)
