@@ -123,7 +123,7 @@
                       </select>
                       
                     </form>-->
-                  <div class="mb-4">
+                  <div class="mb-4" id="curent_location_section">
                     <i class="bi bi-geo-alt fa-lg"></i>
                     <label class="form-label" for="current_location"
                       >Current Location</label
@@ -137,6 +137,7 @@
                       id="current_location"
                       name="current_location"
                     />
+                    
                     <div
                       id="currentaddressSuggestionCard"
                       class="card mt-10"
@@ -159,18 +160,38 @@
                   </div>
 
                   {% endif %}
-
-                  <div class="header-action-icon-2">
-                    <span
-                      ><i class="bi bi-bell fa-lg" style="align: center"></i
-                    ></span>
-
-                    <a href="#">
-                      <span class="pro-count blue" id="notificationCount"
-                        >3</span
+                  &nbsp;
+                  
+                  <!--<div class="header-action-icon-2">
+                    <span >
+                      <i class="bi bi-bell fa-lg position-relative " data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false"></i>
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">99+<span class="visually-hidden">unread messages</span>
+                    </span>
+                    
+                    
+                    <ul class="dropdown-menu dropdown-menu-lg-end" style="transition:1s ease;">
+                      <li><button class="dropdown-item" type="button"> <i class="bi bi-x"></i></button></li>
+                      <li><button class="dropdown-item" type="button">Another action</button></li>
+                      <li><button class="dropdown-item" type="button">Something else here</button></li>
+                    </ul>
+                   
+                  </div>-->
+                  
+                  
+                  <!--<div
+                      id="currentaddressSuggestionCard"
+                      class="card mt-10"
+                      style="position: relative; z-index: 100; width: 300px;left:0px;"
+                    >
+                      <div class="card-header">Suggestions</div>
+                      <div
+                        class="card-body"
+                        style="overflow-y: auto; height: 350px"
                       >
-                    </a>
-                  </div>
+                        <ul id="currentaddressSuggestionListItem"></ul>
+                      </div>
+                    </div>-->
+                  &nbsp;
                   <div class="header-action-icon-2">
                     {% if request.session["session"] %} {% if
                     request.session["session"]["role"] %}
@@ -686,14 +707,15 @@
     <script src="https://www.google.com/recaptcha/api.js"></script>
 
     <script>
-      let controller = new AbortController();
+  
+  
 
       document
         .getElementById("current_location")
         .addEventListener("input", function () {
-          controller.abort(); // Cancel the previous request
+          
 
-          controller = new AbortController(); // Create a new controller for the current request
+          var controller = new AbortController(); // Create a new controller for the current request
 
           var searchQuery = document.getElementById("current_location").value;
 
@@ -993,7 +1015,6 @@
 
       // Windows on load will run everything here
       window.onload = function () {
-        
         // Check if current path = /
         if (window.location.pathname == "/") {
           // Get Donations for Recommended Products
