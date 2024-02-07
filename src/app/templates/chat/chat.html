@@ -60,9 +60,15 @@
                                 <div class="row mb-3"> 
                                     <div class="col-12">
                                         <div class="input-group">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-plus"></i> 
-                                            </span>
+                                            <div class="input-group-text dropdown">
+                                                <span data-bs-toggle="dropdown" aria-expanded="false">
+                                                  <i class="fas fa-plus"></i>
+                                                </span>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item" href="#" id="sendVoice" data-bs-toggle="modal" data-bs-target="#speechToTextModal">Send Voice Message</a></li>
+                                                    <li><a class="dropdown-item" href="#" id="sendImage">Send Image</a></li>
+                                                </ul>
+                                            </div>                                              
                                             <textarea class="form-control" id="messageText" placeholder="Type a message…" spellcheck="true" style="height: 81px;" autofocus></textarea>
                                             <span class="input-group-text">
                                                 <i class="fas fa-paper-plane"></i> <!-- FontAwesome paper plane (send) icon -->
@@ -78,6 +84,31 @@
         </div>
     </div>    
 </main>
+<!-- Speech To Text Modal -->
+<div class="modal fade" id="speechToTextModal" tabindex="-1" aria-labelledby="speechToTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="speechToTextModalLabel">Speech to Text</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button id="startRecordBtn" class="btn btn-outline-primary w-100 mb-3">
+                    <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <div id="recordingIndicator" class="text-center mb-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Recording...</span>
+                    </div>
+                </div>
+                <textarea id="speechToTextOutput" class="form-control" style="height: 150px; font-size: 1.1rem;" placeholder="Spoken text will appear here..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
