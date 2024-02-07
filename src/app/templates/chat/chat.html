@@ -11,7 +11,7 @@
         <div class="message-area">
             <div class="row">
                 <div class="col-12">
-                    <div class="chat-area">
+                    <div class="chat-area" id="scrollHere">
                         <div class="chatlist">
                             <div class="modal-dialog-scrollable">
                                 <div class="modal-content">
@@ -29,49 +29,47 @@
                             </div>
                         </div>
                         <div class="chatbox">
-                            <div class="modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <input type="hidden" id="conversationId">
-                                    <div class="msg-head">
-                                        <div class="row">
-                                            <div class="col-8">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0">
-                                                        <img class="img-fluid" src="{{ receiver.ProfileImage }}" alt="user img" style="width: 40px; height: 40px;">
-                                                        <span id="receiverOnlineHeader" class="active"></span>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h3 id="receiverUsername">{{ receiver.Username }}</h3>
-                                                    </div>
+                            <div class="modal-content">
+                                <input type="hidden" id="conversationId">
+                                <div class="msg-head">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <img class="img-fluid" src="{{ receiver.ProfileImage }}" alt="user img" style="width: 40px; height: 40px;">
+                                                    <span id="receiverOnlineHeader" class="active"></span>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h3 id="receiverUsername">{{ receiver.Username }}</h3>
                                                 </div>
                                             </div>
-                                            <div class="col-4">
-                                                
-                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            
                                         </div>
                                     </div>
-                                    <div id="mainMsgDiv" class="modal-body">
-                                        <div class="msg-body">
-                                            <!-- Message Area Here -->
-                                            <ul id="chatArea">
-                                                <!-- Message List Here -->
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3"> 
-                                        <div class="col-12">
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-plus"></i> 
-                                                </span>
-                                                <textarea class="form-control" id="messageText" placeholder="Type a message…" spellcheck="true" style="height: 81px;" autofocus></textarea>
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-paper-plane"></i> <!-- FontAwesome paper plane (send) icon -->
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>                     
                                 </div>
+                                <div id="mainMsgDiv" class="modal-body" style="position: relative; overflow-y: scroll; overflow-x: hidden;">
+                                    <div class="msg-body">
+                                        <!-- Message Area Here -->
+                                        <ul id="chatArea">
+                                            <!-- Message List Here -->
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row mb-3"> 
+                                    <div class="col-12">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-plus"></i> 
+                                            </span>
+                                            <textarea class="form-control" id="messageText" placeholder="Type a message…" spellcheck="true" style="height: 81px;" autofocus></textarea>
+                                            <span class="input-group-text">
+                                                <i class="fas fa-paper-plane"></i> <!-- FontAwesome paper plane (send) icon -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>                     
                             </div>
                         </div>
                     </div>
@@ -84,7 +82,7 @@
 
 {% block scripts %}
     {{ super() }}
-    <script>        
+    <script>         
         let ws = null;
         inputMsg.addEventListener("keypress", (event) => {
             // Check if the key pressed is the Enter key (code "Enter")
@@ -101,6 +99,8 @@
         let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
         let retrieveInitialMessages = true;
 
+        let scrollPos = mainMsgDiv.scrollTop;
+        let scrollHeight = mainMsgDiv.scrollHeight;
         function startWebSocket() {
             {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
                 ws = new WebSocket("{{ ws_url }}");
@@ -224,12 +224,14 @@
                             </li>
                         `;
                     }
-
                     const newDiv = document.createElement("div");
                     newDiv.innerHTML = msgBodyHtml;
                     messageArea.appendChild(newDiv)
                     messageIds.add(messageId);
-
+                    if (isSender) {
+                        // scroll to the very bottom if the current user had sent a new message
+                        mainMsgDiv.scrollTop = mainMsgDiv.scrollHeight;
+                    }
                 }
                 finally {
                     isProcessingMessage = false;

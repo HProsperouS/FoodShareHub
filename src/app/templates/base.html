@@ -696,6 +696,13 @@
       const loadingDiv = document.getElementById("loadingDiv");
       // On load check for actions to be done in local storage
       window.onload = function () {
+        if (window.location.pathname.startsWith("/chat/")) {
+          var targetElement = document.getElementById("scrollHere");
+           requestAnimationFrame(function() {
+              targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          });
+        }
+
         try {
           const fragment = window.location.hash.substring(1);
           const access_token = new URLSearchParams(fragment).get(
