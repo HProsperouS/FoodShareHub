@@ -414,12 +414,12 @@
     </script>
     <script>
         // Script for Address Suggestions
-        let controller = new AbortController();
+        let locationController = new AbortController();
 
         document.getElementById('pickup_location').addEventListener('input', function() {
-            controller.abort(); // Cancel the previous request
+            locationController.abort(); // Cancel the previous request
 
-            controller = new AbortController(); // Create a new controller for the current request
+            locationController = new AbortController(); // Create a new controller for the current request
 
             var searchQuery = document.getElementById('pickup_location').value;
 
@@ -430,7 +430,7 @@
                 return;
             }
 
-            fetch(`/foodshare/autocomplete/${searchQuery}`, { signal: controller.signal })
+            fetch(`/foodshare/autocomplete/${searchQuery}`, { signal: locationController.signal })
                 .then(response => response.json())
                 .then(data => {
                     if(data.suggestions){
