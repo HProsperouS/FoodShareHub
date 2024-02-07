@@ -53,8 +53,18 @@ import boto3
 import json
 import time
 
-#TESTING FOR LOCATION
+# location service
 import datetime
+
+# database
+from sqlalchemy.orm import Session
+from db import (
+    # DB Session
+    get_db,
+    # Get DB donations
+    get_all_donations_exclude_userid,
+    get_all_donations
+)
 
 # Class Objects
 class MFASetupCode(BaseModel):
@@ -76,8 +86,9 @@ class ResetPassword(BaseModel):
     CurrentPassword: str
     NewPassword: str
 class LocationDistanceTime(BaseModel):
-    TargetLocation: str
+    TargetLocation: list
     CurrentLocation: str
+    FilterType:str
 
 class MFAPassword(BaseModel):
     Password:str
@@ -88,103 +99,127 @@ user_router = APIRouter(
 )
 RBAC_DEPENDS = Depends(USER_RBAC, use_cache=False)
 
-@user_router.post("/user/filteritems")
+
+@user_router.post("/getdonations")
+async def getdonations(request: Request, db:Session = Depends(get_db)) -> ORJSONResponse:
+    if request.get('session'):
+        session = request.get("session")
+        user_id = session["session"]["user_id"]
+
+        donations = get_all_donations_exclude_userid(db, user_id)
+        json_donations = []
+        for donation in donations:
+            item_info = {}
+            item_info["MeetUpLocation"] = donation.MeetUpLocation
+            item_info["Username"] = donation.Username
+            item_info["Image"] = donation.FoodItem.Attachment.PublicAccessURL
+            item_info["Name"] = donation.FoodItem.Name
+            item_info["Category"] = donation.FoodItem.Category.Name
+            item_info["Description"] = donation.FoodItem.Description
+            json_donations += [item_info]
+
+        count = len(donations)
+    else:
+        donations = get_all_donations(db)
+        json_donations = []
+        for donation in donations:
+            item_info = {}
+            item_info["MeetUpLocation"] = donation.MeetUpLocation
+            item_info["Username"] = donation.Username
+            item_info["Image"] = donation.FoodItem.Attachment.PublicAccessURL
+            item_info["Name"] = donation.FoodItem.Name
+            item_info["Category"] = donation.FoodItem.Category.Name
+            item_info["Description"] = donation.FoodItem.Description
+            json_donations += [item_info]
+        
+        print(json_donations)
+
+    #     new_donation = Donation(
+    #     Status=DonationStatus.ACTIVE,
+    #     MeetUpLocation=formData.MeetUpLocation,
+    #     UserId = user_id,
+    #     Username = username,
+    #     FoodItem = new_fooditem
+    # )
+    #     new_fooditem = FoodItem(
+    #     Name=formData.FoodItem.Name,
+    #     Description=formData.FoodItem.Description,
+    #     ExpiryDate=formData.FoodItem.ExpiryDate,
+    #     CategoryID=formData.FoodItem.CategoryID,
+    #     Attachment=new_attachment,
+    # )
+    #     PublicAccessURL = publicAccessURL
+        count = len(json_donations)
+    
+    return ORJSONResponse(
+        content={"donations":json_donations,"count":count}
+    )
+
+    
+
+@user_router.post("/filteritems")
 async def filteritems(request: Request, formData: LocationDistanceTime) -> ORJSONResponse:
     try:
-       # Find location
+        
+        # Find location
         print(formData)
-        target = formData.TargetLocation
+        targets = formData.TargetLocation
         current = formData.CurrentLocation
+        travelType = formData.FilterType
+
+        distance_list = []
+        time_list = []
 
         client = boto3.client('location', region_name='ap-southeast-1')
+        for target in targets:
 
-        response_index1 = client.search_place_index_for_text(
-            IndexName='FoodShareHubIndex',
-            Text=target
-        )
-        response_index2 = client.search_place_index_for_text(
-            IndexName='FoodShareHubIndex',
-            Text=current
-        )
 
-        # Extract longitude and latitude from the response
-        location1 = response_index1['Results'][0]['Place']['Geometry']['Point']
-        location2 = response_index2['Results'][0]['Place']['Geometry']['Point']
-        print(datetime.datetime.now())
-        response = client.calculate_route(
-            CalculatorName='explore.route-calculator.Grab',
-            DeparturePosition=[location2[0], location2[1]],
-            DestinationPosition=[location1[0], location1[1]],
-            TravelMode="Bicycle",
-            DepartureTime=datetime.datetime.now() 
-        )
-        # Options
-        # TravelMode='Car'|'Truck'|'Walking'|'Bicycle'|'Motorcycle'
-        # OptimizeFor='FastestRoute'|'ShortestRoute',
+            response_index1 = client.search_place_index_for_text(
+                IndexName='FoodShareHubIndex',
+                Text=target
+            )
+            response_index2 = client.search_place_index_for_text(
+                IndexName='FoodShareHubIndex',
+                Text=current
+            )
 
-        # Extract distance and duration from the response
-        distance = response['Summary']['Distance']
-        duration = response['Summary']['DurationSeconds'] 
-        minutes, seconds = divmod(duration, 60)
-        formatted_duration = f"{int(minutes)} mins {int(seconds)} seconds"
-        print(distance)
-        print(formatted_duration)
+            # Extract longitude and latitude from the response
+            location1 = response_index1['Results'][0]['Place']['Geometry']['Point']
+            location2 = response_index2['Results'][0]['Place']['Geometry']['Point']
+            print(datetime.datetime.now())
+            response = client.calculate_route(
+                CalculatorName='explore.route-calculator.Grab',
+                DeparturePosition=[location2[0], location2[1]],
+                DestinationPosition=[location1[0], location1[1]],
+                TravelMode=travelType,
+                DepartureTime=datetime.datetime.now() 
+            )
+            # Options
+            # TravelMode='Car'|'Truck'|'Walking'|'Bicycle'|'Motorcycle'
+            # OptimizeFor='FastestRoute'|'ShortestRoute',
+
+            # Extract distance and duration from the response
+            distance = round(response['Summary']['Distance'], 1)
+            duration = response['Summary']['DurationSeconds'] 
+            minutes, seconds = divmod(duration, 60)
+            formatted_duration = f"{int(minutes)} mins"
+            print(distance)
+            print(formatted_duration)
+
+            distance_list += [distance]
+            time_list += [formatted_duration]
+        
 
 
         return ORJSONResponse(
-            content={"distance":distance,"duration":formatted_duration}
+            content={"distance":distance_list,"time":time_list}
         )
     except Exception as e:
         print(e)
 
-@user_router.get("/user")
-async def defaultuserpage(request:Request,rbac_res: RBAC_TYPING=RBAC_DEPENDS) -> HTMLResponse:
 
-    # Find location
-    client = boto3.client('location', region_name='ap-southeast-1')
 
-    response_index1 = client.search_place_index_for_text(
-        IndexName='FoodShareHubIndex',
-        Text="Hougang ave 8 Block 650"
-    )
-    response_index2 = client.search_place_index_for_text(
-        IndexName='FoodShareHubIndex',
-        Text="Marina Bay Sands"
-    )
 
-    # Extract longitude and latitude from the response
-    location1 = response_index1['Results'][0]['Place']['Geometry']['Point']
-    location2 = response_index2['Results'][0]['Place']['Geometry']['Point']
-    print(datetime.datetime.now())
-    response = client.calculate_route(
-        CalculatorName='explore.route-calculator.Grab',
-        DeparturePosition=[location2[0], location2[1]],
-        DestinationPosition=[location1[0], location1[1]],
-        TravelMode="Bicycle",
-        DepartureTime=datetime.datetime.now()  # You can specify a departure time, e.g., '2022-01-01T12:00:00Z'
-    )
-    # Options
-    # TravelMode='Car'|'Truck'|'Walking'|'Bicycle'|'Motorcycle'
-    # OptimizeFor='FastestRoute'|'ShortestRoute',
-
-    # Extract distance and duration from the response
-    distance = response['Summary']['Distance']
-    duration = response['Summary']['DurationSeconds']
-    minutes, seconds = divmod(duration, 60)
-    formatted_duration = f"{int(minutes)} mins {int(seconds)} seconds"
-    # convert = str(datetime.timedelta(seconds = duration))
-    # print(convert)
-    print(distance)
-    print(response)
-    print(formatted_duration)
-
-    return await render_template(
-        name="index.html",
-        context={
-            "request": request,
-            "location":{"distance":distance,"duration":formatted_duration}
-    },
-)
 
 @user_router.get("/usertest")
 async def usertest(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLResponse:
