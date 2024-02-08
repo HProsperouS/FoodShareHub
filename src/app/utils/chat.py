@@ -106,7 +106,7 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
     # Step 1: Get all the chat sessions that the user has or has received messages from, Get the latest message for each chat session
     senderUsername = user_doc['Username']
     chats = await get_latest_messages_for_user(db_session, senderUsername) # This contains the latest message for each chat session but can be null if there is no chat session
-    print("Chats List", chats)
+    # print("Chats List", chats)
     user_dict = {}
 
     # Step 2: Get the opposite users information for the chats
@@ -122,7 +122,7 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
     for chat in chats:
         opposite_user = chat.Receiver if chat.Sender == senderUsername else chat.Sender 
         opposite_user = user_dict.get(opposite_user)
-        print("opposite_user", opposite_user)
+        # print("opposite_user", opposite_user)
 
         receiver_username = ""
 
@@ -157,7 +157,7 @@ async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
         formatted_dict["is_read"] = chat.IsRead
         formatted_chats.append(format_json_response(formatted_dict))
 
-    print("formatted_chats", formatted_chats)
+    # print("formatted_chats", formatted_chats)
     # Step 4： Send the data
     await ws.send_json({"chats": formatted_chats})
 

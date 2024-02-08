@@ -120,8 +120,8 @@
             if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
                 // Prevent the default action (newline character insertion)
                 event.preventDefault();
-                sendMessage(ws, event);
-                resetTextareaHeight(inputMsg);
+                sendMessage(ws, event)
+                    .then(() => resetTextareaHeight(inputMsg));
             }
         });
         
@@ -174,23 +174,21 @@
                 isProcessingMessage = true;
                 
                 const response = JSON.parse(event.data);
-                console.log(response);
                 
                 try {    
                     if (response.chats) {
                         // To display the chat list
-                        console.log("Displaying chat list...");
                         processChats(response.chats, "{{ receiver.Username }}");
                         
                         // Update the current Conversation Id
                         var conversationId = document.getElementById("conversationId");
-                        console.log("Current Conversation Id: " + response.chats[0].conversation_id);
-                        console.log("Current Receiver: " + response.chats[0].conversation_id);
+                        //console.log("Current Conversation Id: " + response.chats[0].conversation_id);
+                        //console.log("Current Receiver: " + response.chats[0].conversation_id);
                         const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
                         
                         if (currentChat) {
                             conversationId.value = currentChat.conversation_id;
-                            console.log("Conversation Id: " + conversationId.value);
+                            // console.log("Conversation Id: " + conversationId.value);
                         }
                         return;
                     }
@@ -218,7 +216,6 @@
                     }
                     
                     const responseTimestamp = response.SendTime;
-                    console.log("Response Timestamp: " + responseTimestamp);
                     const sender = response.Sender;
                     const receiver = response.Receiver;
                     const messageType = response.Type;

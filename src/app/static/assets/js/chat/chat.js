@@ -1,10 +1,10 @@
 /*-------------------- Start of Chat list and search logic  --------------------*/
+_hasInappropriateLanguage = false;
 let userList = [];
 let prevChats = [];
 const chatList = document.getElementById("chatList");
 
 function processChats(chats, currentReceiverId) {
-    console.log("processChats called");
     userList = chats;
 
     // Keep track of the user IDs of the chats that are currently displayed in the chat list
@@ -12,11 +12,9 @@ function processChats(chats, currentReceiverId) {
     
     // Check if the chats array has changed
     let chatsChanged = false;
-    console.log("Chats Compared", chats.length, prevChats.length);
 
     if (chats.length !== prevChats.length) {
         chatsChanged = true;
-        console.log("chats.length !== prevChats.length || Chat Changes" );
     } else {
         for (let i = 0; i < chats.length; i++) {
             const chat = chats[i];
@@ -39,7 +37,6 @@ function processChats(chats, currentReceiverId) {
 
     // Update the DOM if the chats array has changed
     if (chatsChanged) {
-        console.log("chatsChanged, Updating DOM");
         // Update the chat list HTML
         let chatListHtml = "";
         for (let i = 0; i < chats.length; i++) {
@@ -141,7 +138,6 @@ setInterval(() => {
             continue;
         }
         const timestamp = new Date(sendTime).getTime();
-        console.log("readableTimes", timestamp);  
         readableTime.innerText = getReadableTimeDiff(timestamp);
     }
 }, 500);
@@ -149,7 +145,6 @@ setInterval(() => {
     const chatTimestamps = document.querySelectorAll("[data-chat-timestamp]");
     for (const chatTimestamp of chatTimestamps) {
         const timestamp = chatTimestamp.getAttribute("data-chat-timestamp");
-        console.log("chatTimestamps111", timestamp);
         chatTimestamp.innerText = formatDateTime(timestamp);
     }
 }, 5000);
@@ -160,19 +155,16 @@ setInterval(() => {
 const mainMsgDiv = document.getElementById("mainMsgDiv");
 const messageArea = document.getElementById("chatArea");
 const inputMsg = document.getElementById("messageText");
-var conversationId = document.getElementById("conversationId");
+let conversationId = document.getElementById("conversationId");
+// let _hasInappropriateLanguage = false;
 
 function getReadableFileSize(nBytes) {
     var i = nBytes == 0 ? 0 : Math.floor(Math.log(nBytes) / Math.log(1024));
     return (nBytes / Math.pow(1024, i)).toFixed(2) * 1 + " " + ["B", "kB", "MB", "GB", "TB"][i];
 }
 
-function sendMessage(ws, event) {
+async function sendMessage(ws, event) {
     event.preventDefault();
-    if (!inputMsg.checkValidity()) {
-        inputMsg.reportValidity();
-        return;
-    }
 
     // strip value of whitespace
     inputMsg.value = inputMsg.value.trim();
@@ -183,15 +175,26 @@ function sendMessage(ws, event) {
         return;
     }
 
-    // send the JSON message
-    const data = {
+    // Check if the message has inappropriate language
+    const messageData = {
         message: inputMsg.value,
-        // Get the conversation from the current selected receiver
-        conversation_id: conversationId.value,
     };
 
-    ws.send(JSON.stringify(data));
+    const _hasInappropriateLanguage = await detectToxicity(messageData)
+    if (!_hasInappropriateLanguage) {
+        console.log("THEN: No inappropriate language detected");
 
+        // Send the JSON message
+        const data = {
+            message: inputMsg.value,
+            // Get the conversation from the current selected receiver
+            conversation_id: conversationId.value,
+        };
+        console.log(data);
+        console.log(ws);
+        ws.send(JSON.stringify(data));
+    } 
+    
     inputMsg.value = "";
     // chatMsgFileTextInput.value = "";
     event.preventDefault();
@@ -205,6 +208,38 @@ function deleteMessage(ws, messageId) {
     const msgDiv = document.getElementById(messageId);
     if (msgDiv) {
         msgDiv.remove();
+    }
+}
+
+async function detectToxicity(messageData) {
+    try {
+        const response = await fetch("/api/chat/detect_toxicity", {
+            method: "POST",
+            body: JSON.stringify(messageData),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.message) {
+            Swal.fire({
+                title: 'warning!',
+                text: data.message,
+                icon: 'warning',
+                confirmButtonText: 'Okay'
+            });
+            return true;
+        }
+        return false
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        console.log("hasInappropriateLanguage: ", _hasInappropriateLanguage);
     }
 }
 
