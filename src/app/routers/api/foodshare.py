@@ -33,7 +33,7 @@ from db import (
     search_donation_by_name,
     search_donation_by_category
 )
-from schemas.request.donation import DonationCreate, DonationUpdate, ImageData
+from schemas.request.donation import DonationCreate, DonationUpdate, ImageData, DonationData
 from db.dependencies import get_db
 
 from db.models.donation import (
@@ -46,7 +46,8 @@ from db.models.donation import (
 from aws.services import(
     upload_to_s3,
     detect_objects,
-    detect_objects_and_moderate
+    detect_objects_and_moderate,
+    analyze_comprehend_toxicity
 )
 
 # import Python's standard libraries
@@ -224,3 +225,19 @@ async def process_delete_listing(id: int, db: Session = Depends(get_db)) -> ORJS
     return ORJSONResponse(
         content={"redirect_url": redirect_url, "message": success_message}
     )
+
+@foodshare_api.post(
+    path="/foodshare/detect_toxicity",
+    description="Detect food item name and description for toxicity.",
+)
+async def detect_toxicity(text: DonationData):
+    
+    hasToxicWords = analyze_comprehend_toxicity(text.Name + " " + text.Description)
+    
+    print("Words For detect_toxicity ", text)
+    print("hasToxicWords", hasToxicWords)
+    
+    if hasToxicWords:
+        return ORJSONResponse(content={"isToxic": hasToxicWords ,"message": "Inappropriate language detected. Please mind your langueage."})
+    else:
+        return ORJSONResponse(content={"isToxic": hasToxicWords})

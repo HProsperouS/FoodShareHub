@@ -42,3 +42,7 @@ class DonationUpdate(BaseModel):
 
 class ImageData(BaseModel):
     base64_data: str
+
+class DonationData(BaseModel):
+    Name: str
+    Description: str

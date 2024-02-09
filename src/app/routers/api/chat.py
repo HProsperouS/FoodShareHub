@@ -42,7 +42,8 @@ from aws.services import(
     upload_to_s3,
     detect_objects,
     detect_objects_and_moderate,
-    retreive_user
+    retreive_user,
+    analyze_comprehend_toxicity
 )
 from utils.chat import (
     send_chat_list,
@@ -56,6 +57,9 @@ from depends import (
 import asyncio
 from datetime import datetime
 
+from schemas.request.chat import ( 
+    ChatMessage
+)
 
 chat_api = APIRouter(
     include_in_schema=True,
@@ -236,3 +240,20 @@ async def get_info_from_session(
     }
     
     return sender_doc
+
+@chat_api.post(
+    path="/chat/detect_toxicity",
+    description="Detect FoodItem Image uploaded and return labels",
+)
+async def detect_toxicity(text: ChatMessage):
+    
+    print("detect_toxicity", text.message)
+    hasToxicWords = analyze_comprehend_toxicity(text.message)
+    
+    print("Words For detect_toxicity ", text.message)
+    print("hasToxicWords", hasToxicWords)
+    
+    if hasToxicWords:
+        return {"isToxic": hasToxicWords ,"message": "Inappropriate language detected. Please mind your langueage."}
+    return {"isToxic": hasToxicWords}
+    

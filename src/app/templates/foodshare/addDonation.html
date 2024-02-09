@@ -117,68 +117,110 @@
     {{ super() }}
     <script>
     var _base64;
+    var _hasInappropriateLanguage = false;
 
     document.getElementById("process_add_listing_form").addEventListener("submit", function(event) {
         event.preventDefault();
 
         var isValid = validateForm();
 
-        if (isValid) {
-            // Start: Retrieve image input
-            const fileInput = document.getElementById("image");
-            const file = fileInput.files[0];
-            // End: Retrieve image input
+        const donationData = { // To detct if the name and description has inappropriate language
+            Name: document.getElementById("name").value,
+            Description: document.getElementById("description").value,
+        };
 
-            // Start: Retrieve form data
-            const formData = {
-                MeetUpLocation: document.getElementById("pickup_location").value,
-                FoodItem: {
-                    Name: document.getElementById("name").value,
-                    CategoryID: document.getElementById("category").value,
-                    Description: document.getElementById("description").value,
-                    ExpiryDate: document.getElementById("expiry_date").value,
-                    Image: {
-                        FileName: fileInput.files[0].name,
-                        ContentType: fileInput.files[0].type,
-                        Size: fileInput.files[0].size,
-                        Base64: _base64
+        detectToxicity(donationData).then(() => {
+            if (isValid && _hasInappropriateLanguage == false) {
+                // Start: Retrieve image input
+                const fileInput = document.getElementById("image");
+                const file = fileInput.files[0];
+                // End: Retrieve image input
+
+                // Start: Retrieve form data
+                const formData = {
+                    MeetUpLocation: document.getElementById("pickup_location").value,
+                    FoodItem: {
+                        Name: document.getElementById("name").value,
+                        CategoryID: document.getElementById("category").value,
+                        Description: document.getElementById("description").value,
+                        ExpiryDate: document.getElementById("expiry_date").value,
+                        Image: {
+                            FileName: fileInput.files[0].name,
+                            ContentType: fileInput.files[0].type,
+                            Size: fileInput.files[0].size,
+                            Base64: _base64
+                        }
                     }
-                }
-            };
-            // End: Retrieve form data
+                };
+                // End: Retrieve form data
+                console.log("Adding Food Item");
+                const loadingDiv = document.getElementById('loadingDiv');
+                loadingDiv.style.display = '';
 
-            const loadingDiv = document.getElementById('loadingDiv');
-            loadingDiv.style.display = '';
+                // Start: Send form data using Fetch API
+                fetch("/api/foodshare/addMyListing", {
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loader
+                    loadingDiv.style.display = 'none';
 
-            // Start: Send form data using Fetch API
-            fetch("/api/foodshare/addMyListing", {
+                    // Extract the redirect URL from the JSON response
+                    const redirectUrl = data.redirect_url;
+
+                    // Extract the message from the JSON response
+                    const message = data.message;
+                    setNotificationMessage(message.category, message.text);
+
+                    // Redirect to the extracted URL
+                    window.location.href = redirectUrl;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+                // End: Send form data using Fetch API
+            }
+        });        
+    });
+
+    async function detectToxicity(donationData) {
+        const loadingDiv = document.getElementById('loadingDiv');
+        loadingDiv.style.display = '';
+
+        try {
+            const response = await fetch("/api/foodshare/detect_toxicity", {
                 method: "POST",
-                body: JSON.stringify(formData),
+                body: JSON.stringify(donationData),
                 headers: {
                     "Content-Type": "application/json",
                 },
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Hide loader
-                loadingDiv.style.display = 'none';
-
-                // Extract the redirect URL from the JSON response
-                const redirectUrl = data.redirect_url;
-
-                // Extract the message from the JSON response
-                const message = data.message;
-                setNotificationMessage(message.category, message.text);
-
-                // Redirect to the extracted URL
-                window.location.href = redirectUrl;
-            })
-            .catch(error => {
-                console.error("Error:", error);
             });
-            // End: Send form data using Fetch API
+            const data = await response.json();
+
+            if (data.message) {
+                loadingDiv.style.display = 'none';
+                _hasInappropriateLanguage = true;
+                console.log("hasInappropriateLanguage: ", _hasInappropriateLanguage);
+
+                Swal.fire({
+                    title: 'warning!',
+                    text: data.message,
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            console.log("hasInappropriateLanguage: ", _hasInappropriateLanguage);
         }
-    });
+    }
+
     </script>
 
     <script>
@@ -392,12 +434,12 @@
     </script>
     <script>
         // Script for Address Suggestions
-        let controller = new AbortController();
+        var locationController = new AbortController();
 
         document.getElementById('pickup_location').addEventListener('input', function() {
-            controller.abort(); // Cancel the previous request
+            locationController.abort(); // Cancel the previous request
 
-            controller = new AbortController(); // Create a new controller for the current request
+            locationController = new AbortController(); // Create a new controller for the current request
 
             var searchQuery = document.getElementById('pickup_location').value;
 
@@ -408,7 +450,7 @@
                 return;
             }
 
-            fetch(`/foodshare/autocomplete/${searchQuery}`, { signal: controller.signal })
+            fetch(`/foodshare/autocomplete/${searchQuery}`, { signal: locationController.signal })
                 .then(response => response.json())
                 .then(data => {
                     if(data.suggestions){

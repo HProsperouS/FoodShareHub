@@ -33,11 +33,17 @@ from .Cognito import(
     list_cognito_user_by_usernames,
     edit_google_user_information,
     update_last_access,
-    update_online_status
+    update_online_status,
+    edit_google_user_information
 )
 
 from .SES import(
     email_lastaccess,
     email_message_not_viewed,
     verify_email_address
+    
+)
+
+from .Comprehend import (
+    analyze_comprehend_toxicity
 )

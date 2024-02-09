@@ -140,10 +140,9 @@ head %}
             if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
                 // Prevent the default action (newline character insertion)
                 event.preventDefault();
-                sendMessage(ws, event);
-                
-                resetTextareaHeight(inputMsg);
                 sendTextNotificationMail();
+                sendMessage(ws, event)
+                    .then(() => resetTextareaHeight(inputMsg));
             }
         });
 
@@ -159,102 +158,60 @@ head %}
           ws = new WebSocket("{{ ws_url }}");
       {% endwith %}
 
-      ws.onopen = () => {
-          console.log("%c Connection established.", "color: white; background: green;");
-          ws.send(JSON.stringify({
-              "fetch_initial_messages": retrieveInitialMessages,
-          }));
-          retrieveInitialMessages = false;
-      };
+            ws.onmessage = async (event) => {
+                while (isProcessingMessage) {
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                }
+                isProcessingMessage = true;
+                
+                const response = JSON.parse(event.data);
+                
+                try {    
+                    if (response.chats) {
+                        // To display the chat list
+                        processChats(response.chats, "{{ receiver.Username }}");
+                        
+                        // Update the current Conversation Id
+                        var conversationId = document.getElementById("conversationId");
+                        //console.log("Current Conversation Id: " + response.chats[0].conversation_id);
+                        //console.log("Current Receiver: " + response.chats[0].conversation_id);
+                        const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
+                        
+                        if (currentChat) {
+                            conversationId.value = currentChat.conversation_id;
+                            // console.log("Conversation Id: " + conversationId.value);
+                        }
+                        return;
+                    }
+                    
+                    if (response.error) {
+                        const errMsg = response.error;
+                        console.error("Error: " + errMsg);
+                        formatTextareaInput(errMsg);
+                        return;
+                    };
+                    
+                    if (response.new_chat_session) {
+                        fetchingMutex = false;
+                        console.log("New chat session started.");
+                        return; // no more messages to fetch
+                    }
 
-      ws.onclose = (event) => {
-          fetchingMutex = false;
-          console.log("%c Connection closed, trying to reconnect in 3 seconds...", "color: white; background: red;");
-          if (event.reason) {
-              console.log(`%c Reason(s): ${event.reason}`, "color: white; background: red;");
-              if (event.reason == "Not authenticated.") {
-                  window.location.href = "{{ url_for('login') }}";
-              }
-          }
-
-          let count = 3;
-          console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
-          const countdown = setInterval(() => {
-              count--;
-              console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
-              if (count === 0) {
-                  clearInterval(countdown);
-                  startWebSocket();
-              }
-          }, 1000);
-      };
-
-      ws.onmessage = async (event) => {
-          while (isProcessingMessage) {
-              await new Promise((resolve) => setTimeout(resolve, 100));
-          }
-          isProcessingMessage = true;
-
-          const response = JSON.parse(event.data);
-          console.log(response);
-
-          try {
-              if (response.chats) {
-                  // To display the chat list
-                  console.log("Displaying chat list...");
-                  processChats(response.chats, "{{ receiver.Username }}");
-
-                  // Update the current Conversation Id
-                  var conversationId = document.getElementById("conversationId");
-                  console.log("Current Conversation Id: " + response.chats[0].conversation_id);
-                  console.log("Current Receiver: " + response.chats[0].conversation_id);
-                  const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
-
-                  if (currentChat) {
-                      conversationId.value = currentChat.conversation_id;
-                      console.log("Conversation Id: " + conversationId.value);
-                  }
-                  return;
-              }
-
-              if (response.error) {
-                  const errMsg = response.error;
-                  console.error("Error: " + errMsg);
-                  formatTextareaInput(errMsg);
-                  return;
-              };
-
-              if (response.new_chat_session) {
-                  fetchingMutex = false;
-                  console.log("New chat session started.");
-                  return; // no more messages to fetch
-              }
-
-              const messageId = response.Id; // This is null due to the message is not stored into database yet, anyway it cannot be null becuase will be use for the delete button
-              // if the message is already in the chat window, don't add it again
-              // this is to prevent duplicate messages caused by race conditions
-              // when the user scrolls to the top of the chat window to retrieve more messages
-              hasMsgElement = document.getElementById(messageId);
-              if (hasMsgElement) {
-                  return;
-              }
-
-              const responseTimestamp = response.SendTime;
-              console.log("Response Timestamp: " + responseTimestamp);
-              const sender = response.Sender;
-              const receiver = response.Receiver;
-              const messageType = response.Type;
-              const isSender = (sender == "{{ sender.Username }}");
-              const deleteFormBtn = `delete#${messageId}`;
-
-              // const msgDropdownId = `msgDropdown#${messageId}`;
-              // const imageViewId = `imageView#${messageId}`;
-              let msgBodyContent = "";
-              if (response.Content) {
-                  msgBodyContent = response.Content;
-              }
-
-              let msgBodyHtml = "";
+                    const messageId = response.Id; // This is null due to the message is not stored into database yet, anyway it cannot be null becuase will be use for the delete button
+                    // if the message is already in the chat window, don't add it again
+                    // this is to prevent duplicate messages caused by race conditions
+                    // when the user scrolls to the top of the chat window to retrieve more messages
+                    hasMsgElement = document.getElementById(messageId);
+                    if (hasMsgElement) {
+                        return;
+                    }
+                    
+                    const responseTimestamp = response.SendTime;
+                    const sender = response.Sender;
+                    const receiver = response.Receiver;
+                    const messageType = response.Type;
+                    const isSender = (sender == "{{ sender.Username }}");
+                    const deleteFormBtn = `delete#${messageId}`;
 
               if (!isSender) {
                   msgBodyHtml = `
