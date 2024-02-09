@@ -15,13 +15,18 @@ import os
 from dotenv import load_dotenv
 import boto3
 import redis
+import datetime
 from aws.services import (
     register_user,
     register_confirmation,
     retreive_user,
     authenticate_user,
     login_mfa,
-    edit_google_user_information
+    edit_google_user_information,
+    update_last_access,
+    verify_email_address,
+    update_online_status,
+    get_current_user_location
 )
 import jwt
 # import local libraries
@@ -34,6 +39,7 @@ from depends import (
     RBAC_TYPING,
     RBACResults
 )
+import socket
 load_dotenv()
 
 guest_router = APIRouter(
@@ -62,13 +68,17 @@ class LoginMfa(BaseModel):
 class AccessToken(BaseModel):
     Token:str
 
+class UserLocation(BaseModel):
+    Longitude:float
+    Latitude:float
+
 import uuid
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
 elasticache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
 
-def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str):
+def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str,status:str):
     request.session["session"] = {
         "session_id" : session_id,
         "username": username,
@@ -76,10 +86,24 @@ def create_session(request:Request, username: str,role:str,user_id:str,email:str
         "email":email,
         "role": role,
         "mfa": mfa,
-        "image":image
+        "image":image,
+        'status':status
         }
     
     return "success"
+
+@guest_router.post("/getusercurrentlocation")
+async def getUserCurrentLocation(request:Request, formData:UserLocation) -> ORJSONResponse:
+
+    longitude = formData.Longitude
+    latitude = formData.Latitude
+
+    user_location = get_current_user_location(longitude,latitude)
+
+    return ORJSONResponse(
+        content={"user_location": user_location}
+    ) 
+
 @guest_router.post("/googleurl")
 async def googleurl(request: Request) -> ORJSONResponse:
 
@@ -146,6 +170,7 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
             session = str(uuid.uuid4())
             image = 'N/A'
             mfa = "Enabled"
+            status = 'Online'
 
         else:
 
@@ -157,9 +182,12 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
             session = str(uuid.uuid4())
             image = user_attr["image"]
             mfa = "Enabled"
+            status='Online'
 
-        create_session(username=username,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image)
+        create_session(username=username,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image,status=status)
         print(request.get("session"))
+        # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # update_last_access(username,current_time)
         return ORJSONResponse(
             content={"redirect_url": f"{base_url}","status":"success"}
             
@@ -183,6 +211,11 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         # Authenticate user
         auth_user = authenticate_user(name,password)
         print(auth_user)
+
+        # TODO Check if ip has failed to access account for 3x
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        print(ip_address)
 
         if auth_user == "fail" :
             return ORJSONResponse(
@@ -221,8 +254,9 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             session = auth_user["Session"]
             image = attributes["image"]
             mfa = "Disabled"
+            status = "Online"
 
-            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image)
+            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image,status=status)
             
             # caching session ( works with ec2 not local )
             # print(elasticache)
@@ -233,6 +267,15 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             # print(decode)
 
             print(request.session.get("session"))
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            update_last_access(name,current_time)
+            update_online_status(name,"Online")
+
+            # send_email = email_lastaccess(email,name,current_time)
+            # print(send_email)
+
+
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}foodshare/myListings","status":"success","mfa":"Disabled"}
             ) 
@@ -284,30 +327,39 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}register","status":"fail","text_analysis":detect_text["Sentiment"]}
             )
-        if detect_language["Languages"][0]["LanguageCode"] != "en":
-            language_type = detect_language["Languages"][0]["LanguageCode"]
-            print(detect_language)
+        languageBoolean = False
+        language_type = ""
+        for language in detect_language["Languages"]:
+            if language["LanguageCode"] == "en":
+                language_type = language["LanguageCode"]
+                languageBoolean = True
+                
+        if languageBoolean == True:
+            # Create user
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            create_user = register_user(name,password,email,role,image,current_time)
+            print(create_user)
+
+            if create_user == "fail":
+                # Redirect to register page but the container IP keeps changing every deployment
+                return ORJSONResponse(
+                    content={"redirect_url": f"{base_url}register","status":"fail","message":"User already exists"}
+                )
+
+            # temp store account confirmation
+            request.session["account_confirmation"] = name
+
+            verify_ses_email = verify_email_address(email)
+
+            return ORJSONResponse(
+                content={"redirect_url": f"{base_url}register/confirmation","status":"success","language_analysis":language_type}
+            )
+        elif languageBoolean == False:
+            language_type = "ch"
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}register","status":"fail","language_analysis":language_type}
             )
 
-        # Create user
-        create_user = register_user(name,password,email,role,image)
-        print(create_user)
-
-        if create_user == "fail":
-            # Redirect to register page but the container IP keeps changing every deployment
-            return ORJSONResponse(
-                content={"redirect_url": f"{base_url}register","status":"fail","message":"User already exists"}
-            )
-
-        # temp store account confirmation
-        request.session["account_confirmation"] = name
-
-        return ORJSONResponse(
-            content={"redirect_url": f"{base_url}register/confirmation","status":"success"}
-        )
-    
     except Exception as e :
         print(e)
 
@@ -351,12 +403,16 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
        
        request.session.clear()
 
+       
+
        return ORJSONResponse(
             content={"redirect_url": f"{base_url}login","status":"success"}
        )
 
     except Exception as e:
        print(e)
+
+
 
 @guest_router.post("/login/mfa")
 async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
@@ -400,7 +456,12 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
 
         create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=access_token,mfa="Enabled",image=image)
         print(request.session.get("session"))
-        
+
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+        update_last_access(name,current_time)
+        update_online_status(name,"Online")
+    
         return ORJSONResponse(
             content={"redirect_url": f"{base_url}foodshare/myListings","status":"success"}
         ) 

@@ -50,11 +50,11 @@ head %} {{ super() }}
                       <div class="form-group">
                         <button
                           type="submit"
-                          class="btn btn-heading btn-block hover-up"
-                          name="login"
+                          class="btn btn-heading btn-block hover-up "
                         >
                           Log in
                         </button>
+                       
                       </div>
                       <a class="text-muted" href="#">Forgot password?</a>
                     </div>
@@ -92,7 +92,6 @@ head %} {{ super() }}
     })
       .then((response) => response.json())
       .then((data) => {
-        
         window.location.href = data.redirect_url;
       })
       .catch((error) => {

@@ -29,7 +29,10 @@ from aws.services import (
     upload_qrcode_to_s3,
     delete_s3_object,
     upload_userimage_to_s3,
-    authenticate_user
+    authenticate_user,
+    email_message_not_viewed,
+    update_last_access,
+    update_online_status
 )
 from utils import constants as C
 import pyotp
@@ -37,7 +40,8 @@ import qrcode
 
 from aws.services import (
     generate_software_token,
-    verify_software_token
+    verify_software_token,
+    retreive_user
 )
 
 from aws.services import(
@@ -93,11 +97,39 @@ class LocationDistanceTime(BaseModel):
 class MFAPassword(BaseModel):
     Password:str
 
+class UserInfo(BaseModel):
+    Sender:str
+    Receiver:str
+    Message:str
+
 user_router = APIRouter(
     include_in_schema=True,
     tags= ["User"]
 )
 RBAC_DEPENDS = Depends(USER_RBAC, use_cache=False)
+
+@user_router.post("/sendNotificationTextEmail")
+async def sendNotificationTextEmail(request: Request, formData:UserInfo) -> ORJSONResponse:
+
+    #check status
+    sender = formData.Sender
+    receiver = formData.Receiver
+    message = formData.Message
+    receiver_email = ""
+    # status = ""
+    get_user = retreive_user(receiver)
+    for attr in get_user["UserAttributes"]:
+        # if attr["Name"] == "custom:status" and attr["Value"] == "Offline":
+        #     status = "Offline"
+        if attr["Name"] == "email":
+            receiver_email = attr["Value"]
+    #send email
+  
+    response = email_message_not_viewed(sender,receiver,message,receiver_email)
+    return ORJSONResponse(
+        content={"status":"Offline","email":"sent"}
+    )
+    
 
 
 @user_router.post("/getdonations")
@@ -412,6 +444,13 @@ async def account(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTM
 async def logout(request: Request) -> RedirectResponse:
     
     try:
+        name = request.session["session"]["username"]
+        
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+        update_last_access(name,current_time)
+        update_online_status(name,"Offline")
+
         request.session.clear()
         # clear from redis
         # elasticache.delete(request.get("session")["username"])

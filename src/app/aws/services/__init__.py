@@ -11,7 +11,8 @@ from .Rekognition import (
 )
 
 from .Location import (
-    autocomplete_address
+    autocomplete_address,
+    get_current_user_location
 )
 
 from .SecretsManager import (
@@ -30,5 +31,13 @@ from .Cognito import(
     reset_password,
     disable_account,
     list_cognito_user_by_usernames,
-    edit_google_user_information
+    edit_google_user_information,
+    update_last_access,
+    update_online_status
+)
+
+from .SES import(
+    email_lastaccess,
+    email_message_not_viewed,
+    verify_email_address
 )

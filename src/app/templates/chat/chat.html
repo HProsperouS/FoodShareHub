@@ -38,21 +38,30 @@ head %}
                   <div class="row">
                     <div class="col-8">
                       <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
+                        <div class="flex-shrink-0 position-relative" >
                           <img
                             class="img-fluid"
                             src="{{ receiver.ProfileImage }}"
                             alt="user img"
                             style="width: 40px; height: 40px"
-                          />
-                          <span id="receiverOnlineHeader" class="active"></span>
+                          />      
+                          <span id="user_status_icon" class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" >
+                            <span class="visually-hidden">New alerts</span>
+                          </span> 
+                           
                         </div>
+                         
                         <div class="flex-grow-1 ms-3">
                           <h3 id="receiverUsername">{{ receiver.Username }}</h3>
                         </div>
+                        
                       </div>
                     </div>
-                    <div class="col-4"></div>
+                    <div class="col-4">
+                      <span id="receiverOnlineHeader" class="active" hidden
+                            >{{receiver.Status}}</span
+                          >
+                    </div>
                   </div>
                 </div>
                 <div
@@ -102,21 +111,46 @@ head %}
 </main>
 {% endblock %} {% block scripts %} {{ super() }}
 <script>
-  let ws = null;
-  inputMsg.addEventListener("keypress", (event) => {
-      // Check if the key pressed is the Enter key (code "Enter")
-      if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
-          // Prevent the default action (newline character insertion)
-          event.preventDefault();
-          sendMessage(ws, event);
-          resetTextareaHeight(inputMsg);
-      }
-  });
+        
+        // Send email when message is sent and recevier is not online
+        function sendTextNotificationMail(){
+            var receiver_status = document.getElementById('receiverOnlineHeader').innerText;
+            if(receiver_status == "Offline"){
+                var receiver = document.getElementById("receiverUsername").innerText;
+                var message =  document.getElementById('messageText').value;
+                var sender = document.getElementById("current_username").innerText;
+                const formData = {Sender:sender,Receiver:receiver,Message:message};
+                fetch("/sendNotificationTextEmail", {
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                    headers: {
+                        "Content-Type": "application/json",
+                },
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data)
+                })
+            }
+        }
 
-  const messageIds = new Set();
-  let isProcessingMessage = false; // a mutex to prevent race conditions
-  let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
-  let retrieveInitialMessages = true;
+        let ws = null;
+        inputMsg.addEventListener("keypress", (event) => {
+            // Check if the key pressed is the Enter key (code "Enter")
+            if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
+                // Prevent the default action (newline character insertion)
+                event.preventDefault();
+                sendMessage(ws, event);
+                
+                resetTextareaHeight(inputMsg);
+                sendTextNotificationMail();
+            }
+        });
+
+        const messageIds = new Set();
+        let isProcessingMessage = false; // a mutex to prevent race conditions
+        let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
+        let retrieveInitialMessages = true;
 
   let scrollPos = mainMsgDiv.scrollTop;
   let scrollHeight = mainMsgDiv.scrollHeight;

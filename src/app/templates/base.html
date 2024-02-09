@@ -98,24 +98,7 @@
               </div>
               <div class="header-action">
                 <div class="header-action-2">
-                  {% if location %}
-                  <form>
-                    <select
-                      class="select-active"
-                      onchange="getItemLocation()"
-                      id="location_options"
-                    >
-                      <option value="Marina Bay Sands">Marina Bay Sands</option>
-                      <option value="Hougang Mall">Hougang Mall</option>
-                      <option value="Chinatown Street Market">
-                        Chinatown Street Market
-                      </option>
-                      <option value="Jewel Changi Airport">
-                        Jewel Changi Airport
-                      </option>
-                    </select>
-                  </form>
-                  {% else %}
+                  
                   <!--<form>
                       
                       <select class="select-active" >
@@ -159,7 +142,7 @@
                     <span for="current_location" class="text-danger"></span>
                   </div>
 
-                  {% endif %}
+              
                   &nbsp;
                   
                   <!--<div class="header-action-icon-2">
@@ -205,8 +188,8 @@
                         {{request.session["session"]["image"]}}
                       </p>
                     </a>
-                    <a href="#"
-                      ><span class="lable ml-0"
+                    <a href="#" 
+                      ><span class="lable ml-0" id="current_username"
                         >{{request.session["session"]["username"]}}</span
                       ></a
                     >
@@ -708,12 +691,10 @@
 
     <script>
   
-  
-
       document
         .getElementById("current_location")
         .addEventListener("input", function () {
-          
+         
 
           var controller = new AbortController(); // Create a new controller for the current request
 
@@ -785,7 +766,8 @@
           const pickupLocationInput =
             document.getElementById("current_location");
           pickupLocationInput.value = event.target.textContent;
-          currentLocation = pickupLocationInput.value;
+          // currentLocation = pickupLocationInput.value;
+          UserCurrentLocation = pickupLocationInput.value;
           filteritems(filter_type);
 
           // Hide address suggestion card
@@ -796,15 +778,18 @@
         }
       }
 
-      // For captcha
+      // For captcha TO DO LATER
       function onSubmit(token) {
         document.getElementById("signin_form").submit();
       }
 
       // For list of recommended_products
       var index_recommended_products = [];
-      // For current location
-      var currentLocation = "Hougang Block 650";
+      // For user current location
+      var UserCurrentLocation = ""
+      UserCurrentLocation = "Marina Bay Sands"
+      var input_current_location = document.getElementById("current_location");
+      input_current_location.value = UserCurrentLocation
       // For current filter type by default is bicycle
       var filter_type = "Bicycle";
 
@@ -825,14 +810,14 @@
             data["donations"].forEach((item) => {
               index_recommended_products.push(item);
               recommended_products_section.innerHTML += `
-                <div class="col-lg-1-5 col-md-4 col-12 col-sm-6">
+                <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                   <div class="product-cart-wrap mb-30">
                       <div class="product-img-action-wrap">
                           <div class="product-img product-img-zoom">
                               <a href="shop-product-right.html">
                                   <img class="default-img" src="${
                                     item["Image"]
-                                  }" alt="" />
+                                  }" alt="" width=150 height=100 />
                                   <img class="hover-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-2.jpg') }}" alt="" />
                               </a>
                           </div>
@@ -935,7 +920,7 @@
 
         const locationData = {
           TargetLocation: list_of_locations,
-          CurrentLocation: currentLocation,
+          CurrentLocation: UserCurrentLocation,
           FilterType: filter_type,
         };
         // fetch for items location & distances
@@ -950,11 +935,12 @@
           .then((data) => {
             console.log(data);
             // Need to loop through here once have alot of items
-            for (var i = 0; i < 2; i++) {
+            for (var i = 0; i < index_recommended_products.length; i++) {
               var distance = document.getElementById(
                 "distance_" + i.toString()
               );
               if (filter_type == "Bicycle") {
+                console.log("bicycle")
                 var bicycle_time = document.getElementById(
                   "bicycle_time_" + i.toString()
                 );
@@ -972,6 +958,7 @@
                 distance.innerHTML = data.distance[i] + "km";
                 bicycle_time.innerHTML = data.time[i];
               } else if (filter_type == "Walking") {
+                console.log("walking")
                 var walk_time = document.getElementById(
                   "walk_time_" + i.toString()
                 );
@@ -989,6 +976,7 @@
                 distance.innerHTML = data.distance[i] + "km";
                 walk_time.innerHTML = data.time[i];
               } else if (filter_type == "Car") {
+                console.log("car")
                 var car_time = document.getElementById(
                   "car_time_" + i.toString()
                 );
@@ -1013,10 +1001,83 @@
           });
       }
 
+      function getUserCurrentLocation(){
+        if ("geolocation" in navigator) {
+          // Request access to the user's location
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              // Success callback
+              var latitude = position.coords.latitude;
+              var longitude = position.coords.longitude;
+              console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+              
+              // Singapore max & min of longitude and latitude
+              const minLatitude = 1.09;
+              const maxLatitude = 1.47;
+              const minLongitude = 103.59;
+              const maxLongitude = 104.09;
+              
+              if(latitude < minLatitude || latitude > 1.47 && longitude < minLongitude || longitude > maxLongitude){
+                console.log("Location not within Singapore");
+
+              }else{
+                const formData = {Longitude:longitude,Latitude:latitude}
+                fetch("/getusercurrentlocation", {
+                  method: "POST",
+                  body: JSON.stringify(formData),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log(data.user_location);
+                  UserCurrentLocation = data.user_location;
+
+                })
+              }
+              
+            },
+            function(error) {
+              // Error callback
+              switch(error.code) {
+                case error.PERMISSION_DENIED:
+                  console.error("User denied the request for Geolocation.");
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  console.error("Location information is unavailable.");
+                  break;
+                case error.TIMEOUT:
+                  console.error("The request to get user location timed out.");
+                  break;
+                case error.UNKNOWN_ERROR:
+                  console.error("An unknown error occurred.");
+                  break;
+              }
+            }
+          );
+        } else {
+          // Browser doesn't support geolocation
+          console.error("Geolocation is not supported by this browser.");
+        }
+      }
+
       // Windows on load will run everything here
       window.onload = function () {
+        
+        if(document.getElementById("receiverOnlineHeader")){
+          
+          var user_status = document.getElementById("receiverOnlineHeader");
+          var user_status_icon = document.getElementById("user_status_icon");
+          if(user_status.innerText == "Offline"){
+            user_status_icon.style.backgroundColor = "Red"
+          }else{
+            user_status_icon.style.backgroundColor = "#70db70"
+          }
+        }
         // Check if current path = /
         if (window.location.pathname == "/") {
+          getUserCurrentLocation();
           // Get Donations for Recommended Products
           getDonations();
         }

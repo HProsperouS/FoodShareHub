@@ -1,0 +1,19 @@
+#speechToTextOutput {
+    border: 2px solid #dee2e6; /* Bootstrap's border-gray */
+    background-color: #f8f9fa; /* Slightly gray background */
+}
+
+#startRecordBtn.active {
+    color: #fff;
+    background-color: #dc3545; /* Bootstrap's red */
+    border-color: #dc3545; /* Bootstrap's red */
+}
+
+#startRecordBtn.active .fas {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

@@ -71,7 +71,8 @@ async def chat_1_to_1(request: Request, receiver_name: str, rbac_res: rbac.RBACR
         'Username': receiver['Username'],
         'UserId': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'sub'), None),
         'EmailAddress': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'email'), None),
-        'ProfileImage':  next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'custom:image'), None)
+        'ProfileImage':  next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'custom:image'), None),
+        'Status': next((attr['Value'] for attr in receiver['UserAttributes'] if attr['Name'] == 'custom:status'), None)
     }
 
     # Extracting Sender Username, UserId, and EmailAddress
