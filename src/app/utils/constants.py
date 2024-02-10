@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 APP_ROOT_PATH = pathlib.Path(__file__).parent.parent.resolve()
 STATIC_PATH = APP_ROOT_PATH.joinpath("static")
 FAVICON_PATH = STATIC_PATH.joinpath("favicon.ico")
@@ -31,7 +31,7 @@ PASSWORD_HASHER = PasswordHasher(
 )
 
 # Application constants
-DOMAIN = "https://localhost:8080" if DEBUG_MODE else "https://deployed.live"
+DOMAIN = "https://localhost:8080" if DEBUG_MODE else "FoodShareHub-ALB-1873055449.ap-southeast-1.elb.amazonaws.com"
 FLASH_MESSAGES = "_messages"
 SESSION_COOKIE = "session"
 API_PREFIX = "/api"
