@@ -13,19 +13,14 @@ def analyze_comprehend_toxicity(text):
         LanguageCode='en'
     )
 
-    threshold = 0.7
+    threshold = 0.6
     toxicity_score = toxic_response.get('ResultList', [{}])[0].get('Toxicity', 0)
+    print(toxic_response)
     if toxicity_score > threshold:
         return True
-    
-    # Labels Method (Not used)
-    # labels = toxic_response.get('ResultList', [{}])[0].get('Labels', [])
-    # for label in labels:
-    #     if label['Score'] > threshold:
-    #         # If any score is above the threshold, return a True, means the content is toxic
-    #         return True
 
     return False
     
 # text = "Can you come my room? I want to show you something."
-# detect_malicious_content(text)
+# text = "Fuck You Chibai"
+# analyze_comprehend_toxicity(text)
