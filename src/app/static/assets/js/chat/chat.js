@@ -112,8 +112,10 @@ function getChatHtml(chat, currentReceiverId, filteredFromSearch) {
         chatMsg = "";
     }
 
+    var redirectUrl = `/chat/${chat.username}`;
+
     return chatHtml = `
-        <a id="${chat._id}" href="${chat._id}" class="d-flex align-items-center">
+        <a id="${chat._id}" href="${redirectUrl}" class="d-flex align-items-center">
             <div class="flex-shrink-0">
                 <img class="img-fluid" src="${chat.profile}" alt="user img" style="width: 40px; height 40px;">
                 <span class="active"></span>
