@@ -1,162 +1,171 @@
-{% extends "base.html" %} {% block title %}FoodShareHub{% endblock %} {% block
-head %}
+{% extends "base.html" %}
+{% block title %}FoodShareHub{% endblock %}
+{% block head %}
 <!-- Include DOMPurify from CDN -->
-{% endblock %} {% block content %}
+{% endblock %}
+{% block content %}
 <main class="main">
-  <div class="page-header mt-30 mb-50"></div>
-  <div class="container mb-30">
-    <div class="message-area">
-      <div class="row">
-        <div class="col-12">
-          <div class="chat-area" id="scrollHere">
-            <div class="chatlist">
-              <div class="modal-dialog-scrollable">
-                <div class="modal-content">
-                  <div class="chat-header">
-                    <div class="msg-search">
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="inlineFormInputGroup"
-                        placeholder="Search for user"
-                        aria-label="search"
-                      />
-                    </div>
-                  </div>
-                  <div class="modal-body">
-                    <div id="chatList" class="chat-list">
-                      <!-- Chat List Here-->
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="chatbox">
-              <div class="modal-content">
-                <input type="hidden" id="conversationId" />
-                <div class="msg-head">
-                  <div class="row">
-                    <div class="col-8">
-                      <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 position-relative" >
-                          <img
-                            class="img-fluid"
-                            src="{{ receiver.ProfileImage }}"
-                            alt="user img"
-                            style="width: 40px; height: 40px"
-                          />      
-                          <span id="user_status_icon" class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" >
-                            <span class="visually-hidden">New alerts</span>
-                          </span> 
-                           
-                        </div>
-                         
-                        <div class="flex-grow-1 ms-3">
-                          <h3 id="receiverUsername">{{ receiver.Username }}</h3>
-                        </div>
-                        
-                      </div>
-                    </div>
-                    <div class="col-4">
-                      <span id="receiverOnlineHeader" class="active" hidden
-                            >{{receiver.Status}}</span
-                          >
-                    </div>
-                  </div>
-                </div>
-                <div
-                  id="mainMsgDiv"
-                  class="modal-body"
-                  style="
-                    position: relative;
-                    overflow-y: scroll;
-                    overflow-x: hidden;
-                  "
-                >
-                  <div class="msg-body">
-                    <!-- Message Area Here -->
-                    <ul id="chatArea">
-                      <!-- Message List Here -->
-                    </ul>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-12">
-                    <div class="input-group">
-                      <span class="input-group-text">
-                        <i class="fas fa-plus"></i>
-                      </span>
-                      <textarea
-                        class="form-control"
-                        id="messageText"
-                        placeholder="Type a message…"
-                        spellcheck="true"
-                        style="height: 81px"
-                        autofocus
-                      ></textarea>
-                      <span class="input-group-text">
-                        <i class="fas fa-paper-plane"></i>
-                        <!-- FontAwesome paper plane (send) icon -->
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="page-header mt-30 mb-50">
     </div>
-  </div>
+    <div class="container mb-30">
+        <div class="message-area">
+            <div class="row">
+                <div class="col-12">
+                    <div class="chat-area" id="scrollHere">
+                        <div class="chatlist">
+                            <div class="modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="chat-header">
+                                        <div class="msg-search">
+                                            <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search for user" aria-label="search">
+                                        </div>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="chatList" class="chat-list">
+                                            <!-- Chat List Here-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chatbox">
+                            <div class="modal-content">
+                                <input type="hidden" id="conversationId">
+                                <div class="msg-head">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <img class="img-fluid" src="{{ receiver.ProfileImage }}" alt="user img" style="width: 40px; height: 40px;">
+                                                    <span id="receiverOnlineHeader" class="active"></span>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h3 id="receiverUsername">{{ receiver.Username }}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="mainMsgDiv" class="modal-body" style="position: relative; overflow-y: scroll; overflow-x: hidden;">
+                                    <div class="msg-body">
+                                        <!-- Message Area Here -->
+                                        <ul id="chatArea">
+                                            <!-- Message List Here -->
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row mb-3"> 
+                                    <div class="col-12">
+                                        <div class="input-group">
+                                            <div class="input-group-text dropdown">
+                                                <span data-bs-toggle="dropdown" aria-expanded="false">
+                                                  <i class="fas fa-plus"></i>
+                                                </span>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item" href="#" id="sendVoice" data-bs-toggle="modal" data-bs-target="#speechToTextModal">Send Voice Message</a></li>
+                                                    <li><a class="dropdown-item" href="#" id="sendImage">Send Image</a></li>
+                                                </ul>
+                                            </div>                                              
+                                            <textarea class="form-control" id="messageText" placeholder="Type a message…" spellcheck="true" style="height: 81px;" autofocus></textarea>
+                                            <span class="input-group-text">
+                                                <i class="fas fa-paper-plane"></i> <!-- FontAwesome paper plane (send) icon -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>                     
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
 </main>
-{% endblock %} {% block scripts %} {{ super() }}
-<script>
-        
-        // Send email when message is sent and recevier is not online
-        function sendTextNotificationMail(){
-            var receiver_status = document.getElementById('receiverOnlineHeader').innerText;
-            if(receiver_status == "Offline"){
-                var receiver = document.getElementById("receiverUsername").innerText;
-                var message =  document.getElementById('messageText').value;
-                var sender = document.getElementById("current_username").innerText;
-                const formData = {Sender:sender,Receiver:receiver,Message:message};
-                fetch("/sendNotificationTextEmail", {
-                    method: "POST",
-                    body: JSON.stringify(formData),
-                    headers: {
-                        "Content-Type": "application/json",
-                },
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data)
-                })
-            }
-        }
+<!-- Speech To Text Modal -->
+<div class="modal fade" id="speechToTextModal" tabindex="-1" aria-labelledby="speechToTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="speechToTextModalLabel">Speech to Text</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button id="startRecordBtn" class="btn btn-outline-primary w-100 mb-3">
+                    <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <div id="recordingIndicator" class="text-center mb-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Recording...</span>
+                    </div>
+                </div>
+                <textarea id="speechToTextOutput" class="form-control" style="height: 150px; font-size: 1.1rem;" placeholder="Spoken text will appear here..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
+{% block scripts %}
+    {{ super() }}
+    <script>         
         let ws = null;
         inputMsg.addEventListener("keypress", (event) => {
             // Check if the key pressed is the Enter key (code "Enter")
             if ((event.code === "Enter" || event.code == "NumpadEnter") && !event.shiftKey) {
                 // Prevent the default action (newline character insertion)
                 event.preventDefault();
-                sendTextNotificationMail();
                 sendMessage(ws, event)
                     .then(() => resetTextareaHeight(inputMsg));
             }
         });
-
+        
         const messageIds = new Set();
         let isProcessingMessage = false; // a mutex to prevent race conditions
         let fetchingMutex = false; // a mutex to prevent race conditions when fetching old messages
         let retrieveInitialMessages = true;
 
-  let scrollPos = mainMsgDiv.scrollTop;
-  let scrollHeight = mainMsgDiv.scrollHeight;
-  function startWebSocket() {
-      {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
-          ws = new WebSocket("{{ ws_url }}");
-      {% endwith %}
+        let scrollPos = mainMsgDiv.scrollTop;
+        let scrollHeight = mainMsgDiv.scrollHeight;
+        function startWebSocket() {
+            {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
+                ws = new WebSocket("{{ ws_url }}");
+            {% endwith %}
+    
+            ws.onopen = () => {
+                console.log("%c Connection established.", "color: white; background: green;");
+                ws.send(JSON.stringify({
+                    "fetch_initial_messages": retrieveInitialMessages,
+                }));
+                retrieveInitialMessages = false;
+            };
+            
+            ws.onclose = (event) => {
+                fetchingMutex = false;
+                console.log("%c Connection closed, trying to reconnect in 3 seconds...", "color: white; background: red;");
+                if (event.reason) {
+                    console.log(`%c Reason(s): ${event.reason}`, "color: white; background: red;");
+                    if (event.reason == "Not authenticated.") {
+                        window.location.href = "{{ url_for('login') }}";
+                    }
+                }
+    
+                let count = 3;
+                console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
+                const countdown = setInterval(() => {
+                    count--;
+                    console.log(`%c Reconnecting in ${count}...`, "color: white; background: red;");
+                    if (count === 0) {
+                        clearInterval(countdown);
+                        startWebSocket();
+                    }
+                }, 1000);
+            };
 
             ws.onmessage = async (event) => {
                 while (isProcessingMessage) {
@@ -213,41 +222,47 @@ head %}
                     const isSender = (sender == "{{ sender.Username }}");
                     const deleteFormBtn = `delete#${messageId}`;
 
-              if (!isSender) {
-                  msgBodyHtml = `
-                      <li class="sender" id="${messageId}">
-                          <!-- msg content -->
-                          <p>${msgBodyContent}</p>
-                          <span class="time" data-chat-timestamp="${responseTimestamp}">
-                              ${formatDateTime(responseTimestamp)}
-                          </span>
-                      </li>
-                  `;
-              } else {
-                  msgBodyHtml = `
-                      <li class="receiver" id="${messageId}">
-                          <!-- msg content -->
-                          <p>${msgBodyContent}</p>
-                          <span class="time" data-chat-timestamp="${responseTimestamp}">
-                              ${formatDateTime(responseTimestamp)}
-                          </span>
-                      </li>
-                  `;
-              }
-              const newDiv = document.createElement("div");
-              newDiv.innerHTML = msgBodyHtml;
-              messageArea.appendChild(newDiv)
-              messageIds.add(messageId);
-              if (isSender) {
-                  // scroll to the very bottom if the current user had sent a new message
-                  mainMsgDiv.scrollTop = mainMsgDiv.scrollHeight;
-              }
-          }
-          finally {
-              isProcessingMessage = false;
-          }
-      };
-  };
-  startWebSocket();
-</script>
+                    // const msgDropdownId = `msgDropdown#${messageId}`;
+                    // const imageViewId = `imageView#${messageId}`;
+                    let msgBodyContent = "";
+                    if (response.Content) {
+                        msgBodyContent = response.Content;
+                    }
+                    
+                    let msgBodyHtml = "";
+                    
+                    if (!isSender) {
+                        msgBodyHtml = `
+                            <li class="sender" id="${messageId}">
+                                <!-- msg content -->
+                                <p>${msgBodyContent}</p>
+                                <span class="time" data-chat-timestamp="${responseTimestamp}">
+                                    ${formatDateTime(responseTimestamp)}
+                                </span>
+                            </li>
+                        `;
+                    } else {
+                        msgBodyHtml = `
+                            <li class="receiver" id="${messageId}">
+                                <!-- msg content -->
+                                <p>${msgBodyContent}</p>
+                                <span class="time" data-chat-timestamp="${responseTimestamp}">
+                                    ${formatDateTime(responseTimestamp)}
+                                </span>
+                            </li>
+                        `;
+                    }
+                    const newDiv = document.createElement("div");
+                    newDiv.innerHTML = msgBodyHtml;
+                    messageArea.appendChild(newDiv)
+                    messageIds.add(messageId);
+                    mainMsgDiv.scrollTop = mainMsgDiv.scrollHeight;
+                }
+                finally {
+                    isProcessingMessage = false;
+                }
+            };
+        };
+        startWebSocket();
+    </script>
 {% endblock %}
