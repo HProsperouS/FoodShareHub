@@ -18,9 +18,6 @@ from sqlalchemy.orm import Session
 from websockets.exceptions import WebSocketException
 
 # import local libraries
-from utils.helper import (
-    filler_task
-)
 from utils import constants as C
 from utils import helper as Helper
 from db import (
@@ -89,7 +86,7 @@ async def get_notifications(
         msg_suffix = msg_suffix = unread_msg[0]["Username"] + f" and {num_of_unread - 1} other"
     elif num_of_unread == 1:
         msg_suffix = unread_msg[0]["Username"]
-    
+
     data = {
         "users": unread_msg,
         "message": f"You have unread messages from {msg_suffix}" if num_of_unread > 0 else "You have no unread messages",
