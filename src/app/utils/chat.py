@@ -71,36 +71,36 @@ async def remove_user_from_connected_list(websocket: WebSocket, user_id: str) ->
         # remove the user from the list of connected users
         websocket.app.state.chat_connected_users.remove(user_id)
 
-# async def get_chat_notifications(username: str, db_session) -> list[dict]:
-#     """Get all the unread chats for the user using RDS in a synchronous way.
+async def get_chat_notifications(username: str, db_session) -> list[dict]:
+    """Get all the unread chats for the user using RDS in a synchronous way.
 
-#     Args:
-#         user_id (int):
-#             The user id.
-#         db_session:
-#             The SQLAlchemy session object.
-#     Returns:
-#         list[dict]:
-#             The list of unread chats.
-#     """
+    Args:
+        user_id (int):
+            The user id.
+        db_session:
+            The SQLAlchemy session object.
+    Returns:
+        list[dict]:
+            The list of unread chats.
+    """
 
-#     # Get Unread Messages Sender Username
-#     senders = await get_sendername_of_unread_messages(db_session, username)
+    # Get Unread Messages Sender Username
+    senders = await get_sendername_of_unread_messages(db_session, username)
 
-#     # Get User Information by Sender Username
-#     if senders:
-#         users = list_cognito_user_by_usernames(senders)
-#         print("users in get_chat_notifications", users)
+    # Get User Information by Sender Username
+    if senders:
+        users = list_cognito_user_by_usernames(senders)
+        print("users in get_chat_notifications", users)
 
-#         return [
-#             {
-#                 "Username": user.username,
-#                 "ProfileImage": user.profile_image_url,
-#             } 
-#             for user in users
-#         ]
-#     else:
-#         return []
+        return [
+            {
+                "Username": user.username,
+                "ProfileImage": user.profile_image_url,
+            } 
+            for user in users
+        ]
+    else:
+        return []
 
 async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
     # Step 1: Get all the chat sessions that the user has or has received messages from, Get the latest message for each chat session
@@ -239,47 +239,47 @@ async def get_info_from_session(
     
     return sender_doc
 
-async def get_chat_notifications(username: str, db_session) -> list[dict]:
-    """Get all the unread chats for the user using RDS in a synchronous way.
+# async def get_chat_notifications(username: str, db_session) -> list[dict]:
+#     """Get all the unread chats for the user using RDS in a synchronous way.
 
-    Args:
-        username (str):
-            The username of the user.
-        db_session:
-            The SQLAlchemy session object.
-    Returns:
-        list[dict]:
-            The list of unread chats.
-            Username: str
-            ProfileImage: str
-            Message: str
-            SendTime: datetime
-    """
+#     Args:
+#         username (str):
+#             The username of the user.
+#         db_session:
+#             The SQLAlchemy session object.
+#     Returns:
+#         list[dict]:
+#             The list of unread chats.
+#             Username: str
+#             ProfileImage: str
+#             Message: str
+#             SendTime: datetime
+#     """
     
-    # Get Unread Messages Sender Username
-    unread_chats = await get_chat_notifications(db_session, username)
+#     # Get Unread Messages Sender Username
+#     unread_chats = await get_chat_notifications(db_session, username)
 
-    # Get User Information by Sender Username
-    if unread_chats:
-        senders = [chat["Username"] for chat in unread_chats]
-        users = list_cognito_user_by_usernames(senders)
-        print("users in get_chat_notifications", users)
+#     # Get User Information by Sender Username
+#     if unread_chats:
+#         senders = [chat["Username"] for chat in unread_chats]
+#         users = list_cognito_user_by_usernames(senders)
+#         print("users in get_chat_notifications", users)
 
         
-        user_dict = {user["Username"]: user for user in users}
+#         user_dict = {user["Username"]: user for user in users}
 
-        unread_chats = [
-            {**chat, **user_dict.get(chat["Username"])}
-            for chat in unread_chats
-        ]
+#         unread_chats = [
+#             {**chat, **user_dict.get(chat["Username"])}
+#             for chat in unread_chats
+#         ]
 
-        unread_chats.sort(key=lambda x: x['SendTime'], reverse=True)
+#         unread_chats.sort(key=lambda x: x['SendTime'], reverse=True)
 
-        print("unread_chats", unread_chats)
+#         print("unread_chats", unread_chats)
 
-        return unread_chats
-    else:
-        return []
+#         return unread_chats
+#     else:
+#         return []
 
 
 

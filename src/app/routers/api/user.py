@@ -77,20 +77,19 @@ async def get_notifications(
 ):
     # Extracting Sender Username, UserId, and EmailAddress
     user_doc = await get_info_from_session(request)
-
     # Extract Unread Messages with the Sender's Username
     unread_msg = await get_chat_notifications(username=user_doc["Username"],db=db) 
 
-
     print(unread_msg)
+
     num_of_unread = 0
-
     num_of_unread = len(unread_msg)
-    if num_of_unread > 1:
-        msg_suffix = msg_suffix = unread_msg[0]["display_name"] + f" and {num_of_unread - 1} other"
-    elif num_of_unread == 1:
-        msg_suffix = unread_msg[0]["display_name"]
 
+    if num_of_unread > 1:
+        msg_suffix = msg_suffix = unread_msg[0]["Username"] + f" and {num_of_unread - 1} other"
+    elif num_of_unread == 1:
+        msg_suffix = unread_msg[0]["Username"]
+    
     data = {
         "users": unread_msg,
         "message": f"You have unread messages from {msg_suffix}" if num_of_unread > 0 else "You have no unread messages",
