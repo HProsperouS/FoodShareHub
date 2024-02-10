@@ -1064,7 +1064,13 @@
 
       // Windows on load will run everything here
       window.onload = function () {
-        
+        if (window.location.pathname.startsWith("/chat/")) {
+            var targetElement = document.getElementById("scrollHere");
+            requestAnimationFrame(function() {
+              targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            })
+        }
+
         if(document.getElementById("receiverOnlineHeader")){
           
           var user_status = document.getElementById("receiverOnlineHeader");
@@ -1075,6 +1081,7 @@
             user_status_icon.style.backgroundColor = "#70db70"
           }
         }
+        
         // Check if current path = /
         if (window.location.pathname == "/") {
           getUserCurrentLocation();
