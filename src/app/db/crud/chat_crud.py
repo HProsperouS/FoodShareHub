@@ -75,6 +75,18 @@ async def get_messages_for_user(db: Session, sender: str, receiver:str, AfterSen
 
     return [model_to_dict(message) for message in messages]
 
+async def get_chat_notifications(username: str, db: Session):
+    query = db.query(Message.Sender,Message.Content, Message.SendTime).filter(
+        and_(
+            Message.Receiver == username,
+            Message.IsRead == False 
+        )
+    )
+
+    messages = query.order_by(Message.SendTime).all()
+    
+    return [model_to_dict(message) for message in messages]
+
 
 async def get_message_by_id_and_sender(db: Session, message_id: int, sender: str):
     return db.query(Message).filter(and_(

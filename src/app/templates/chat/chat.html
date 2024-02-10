@@ -182,13 +182,10 @@
                         
                         // Update the current Conversation Id
                         var conversationId = document.getElementById("conversationId");
-                        //console.log("Current Conversation Id: " + response.chats[0].conversation_id);
-                        //console.log("Current Receiver: " + response.chats[0].conversation_id);
                         const currentChat = response.chats.find(chat => chat.username === "{{ receiver.Username }}");
                         
                         if (currentChat) {
                             conversationId.value = currentChat.conversation_id;
-                            // console.log("Conversation Id: " + conversationId.value);
                         }
                         return;
                     }
@@ -222,8 +219,6 @@
                     const isSender = (sender == "{{ sender.Username }}");
                     const deleteFormBtn = `delete#${messageId}`;
 
-                    // const msgDropdownId = `msgDropdown#${messageId}`;
-                    // const imageViewId = `imageView#${messageId}`;
                     let msgBodyContent = "";
                     if (response.Content) {
                         msgBodyContent = response.Content;

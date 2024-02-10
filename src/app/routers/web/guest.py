@@ -23,9 +23,9 @@ from aws.services import (
     authenticate_user,
     login_mfa,
     edit_google_user_information,
-    update_last_access,
+    # update_last_access,
     verify_email_address,
-    update_online_status,
+    # update_online_status,
     get_current_user_location
 )
 import jwt
@@ -269,8 +269,8 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             print(request.session.get("session"))
             current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            update_last_access(name,current_time)
-            update_online_status(name,"Online")
+            # update_last_access(name,current_time)
+            # update_online_status(name,"Online")
 
             # send_email = email_lastaccess(email,name,current_time)
             # print(send_email)
@@ -459,8 +459,8 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
 
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-        update_last_access(name,current_time)
-        update_online_status(name,"Online")
+        # update_last_access(name,current_time)
+        # update_online_status(name,"Online")
     
         return ORJSONResponse(
             content={"redirect_url": f"{base_url}foodshare/myListings","status":"success"}

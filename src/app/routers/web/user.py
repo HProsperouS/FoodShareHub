@@ -31,8 +31,8 @@ from aws.services import (
     upload_userimage_to_s3,
     authenticate_user,
     email_message_not_viewed,
-    update_last_access,
-    update_online_status
+    # update_last_access,
+    # update_online_status
 )
 from utils import constants as C
 import pyotp
@@ -448,8 +448,8 @@ async def logout(request: Request) -> RedirectResponse:
         
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-        update_last_access(name,current_time)
-        update_online_status(name,"Offline")
+        # update_last_access(name,current_time)
+        # update_online_status(name,"Offline")
 
         request.session.clear()
         # clear from redis

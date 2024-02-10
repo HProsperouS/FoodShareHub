@@ -32,6 +32,7 @@ from db import (
 )
 from utils.chat import (
     add_user_to_connected_list,
+    get_info_from_session
 )
 from db.dependencies import get_db
 from db. models.chat import (
@@ -83,7 +84,7 @@ async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depend
     print(sender_doc)
     if sender_doc['Username'] == receiver_name:
         return await websocket.close(reason="Sorry! You can't chat with yourself even if you're that lonely.")
-
+    
     receiver = retreive_user(receiver_name)
     if receiver == "fail":
         return await websocket.close(reason="No such user exists.")
@@ -228,18 +229,6 @@ async def chat_ws(websocket: WebSocket, receiver_name: str, db: Session = Depend
     except (WebSocketDisconnect, WebSocketException):
         print("ERROR.FOUND IN WEBSOCKET")
 
-async def get_info_from_session(
-    request: Request | WebSocket
-) -> dict :
-    session = request.session.get(C.SESSION_COOKIE, None)
-
-    sender_doc = {
-        'Username': session["username"],
-        'UserId': session["user_id"],
-        'EmailAddress': session["email"]
-    }
-    
-    return sender_doc
 
 @chat_api.post(
     path="/chat/detect_toxicity",

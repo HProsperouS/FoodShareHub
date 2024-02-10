@@ -79,23 +79,23 @@ async def remove_user_from_connected_list(websocket: WebSocket, user_id: str) ->
 #             The user id.
 #         db_session:
 #             The SQLAlchemy session object.
-
 #     Returns:
 #         list[dict]:
 #             The list of unread chats.
 #     """
+
 #     # Get Unread Messages Sender Username
 #     senders = await get_sendername_of_unread_messages(db_session, username)
 
 #     # Get User Information by Sender Username
 #     if senders:
 #         users = list_cognito_user_by_usernames(senders)
-        
+#         print("users in get_chat_notifications", users)
+
 #         return [
 #             {
 #                 "Username": user.username,
-#                 "display_name": user.display_name,
-#                 "profile_image": user.profile_image_url,
+#                 "ProfileImage": user.profile_image_url,
 #             } 
 #             for user in users
 #         ]
@@ -226,3 +226,61 @@ def model_to_dict(model_instance):
     return {column.name: getattr(model_instance, column.name) for column in model_instance.__table__.columns}
 
 
+async def get_info_from_session(
+    request: Request | WebSocket
+) -> dict :
+    session = request.session.get(C.SESSION_COOKIE, None)
+
+    sender_doc = {
+        'Username': session["username"],
+        'UserId': session["user_id"],
+        'EmailAddress': session["email"]
+    }
+    
+    return sender_doc
+
+async def get_chat_notifications(username: str, db_session) -> list[dict]:
+    """Get all the unread chats for the user using RDS in a synchronous way.
+
+    Args:
+        username (str):
+            The username of the user.
+        db_session:
+            The SQLAlchemy session object.
+    Returns:
+        list[dict]:
+            The list of unread chats.
+            Username: str
+            ProfileImage: str
+            Message: str
+            SendTime: datetime
+    """
+    
+    # Get Unread Messages Sender Username
+    unread_chats = await get_chat_notifications(db_session, username)
+
+    # Get User Information by Sender Username
+    if unread_chats:
+        senders = [chat["Username"] for chat in unread_chats]
+        users = list_cognito_user_by_usernames(senders)
+        print("users in get_chat_notifications", users)
+
+        
+        user_dict = {user["Username"]: user for user in users}
+
+        unread_chats = [
+            {**chat, **user_dict.get(chat["Username"])}
+            for chat in unread_chats
+        ]
+
+        unread_chats.sort(key=lambda x: x['SendTime'], reverse=True)
+
+        print("unread_chats", unread_chats)
+
+        return unread_chats
+    else:
+        return []
+
+
+
+    

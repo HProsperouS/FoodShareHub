@@ -32,8 +32,8 @@ from .Cognito import(
     disable_account,
     list_cognito_user_by_usernames,
     edit_google_user_information,
-    update_last_access,
-    update_online_status,
+    # update_last_access,
+    # update_online_status,
     edit_google_user_information
 )
 
