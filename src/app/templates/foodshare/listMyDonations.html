@@ -85,7 +85,7 @@
                                     </a>
                                     <a aria-label="Remove This Listing" class="action-btn">
                                         <i class="fi-rs-trash" onclick="openConfirmationModal('{{donation.Id}}')"></i>
-                                    </a>                                                                                                                                                        
+                                    </a>                                                                                                                                             
                                 </div>
                                 <div class="product-badges product-badges-position product-badges-mrg">
                                     {% if donation.Status.value == "ACTIVE" %}
@@ -127,10 +127,36 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- Donation Details Modal -->
                                         <div class="col-md-6 col-sm-12 col-xs-12">
                                             <div class="detail-info pr-30 pl-30">
                                                 <span id="modalDonationStatus" class="stock-status in-stock"></span>
-                                                <h3 id="modalFoodName" class="title-detail"><a href="#" class="text-heading"></a></h3>
+
+                                                <!-- Kebab Icon with Dropdown -->
+                                                <div class="dropdown d-inline-block" style="padding-left: 10px;">
+                                                    <a class="action-btn dropdown-toggle" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                        <li>
+                                                            <a id="modalDDLOption1" class="dropdown-item" onclick="editDonationStatus(this.getAttribute('data-id'), 'RESERVED')">
+                                                              <i class="fa fa-bookmark"></i> Mark as Reserved
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a id="modalDDLOption2" class="dropdown-item" onclick="editDonationStatus(this.getAttribute('data-id'), 'COMPLETED')">
+                                                              <i class="fa fa-check-circle"></i> Mark as Completed
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a id="modalDDLOption3" class="dropdown-item" onclick="editDonationStatus(this.getAttribute('data-id'), 'INACTIVE')">
+                                                              <i class="fa fa-times-circle"></i> Remove From Listing
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <h3 id="modalFoodName" class="title-detail"><a class="text-heading"></a></h3>
                                                 <div class="food-description">
                                                     <h3 id="modalFoodCategory" class="badge bg-secondary"></h3>
                                                     <br>
@@ -221,6 +247,12 @@
             document.getElementById('modalFoodDescription').textContent = donation.FoodItem.Description;
             document.getElementById('modalPickUpLocation').textContent = donation.MeetUpLocation;
             document.getElementById('modalDateOfCreation').textContent = new Date(donation.CreatedDate).toLocaleDateString();
+
+            // Set data-id attribute for all dropdown items
+            var dropdownItems = document.getElementsByClassName('dropdown-item');
+            for (var i = 0; i < dropdownItems.length; i++) {
+                dropdownItems[i].setAttribute('data-id', id);
+            }
         }
 
         function openConfirmationModal(donationId) {
@@ -266,6 +298,36 @@
                 console.error("Error:", error);
             });
         });
+
+        function editDonationStatus(id, status){
+            const formData = {
+                id: id,
+                donationStatus: status
+            };
+            const loadingDiv = document.getElementById('loadingDiv');
+            loadingDiv.style.display = '';
+
+            // Start: Send form data using Fetch API
+            fetch("/api/foodshare/editListingStatus", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                const redirectUrl = data.redirect_url;
+                const message = data.message;
+                setNotificationMessage(message.category, message.text);
+                window.location.href = redirectUrl;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+            // End: Send form data using Fetch API
+        }
     </script>
     {{ super() }}
 {% endblock %}

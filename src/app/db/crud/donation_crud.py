@@ -25,10 +25,7 @@ async def get_donation_by_id(db: Session, donation_id: int):
     return db.query(Donation).filter(Donation.Id == donation_id).first()
 
 async def update_donation(db: Session, donation_id: int, updated_data: Donation, updated_image: bool):
-
-    # Use merge() Method to update db, This is easier to use but not good for performance as it updated every columns
-    # updated_donation = db.merge(updated_data)
-
+    
     existing_donation = db.query(Donation).filter_by(Id=donation_id).first()
 
     if existing_donation:
@@ -63,8 +60,16 @@ async def softdelete_donation(db: Session, donation_id: int):
 
     if existing_donation:
         existing_donation.Status = "INACTIVE"
-        # existing_donation.FoodItem.Status = "INACTIVE"
-        # existing_donation.FoodItem.Attachment.Status = "INACTIVE"
+        db.commit()
+    else:
+        print("Donation record not found.")
+
+
+async def update_donation_status(db: Session, donation_id: int, status: str):
+    existing_donation = db.query(Donation).filter_by(Id=donation_id).first()
+
+    if existing_donation:
+        existing_donation.Status = status
         db.commit()
     else:
         print("Donation record not found.")

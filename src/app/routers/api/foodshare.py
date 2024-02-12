@@ -29,11 +29,18 @@ from db import (
     add_donation,
     update_donation,
     softdelete_donation,
+    update_donation_status,
     # Search
     search_donation_by_name,
     search_donation_by_category
 )
-from schemas.request.donation import DonationCreate, DonationUpdate, ImageData, DonationData
+from schemas.request.donation import (
+    DonationCreate, 
+    DonationUpdate, 
+    ImageData, 
+    DonationData, 
+    DonationEditStatus
+)
 from db.dependencies import get_db
 
 from db.models.donation import (
@@ -241,3 +248,18 @@ async def detect_toxicity(text: DonationData):
         return ORJSONResponse(content={"isToxic": hasToxicWords ,"message": "Inappropriate language detected. Please mind your langueage."})
     else:
         return ORJSONResponse(content={"isToxic": hasToxicWords})
+    
+
+@foodshare_api.post(
+    path="/foodshare/editListingStatus",
+    description="Edit Donation Listing Status",
+)
+async def process_edit_status_form(request: Request, formData: DonationEditStatus, db: Session = Depends(get_db)) -> ORJSONResponse:
+
+    await update_donation_status(db, formData.id, formData.donationStatus)
+    success_message = {"category": "success", "text": "Your Listing Status have been edited successfully"}
+    redirect_url = "/foodshare/myListings"
+
+    return ORJSONResponse(
+        content={"redirect_url": redirect_url, "message":success_message}
+    )

@@ -46,3 +46,7 @@ class ImageData(BaseModel):
 class DonationData(BaseModel):
     Name: str
     Description: str
+
+class DonationEditStatus(BaseModel):
+    id : int 
+    donationStatus : DonationStatus

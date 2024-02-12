@@ -71,7 +71,7 @@ from db import (
     get_all_donations_exclude_userid,
     get_all_donations
 )
-import requests
+
 # Class Objects
 class MFASetupCode(BaseModel):
     AccessToken: str
