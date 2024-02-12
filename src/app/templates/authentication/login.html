@@ -159,6 +159,17 @@ head %} {{ super() }}
                 confirmButtonColor: "#3BB77E",
                 text: "Invalid username or password, Please try again",
               });
+            }else if (data.status == "account disabled"){
+              // Hide loader
+              loadingDiv.style.display = "none";
+
+              // Display Error notification if authentication fails
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                confirmButtonColor: "#3BB77E",
+                text: "Account has been disabled, Please contact admin to activate account",
+              });
             }
           })
           .catch((error) => {

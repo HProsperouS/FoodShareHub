@@ -182,7 +182,7 @@
                                                 {% if request.session["session"]["mfa"] == "Enabled" %}
                                                     <button type="button" class="btn btn-heading btn-block" disabled name="login" >MFA Enabled</button>
                                                 {% else %}
-                                                    <button type="button" class="btn btn-heading btn-block" name="login" onclick="enableMFA()" style="background-color: red;">MFA Disabled</button>
+                                                    <button type="button" class="btn btn-heading btn-block" name="login" onclick="verifyPassword()" style="background-color: red;">MFA Disabled</button>
                                                     <p id="user_id" hidden>{{request.session["session"]["user_id"]}}</p>
                                                 {% endif %}
                                         
@@ -194,9 +194,15 @@
                                                 <h5>Change Password </h5>
                                                 <!-- <input type="text" id="code" name="code" placeholder="Confirmation code *" /> -->
                                             </div>
+                                            {% if request.session["session"]["mfa"] == "Enabled" %}
                                             <div class="form-group">
                                                 <button type="button" class="btn btn-heading btn-block" onclick="resetPassword()">Change</button>
                                             </div>
+                                            {% else %}
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-heading btn-block" disabled>Change</button>
+                                            </div>
+                                            {% endif %}
                                         </div>
                                         <div class="login_footer mb-3">
                                             <div class="chek-form">
@@ -248,7 +254,7 @@
                     if(data.status === "success"){
                         loadingDiv.style.display = "none";
                         
-                        window.location.href = "http://127.0.0.1:8000/"
+                        window.location.href = window.location.origin;
                         
 
                     // If code is incorrect
@@ -362,7 +368,14 @@
                 });
 
             // If code is incorrect
-            }else if(data.status === "fail"){
+            }else if (data.status == "mfa required"){
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong! Try logging out and try again",
+                });
+            }
+            else if(data.status === "fail"){
                 // console.log("code fail")
                 // Hide loader
                 loadingDiv.style.display = "none";
@@ -377,6 +390,198 @@
             }
         })
     }
+
+    // function mfaPasswordCode(name, password,session) {
+    //     Swal.fire({
+    //     title: "",
+    //     text: "Google Authentication",
+    //     allowOutsideClick: false,
+    //     input: "text",
+    //     inputPlaceholder: "Enter your code here",
+    //     inputAttributes: {
+    //         maxlength: "10",
+    //         autocapitalize: "off",
+    //         autocorrect: "off",
+    //     },
+    //     preConfirm: (value) => {
+    //         return value;
+    //     },
+    //     }).then((result) => {
+    //         // Verify code with Cognito
+    //         fetch("/login/mfa", {
+    //         method: "POST",
+    //         body: JSON.stringify(formData),
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //         })
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             // If code is correct
+    //             if (data.status === "success") {
+    //             // Show loader
+    //             loadingDiv.style.display = "";
+
+    //             // console.log("code pass");
+    //             // Set item in local to display message in next page
+    //             localStorage.setItem("action", "success_login");
+
+    //             // Redirect to the extracted URL
+    //             window.location.href = data.redirect_url;
+
+    //             // Hide loader
+    //             // loadingDiv.style.display = "";
+
+    //             // If code is incorrect
+    //             } else if (data.status === "fail") {
+    //             // Hide loader
+    //             loadingDiv.style.display = "none";
+
+    //             // Re enter code
+    //             mfaCodeRetry(name, password);
+    //             }
+    //         });
+
+    //         // console.log("Starting Auth Code");
+
+    //         // Verify code with Cognito
+    //         mfaAuthPasswordCode(name, password, result.value);
+
+    //         // console.log("Finish Auth Code");
+
+    //         // Hide loader
+    //         loadingDiv.style.display = "none";
+    //     });
+    // };
+
+    
+    // function mfaAuthPasswordCode(name,password,code){
+    //     // Data to send in the post request
+    //     const formData = {Name:name,Password:password,Code:code};
+
+    //     // Verify code with Cognito
+    //     fetch("/verifypasswordmfa", {
+    //         method: "POST",
+    //         body: JSON.stringify(formData),
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         // If code is correct
+    //         if(data.status === "success"){
+    //             // Hide loader
+    //             loadingDiv.style.display = "none";
+                
+    //             // Successful toast of MFA enabled
+    //             const SuccessToast = Swal.mixin({
+    //                 toast: true,
+    //                 position: "top-end",
+    //                 showConfirmButton: false,
+    //                 timer: 3000,
+    //                 timerProgressBar: true,
+    //                 didOpen: (toast) => {
+    //                     toast.onmouseenter = Swal.stopTimer;
+    //                     toast.onmouseleave = Swal.resumeTimer;
+    //                 }
+    //             }); 
+    //             SuccessToast.fire({
+    //                 icon:"success",
+    //                 title:"Password Changed Successfully"
+    //             });
+    //         // If code is incorrect
+    //         }else if(data.success === "fail"){
+    //             // Hide loader
+    //             loadingDiv.style.display = "none";
+
+    //             // Re enter code
+    //             mfaPasswordCode(session,access_token.qr_code)
+    //         }
+    //     })
+    // };
+
+    function mfaAuthCode(name, password, code) {
+        const formData = { Name: name, Password: password, Code: code };
+
+        // Verify code with Cognito
+        fetch("/login/mfa", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+            "Content-Type": "application/json",
+        },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            // If code is correct
+            if (data.status === "success") {
+                // Show loader
+                loadingDiv.style.display = "";
+
+                 // Successful toast of MFA enabled
+                const SuccessToast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                }); 
+                SuccessToast.fire({
+                    icon:"success",
+                    title:"MFA Enabled Successfully"
+                });
+
+
+                // Hide loader
+                // loadingDiv.style.display = "";
+
+            // If code is incorrect
+            } else if (data.status === "fail") {
+                // Hide loader
+                loadingDiv.style.display = "none";
+
+                // Re enter code
+                mfaCodeRetry(name, password);
+            }
+        });
+    }
+    function mfaCodeRetry(name, password) {
+    Swal.fire({
+      icon: "error",
+      title: "Google Authentication",
+      text: "Invalid Code, Please try again",
+      allowOutsideClick: false,
+      input: "text",
+      inputPlaceholder: "Enter your code here",
+      inputAttributes: {
+        maxlength: "10",
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+      preConfirm: (value) => {
+        return value;
+      },
+    }).then((result) => {
+      // Show loader
+      loadingDiv.style.display = "";
+
+      // console.log("Starting Auth Code");
+      // Verify code with Cognito
+      mfaAuthCode(name, password, result.value);
+
+      // console.log("Finish Auth Code");
+
+      // Hide loader
+      loadingDiv.style.display = "none";
+    });
+  }
+
+    
 
     function validatePassword(current_pass,new_pass){
         if (current_pass === new_pass) {
@@ -668,7 +873,7 @@
     }
 
 
-    // Verify Password
+    // MFA Step 1 : Verify Password
     function verifyPassword(){
         const { value: email } = Swal.fire({
             title: "Password",
@@ -688,7 +893,7 @@
             });
             
     }
-    // Enable MFA Step 2 : Turn on MFA & Create QR code for Google Auth Setup
+    // MFA Step 2 : Create qrcode and wait for user to enter code
     function enableMFA(password){
         var fetch_request = true;
         var post_data = {Password:password}
@@ -696,7 +901,7 @@
         // Auth user & Create QR code to scan for Google Auth Setup
         fetch("/enablemfa",{
             method:"POST",
-            body: post_data,
+            body: JSON.stringify(post_data),
             headers:{
                 "Content-Type": "application/json",
             }
@@ -722,10 +927,10 @@
                     text: "Scan this with Google Authenticator",
                     allowOutsideClick: false,
                     imageUrl: `${data.qr_code}`,
-                    imageWidth: 400,
+                    imageWidth: 200,
                     imageHeight: 200,
                     imageAlt: "Custom image",
-                    input: "text",
+                    input: "password",
                     inputLabel: "Authenticator Code",
                     inputPlaceholder: "Enter your code here",
                     inputAttributes: {
@@ -755,6 +960,8 @@
 
                     // Hide loader
                     loadingDiv.style.display = "none";
+
+                   
                 })
 
             // If password is incorrect
@@ -790,7 +997,7 @@
         });
     }
   
-    // Enable MFA Step 3 : Check w/ Cognito if code is correct
+    // MFA Step 3 : Check w/ Cognito if code is correct
     function mfaAuthCode(code,access_token,session,qr_code){
         // Data to send in the post request
         const formData = {AccessToken:access_token,Session:session,Code:code};
@@ -826,11 +1033,6 @@
                     icon:"success",
                     title:"MFA Enabled Successfully"
                 });
-
-
-
-
-
             // If code is incorrect
             }else if(data.success === "fail"){
                 // Hide loader
@@ -842,7 +1044,7 @@
         })
     };
    
-    // Re enter code
+    // Re enter code if code is wrong
     function mfaCode(session,access_token,qr_code){
         const user_id= document.getElementById("user_id").text
         const {value: code} = Swal.fire({

@@ -17,10 +17,12 @@ def authenticate_user(name:str,password:str):
         return login
     except Exception as e:
         print(e)
+        if "User is disabled" in str(e):
+            return "account disabled"
         return "fail"
         
 
-def register_user(name:str,password:str,email:str,role:str,image:str):
+def register_user(name:str,password:str,email:str,role:str,image:str,current_time:str):
     try:
         register = client.sign_up(
             ClientId = C.COGNITO_CLIENT_ID,
@@ -29,7 +31,8 @@ def register_user(name:str,password:str,email:str,role:str,image:str):
             UserAttributes=[
                 {'Name': 'email', 'Value': email},
                 {"Name": "custom:role", "Value":role},
-                {'Name':"custom:image", "Value":image}
+                {'Name':"custom:image", "Value":image},
+                {'Name':"custom:lastaccess","Value":current_time}
             ]
         )
         
@@ -97,6 +100,34 @@ def login_mfa(code:str,session:str,name:str):
     except Exception as e: 
         print(e)
         return "fail"
+    
+def update_last_access(name,lastaccess):
+    try:
+        edit_user = client.admin_update_user_attributes(
+            UserPoolId=C.COGNITO_USER_POOL_ID,
+            Username=name,
+            UserAttributes=[{'Name':"custom:lastaccess","Value":lastaccess}],
+        )
+        return edit_user
+
+    except Exception as e:
+        print(e)
+        
+        return "fail"
+    
+def update_online_status(name,status):
+    try:
+        edit_user = client.admin_update_user_attributes(
+            UserPoolId=C.COGNITO_USER_POOL_ID,
+            Username=name,
+            UserAttributes=[{'Name':"custom:status","Value":status}],
+        )
+        return edit_user
+
+    except Exception as e:
+        print(e)
+        
+        return "fail"
 
 def edit_user_information(name,email,image):
     try:
@@ -138,6 +169,8 @@ def reset_password(current_pass,new_pass,access_token):
         return "success"
     except Exception as e:
         print(e)
+        if "Invalid Access Token" in str(e):
+            return "Invalid Access Token"
         return "fail"
     
 def disable_account(username):

@@ -23,9 +23,9 @@ from aws.services import (
     authenticate_user,
     login_mfa,
     edit_google_user_information,
-    # update_last_access,
+    update_last_access,
     verify_email_address,
-    # update_online_status,
+    update_online_status,
     get_current_user_location
 )
 import jwt
@@ -132,9 +132,6 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
 
     try:
         base_url = str(request.base_url)
-        # decode token
-        # response = requests.get("https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_HceZH2hQv/.well-known/jwks.json")
-        # json = response.json()
 
         # TODO Need a way to get the info for google , missing secret key
         # TODO Need a way to revoke access token
@@ -167,7 +164,7 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
             role = "User"
             email= user_attr["email"]
             id = user_attr["id"]
-            session = str(uuid.uuid4())
+            session = formData.Token
             image = 'N/A'
             mfa = "Enabled"
             status = 'Online'
@@ -179,7 +176,7 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
             role = user_attr["role"]
             email= user_attr["email"]
             id = user_attr["id"]
-            session = str(uuid.uuid4())
+            session = formData.Token
             image = user_attr["image"]
             mfa = "Enabled"
             status='Online'
@@ -221,6 +218,10 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"fail"}
             )
+        elif auth_user == "account disabled":
+            return ORJSONResponse(
+                content={"redirect_url": f"{base_url}login","status":"account disabled"}
+            )
         elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
             request.session["temp_session"] = auth_user["Session"]
             
@@ -258,22 +259,11 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
             create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image,status=status)
             
-            # caching session ( works with ec2 not local )
-            # print(elasticache)
-            # elasticache.set(name,session)
-            # elasticache.expire(name, 300)
-            # value = elasticache.get(name)
-            # decode = value.decode("utf-8")
-            # print(decode)
-
             print(request.session.get("session"))
             current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            # update_last_access(name,current_time)
-            # update_online_status(name,"Online")
-
-            # send_email = email_lastaccess(email,name,current_time)
-            # print(send_email)
+            update_last_access(name,current_time)
+            update_online_status(name,"Online")
 
 
             return ORJSONResponse(
@@ -350,6 +340,7 @@ async def register(request: Request,formData:NewUser, rbac_res: RBAC_TYPING = RB
             request.session["account_confirmation"] = name
 
             verify_ses_email = verify_email_address(email)
+            print(verify_ses_email)
 
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}register/confirmation","status":"success","language_analysis":language_type}
@@ -403,8 +394,6 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
        
        request.session.clear()
 
-       
-
        return ORJSONResponse(
             content={"redirect_url": f"{base_url}login","status":"success"}
        )
@@ -417,8 +406,11 @@ async def confirmation(request: Request,formData:RegisterConfirmation, rbac_res:
 @guest_router.post("/login/mfa")
 async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     try:
-        base_url = str(request.base_url)
         session = request.session.get("temp_session")
+    except Exception as e:
+        session = request.session.get("session")["session_id"]
+    try:
+        base_url = str(request.base_url)
         code = formData.Code
         name = formData.Name
         password = formData.Password
@@ -430,6 +422,8 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
             new_session = authenticate_user(name,password)["Session"]
 
             request.session["temp_session"] = new_session
+
+            challenge = login_mfa(code,new_session,name)
 
 
         get_user = retreive_user(name)
@@ -453,14 +447,17 @@ async def loginMfa(request: Request,formData:LoginMfa, rbac_res: RBAC_TYPING = R
         id = attributes["id"] 
         image = attributes["image"]
         access_token = challenge["AuthenticationResult"]["AccessToken"]
+        status = "Online"
 
-        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=access_token,mfa="Enabled",image=image)
+        create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=access_token,mfa="Enabled",image=image,status=status)
         print(request.session.get("session"))
 
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-        # update_last_access(name,current_time)
-        # update_online_status(name,"Online")
+        update_last_access(name,current_time)
+        update_online_status(name,"Online")
+
+        print("User is now online")
     
         return ORJSONResponse(
             content={"redirect_url": f"{base_url}foodshare/myListings","status":"success"}

@@ -41,7 +41,9 @@ import qrcode
 from aws.services import (
     generate_software_token,
     verify_software_token,
-    retreive_user
+    retreive_user,
+    update_last_access,
+    update_online_status
 )
 
 from aws.services import(
@@ -69,7 +71,7 @@ from db import (
     get_all_donations_exclude_userid,
     get_all_donations
 )
-
+import requests
 # Class Objects
 class MFASetupCode(BaseModel):
     AccessToken: str
@@ -226,9 +228,6 @@ async def filteritems(request: Request, formData: LocationDistanceTime) -> ORJSO
                 TravelMode=travelType,
                 DepartureTime=datetime.datetime.now() 
             )
-            # Options
-            # TravelMode='Car'|'Truck'|'Walking'|'Bicycle'|'Motorcycle'
-            # OptimizeFor='FastestRoute'|'ShortestRoute',
 
             # Extract distance and duration from the response
             distance = round(response['Summary']['Distance'], 1)
@@ -442,14 +441,13 @@ async def account(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTM
 
 @user_router.post("/logout")
 async def logout(request: Request) -> RedirectResponse:
-    
     try:
         name = request.session["session"]["username"]
         
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-        # update_last_access(name,current_time)
-        # update_online_status(name,"Offline")
+        update_last_access(name,current_time)
+        update_online_status(name,"Offline")
 
         request.session.clear()
         # clear from redis
@@ -525,6 +523,8 @@ def verifymfa(request:Request,formData:MFASetupCode) -> ORJSONResponse:
         path = "uploads/" + username + "_qrcode.png"
         delete = delete_s3_object(path)
 
+        print("MFA setup code has been verified")
+
         return ORJSONResponse(
             content={"status":"success"}
         )
@@ -579,16 +579,31 @@ async def edit_information(request:Request, formData:EditUser) -> ORJSONResponse
             content={"status":"fail"}
         )
 
+
+    
 @user_router.post(path="/user/password/reset")
 async def reset_user_password(request:Request, formData:ResetPassword) -> ORJSONResponse:
     try:
         current_pass = formData.CurrentPassword
         new_pass = formData.NewPassword
         access_token = request.session["session"]["session_id"]
+        username = request.session["session"]["username"]
 
+        
         reset = reset_password(current_pass,new_pass,access_token)
-
-        if reset == "fail":
+        if reset == "Invalid Access Token":
+            newsession = authenticate_user(username,current_pass)
+            print(newsession)
+            if newsession["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
+                access_token =  newsession["Session"]
+                return ORJSONResponse(
+                    content={"status":"mfa required","name":username,"session":access_token}
+                )
+            else:
+                access_token =  newsession["Session"]
+                print(access_token)
+                reset = reset_password(current_pass,new_pass,access_token)
+        elif reset == "fail":
             return ORJSONResponse(
                 content={"status":"fail"}
             )
@@ -605,6 +620,8 @@ async def reset_user_password(request:Request, formData:ResetPassword) -> ORJSON
             content={"status":"fail"}
         )
 
+
+
 @user_router.post(path="/user/account/disable")
 async def reset_user_password(request:Request) -> ORJSONResponse:
     try:
@@ -616,6 +633,8 @@ async def reset_user_password(request:Request) -> ORJSONResponse:
             return ORJSONResponse(
                 content={"status":"fail"}
             )
+        
+        request.session.clear()
         
         return ORJSONResponse(
             content={"status":"success"}

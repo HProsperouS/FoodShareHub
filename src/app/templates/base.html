@@ -1062,6 +1062,38 @@
         }
       }
 
+      // Load after everything is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+          // Profile image
+          try {
+            var user_image_name = document.getElementById("tempHolder");
+            var user_image = document.getElementById("imagePreview");
+            if (user_image_name.innerText === "N/A") {
+              user_image.style.backgroundImage =
+                "url(https://tse2.mm.bing.net/th?id=OIP.6UhgwprABi3-dz8Qs85FvwHaHa&pid=Api&P=0&h=180)";
+            } else {
+              user_image.style.backgroundImage = `url(${user_image_name.innerText})`;
+            }
+          } catch (error) {
+            console.log(error);
+          }
+          try {
+            var user_image_name = document.getElementById("user_image_name");
+            var user_image = document.getElementById("user_image");
+            user_image.src = user_image_name.innerText;
+          } catch (error) {
+            console.log(error);
+          }
+
+            // Check if current path = /
+          if (window.location.pathname == "/") {
+            getUserCurrentLocation();
+            // Get Donations for Recommended Products
+            getDonations();
+          }
+
+        });
+
       // Windows on load will run everything here
       window.onload = function () {
         if (window.location.pathname.startsWith("/chat/")) {
@@ -1082,13 +1114,6 @@
           }
         }
         
-        // Check if current path = /
-        if (window.location.pathname == "/") {
-          getUserCurrentLocation();
-          // Get Donations for Recommended Products
-          getDonations();
-        }
-
         // Google login
         try {
           const fragment = window.location.hash.substring(1);
@@ -1106,6 +1131,7 @@
             })
               .then((response) => response.json())
               .then((data) => {
+                
                 window.location.href = data.redirect_url;
               })
               .catch((error) => {
@@ -1116,26 +1142,7 @@
           console.log(error);
         }
 
-        // Profile image
-        try {
-          var user_image_name = document.getElementById("tempHolder");
-          var user_image = document.getElementById("imagePreview");
-          if (user_image_name.innerText === "N/A") {
-            user_image.style.backgroundImage =
-              "url(https://tse2.mm.bing.net/th?id=OIP.6UhgwprABi3-dz8Qs85FvwHaHa&pid=Api&P=0&h=180)";
-          } else {
-            user_image.style.backgroundImage = `url(${user_image_name.innerText})`;
-          }
-        } catch (error) {
-          console.log(error);
-        }
-        try {
-          var user_image_name = document.getElementById("user_image_name");
-          var user_image = document.getElementById("user_image");
-          user_image.src = user_image_name.innerText;
-        } catch (error) {
-          console.log(error);
-        }
+        
 
         // On load check for actions to be done in local storage
         try {
