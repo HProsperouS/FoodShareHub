@@ -71,36 +71,30 @@ async def remove_user_from_connected_list(websocket: WebSocket, user_id: str) ->
         # remove the user from the list of connected users
         websocket.app.state.chat_connected_users.remove(user_id)
 
-async def get_chat_notifications(username: str, db_session) -> list[dict]:
+async def get_chat_notifications(username: str, db_session) -> list[str]:
     """Get all the unread chats for the user using RDS in a synchronous way.
 
     Args:
-        user_id (int):
-            The user id.
+        username (str):
+            The username.
         db_session:
             The SQLAlchemy session object.
     Returns:
-        list[dict]:
-            The list of unread chats.
+        list[str]:
+            The list of unread chats sender usernames.
     """
 
     # Get Unread Messages Sender Username
-    senders = await get_sendername_of_unread_messages(db_session, username)
+    senders_tuples = await get_sendername_of_unread_messages(db_session, username)
+    # Example senders_tuples: [('tzy',), ('abc',)]
 
-    # Get User Information by Sender Username
-    if senders:
-        users = list_cognito_user_by_usernames(senders)
-        print("users in get_chat_notifications", users)
-
-        return [
-            {
-                "Username": user.username,
-                "ProfileImage": user.profile_image_url,
-            } 
-            for user in users
-        ]
+    if senders_tuples:
+        senders = [sender[0] for sender in senders_tuples if sender]
     else:
-        return []
+        senders = []
+        
+    return senders
+
 
 async def send_chat_list(ws: WebSocket, user_doc: dict, db_session):
     # Step 1: Get all the chat sessions that the user has or has received messages from, Get the latest message for each chat session

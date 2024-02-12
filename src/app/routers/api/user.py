@@ -65,7 +65,7 @@ user_api = APIRouter(
 )
 
 @user_api.get(
-    path="/get/notifications",
+    path="/user/getNotifications",
     description="Retrieve the list of notifications for the current user.",
 )
 async def get_notifications(
@@ -74,22 +74,21 @@ async def get_notifications(
 ):
     # Extracting Sender Username, UserId, and EmailAddress
     user_doc = await get_info_from_session(request)
+    print(user_doc["Username"])
+
     # Extract Unread Messages with the Sender's Username
-    unread_msg = await get_chat_notifications(username=user_doc["Username"],db=db) 
+    unread_msg_users = await get_chat_notifications(username=user_doc["Username"], db_session=db) 
+    print(unread_msg_users) # Sample output: ['tzy', 'ljj', 'declan']
 
-    print(unread_msg)
+    # Construct notifications data
+    notifications = [
+        {
+            "username": notification,
+            "message": f"You have an unread message from {notification}"
+        }
+        for notification in unread_msg_users
+    ]
 
-    num_of_unread = 0
-    num_of_unread = len(unread_msg)
-
-    if num_of_unread > 1:
-        msg_suffix = msg_suffix = unread_msg[0]["Username"] + f" and {num_of_unread - 1} other"
-    elif num_of_unread == 1:
-        msg_suffix = unread_msg[0]["Username"]
-
-    data = {
-        "users": unread_msg,
-        "message": f"You have unread messages from {msg_suffix}" if num_of_unread > 0 else "You have no unread messages",
-    }
+    print(notifications)
     
-    return format_json_response(data)
+    return ORJSONResponse(notifications)

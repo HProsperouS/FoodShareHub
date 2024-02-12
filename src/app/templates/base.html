@@ -236,6 +236,20 @@
                     </a>
                     {% endif %}
                   </div>
+                  <div class="dropdown">
+                    <div class="header-action-icon-2">
+                        <a class="cart-icon position-relative" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="fetchNotifications()">
+                            <img alt="Notifications" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notifications.svg') }}" />
+                            <span class="pro-count blue">2</span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <!--Notification List Here-->
+                        </ul>
+                    </div>
+                  </div>
+                
+                </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -1320,6 +1334,66 @@
         if (!results) return null;
         if (!results[2]) return "";
         return results[2].replace(/\+/g, " ");
+      }
+
+      // Get notification
+      function fetchNotifications() {
+        console.log("fetching notifications");
+        fetch("/api/user/getNotifications", {
+          method: "Get",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+          populateNotificationDropdown(data);
+        })
+        .catch(error => {
+          console.error('There has been a problem with your fetch operation:', error);
+        });
+      }
+
+      function populateNotificationDropdown(notifications) {
+          const dropdownMenu = document.querySelector('.header-action-icon-2 .dropdown-menu');
+          dropdownMenu.innerHTML = ''; // Clear current notifications
+
+          notifications.forEach(notification => {
+              console.log("notification", notification);
+
+              const ahrefItem = document.createElement('a');
+              ahrefItem.href = `/chat/${notification.username}`;
+              ahrefItem.innerHTML = `
+                  <li class="d-flex align-items-center justify-content-between dropdown-item">
+                      <div class="d-flex align-items-center">
+                          <img alt="MessageIcon" src="{{ url_for('static', path='assets/imgs/theme/icons/message.gif') }}" class="rounded-circle me-2" style="width: 25px; height: 25px;"/> 
+                          <span>${notification.message}</span>
+                      </div>
+                  </li>
+              `;
+              dropdownMenu.appendChild(ahrefItem);
+              // const listItem = document.createElement('li');
+              // listItem.className = 'd-flex align-items-center justify-content-between dropdown-item';
+              // const chatUrl = `/chat/${notification.username}`;
+
+              // listItem.innerHTML = `
+              //     <a href="${chatUrl}">
+              //       <li class="d-flex align-items-center justify-content-between dropdown-item">
+              //           <div class="d-flex align-items-center">
+              //               <img alt="MessageIcon" src="{{ url_for('static', path='assets/imgs/theme/icons/message.gif') }}" class="rounded-circle me-2" style="width: 25px; height: 25px;"/> 
+              //               <span>${notification.message}</span>
+              //           </div>
+              //       </li>
+              //     </a>
+              // `;
+              // dropdownMenu.appendChild(listItem);
+          });
       }
     </script>
     {% endblock %}
