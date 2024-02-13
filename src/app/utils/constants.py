@@ -31,7 +31,7 @@ PASSWORD_HASHER = PasswordHasher(
 )
 
 # Application constants
-DOMAIN = "https://localhost:8080" if DEBUG_MODE else "FoodShareHub-ALB-1873055449.ap-southeast-1.elb.amazonaws.com"
+DOMAIN = "https://localhost:8080" if DEBUG_MODE else "http://foodsharehub-alb-1873055449.ap-southeast-1.elb.amazonaws.com"
 FLASH_MESSAGES = "_messages"
 SESSION_COOKIE = "session"
 API_PREFIX = "/api"
