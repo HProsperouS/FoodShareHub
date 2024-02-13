@@ -231,17 +231,19 @@
                     </a>
                     {% endif %}
                   </div>
-                  <div class="dropdown">
-                    <div class="header-action-icon-2">
-                        <a class="cart-icon position-relative" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img alt="Notifications" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notifications.svg') }}" />
-                            <span class="pro-count blue">2</span>
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          <!--Notification List Here-->
-                        </ul>
+                  {% if request.session["session"] %}
+                    <div class="dropdown">
+                      <div class="header-action-icon-2">
+                          <a class="cart-icon position-relative" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                              <img alt="Notifications" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notifications.svg') }}" />
+                              <span class="pro-count blue">2</span>
+                          </a>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <!--Notification List Here-->
+                          </ul>
+                      </div>
                     </div>
-                  </div>
+                  {% endif %}
                 
                 </div>
                 </div>
