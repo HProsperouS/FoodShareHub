@@ -133,7 +133,7 @@
         let scrollPos = mainMsgDiv.scrollTop;
         let scrollHeight = mainMsgDiv.scrollHeight;
         function startWebSocket() {
-            {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("https://", "ws://", 1) %}
+            {% with ws_url = url_for("chat_ws", external=True, receiver_name=receiver.Username) | replace("http://", "ws://", 1) %}
                 ws = new WebSocket("{{ ws_url }}");
             {% endwith %}
     
