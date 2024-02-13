@@ -220,7 +220,6 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"too many attempts"}
             )
-
         elif auth_user == "fail" :
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
@@ -283,7 +282,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         print(e)
 
         return ORJSONResponse(
-            content={"redirect_url": f"{base_url}login","status":"fail"}
+            content={"redirect_url": f"{base_url}login","status":"fail",'error':str(e)}
         )
 
 
