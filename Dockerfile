@@ -8,10 +8,11 @@ COPY ./requirements.txt ./FoodShareHubDev
 
 RUN pip install -r ./FoodShareHubDev/requirements.txt
 
-RUN apk add --no-cache tzdata && \
+RUN apt-get update && \
+    apt-get install -y tzdata && \
     cp /usr/share/zoneinfo/Asia/Singapore /etc/localtime && \
-    echo "Asia/Singapore" > /etc/timezone && \
-    
+    echo "Asia/Singapore" > /etc/timezone
+
 WORKDIR ./FoodShareHubDev/src/app
 
 CMD [ "python", "./main.py" ]
