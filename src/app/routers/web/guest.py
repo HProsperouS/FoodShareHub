@@ -208,7 +208,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
         # Authenticate user
         auth_user_list = authenticate_user(name,password)
-        print(auth_user)
+        print(auth_user_list)
         auth_user = auth_user_list[0]
         auth_error = auth_user_list[1]
 
