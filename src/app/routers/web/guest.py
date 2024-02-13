@@ -77,7 +77,6 @@ import uuid
     
 RBAC_DEPENDS = Depends(GUEST_RBAC, use_cache=False)
 
-elasticache = redis.StrictRedis(os.environ.get('REDIS_CACHE'),port=6379,db=0)
 
 def create_session(request:Request, username: str,role:str,user_id:str,email:str,session_id:str,mfa:str,image:str,status:str):
     request.session["session"] = {
@@ -214,13 +213,13 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
-        user_attempts = login_attempts(ip_address,name)
-
-        if user_attempts == "too many attempts":
-            return ORJSONResponse(
-                content={"redirect_url": f"{base_url}login","status":"too many attempts"}
-            )
+        
         if auth_user == "fail" :
+            user_attempts = login_attempts(ip_address,name)
+            if user_attempts == "too many attempts":
+                return ORJSONResponse(
+                    content={"redirect_url": f"{base_url}login","status":"too many attempts"}
+                )
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
             )
