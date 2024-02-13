@@ -206,11 +206,6 @@
                         </li>
                         <li>
                           <a href="#"
-                            ><i class="fi fi-rs-bell mr-10"></i>Notification</a
-                          >
-                        </li>
-                        <li>
-                          <a href="#"
                             ><i class="fi fi-rs-settings-sliders mr-10"></i
                             >Setting</a
                           >
@@ -238,7 +233,7 @@
                   </div>
                   <div class="dropdown">
                     <div class="header-action-icon-2">
-                        <a class="cart-icon position-relative" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="fetchNotifications()">
+                        <a class="cart-icon position-relative" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                             <img alt="Notifications" src="{{ url_for('static', path='assets/imgs/theme/icons/icon-notifications.svg') }}" />
                             <span class="pro-count blue">2</span>
                         </a>
@@ -1106,6 +1101,12 @@
             getDonations();
           }
 
+
+          // Fetch Notification Method
+          var dropdownButton = document.getElementById('dropdownMenuButton');
+          dropdownMenuButton.addEventListener('shown.bs.dropdown', function () {
+              fetchNotifications();
+          });
         });
 
       // Windows on load will run everything here
@@ -1336,6 +1337,9 @@
         return results[2].replace(/\+/g, " ");
       }
 
+      
+    </script>
+    <script>
       // Get notification
       function fetchNotifications() {
         console.log("fetching notifications");
@@ -1364,36 +1368,32 @@
           const dropdownMenu = document.querySelector('.header-action-icon-2 .dropdown-menu');
           dropdownMenu.innerHTML = ''; // Clear current notifications
 
-          notifications.forEach(notification => {
-              console.log("notification", notification);
-
-              const ahrefItem = document.createElement('a');
-              ahrefItem.href = `/chat/${notification.username}`;
-              ahrefItem.innerHTML = `
-                  <li class="d-flex align-items-center justify-content-between dropdown-item">
+          if (notifications.length === 0) {
+              dropdownMenu.innerHTML = `
+                  <li class="dropdown-item">
                       <div class="d-flex align-items-center">
-                          <img alt="MessageIcon" src="{{ url_for('static', path='assets/imgs/theme/icons/message.gif') }}" class="rounded-circle me-2" style="width: 25px; height: 25px;"/> 
-                          <span>${notification.message}</span>
+                          <span>You do not have any unread notifications</span>
                       </div>
                   </li>
               `;
-              dropdownMenu.appendChild(ahrefItem);
-              // const listItem = document.createElement('li');
-              // listItem.className = 'd-flex align-items-center justify-content-between dropdown-item';
-              // const chatUrl = `/chat/${notification.username}`;
+          } else {
+              notifications.forEach(notification => {
+                  console.log("notification", notification);
 
-              // listItem.innerHTML = `
-              //     <a href="${chatUrl}">
-              //       <li class="d-flex align-items-center justify-content-between dropdown-item">
-              //           <div class="d-flex align-items-center">
-              //               <img alt="MessageIcon" src="{{ url_for('static', path='assets/imgs/theme/icons/message.gif') }}" class="rounded-circle me-2" style="width: 25px; height: 25px;"/> 
-              //               <span>${notification.message}</span>
-              //           </div>
-              //       </li>
-              //     </a>
-              // `;
-              // dropdownMenu.appendChild(listItem);
-          });
+                  const ahrefItem = document.createElement('a');
+                  ahrefItem.href = `/chat/${notification.username}`;
+                  ahrefItem.innerHTML = `
+                      <li class="d-flex align-items-center justify-content-between dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <i class="fa-regular fa-message"></i>
+
+                              <span>&nbsp; ${notification.message}</span>
+                          </div>
+                      </li>
+                  `;
+                  dropdownMenu.appendChild(ahrefItem);
+              });
+          }
       }
     </script>
     {% endblock %}

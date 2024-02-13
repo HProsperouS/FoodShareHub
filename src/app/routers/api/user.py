@@ -74,12 +74,11 @@ async def get_notifications(
 ):
     # Extracting Sender Username, UserId, and EmailAddress
     user_doc = await get_info_from_session(request)
-    print(user_doc["Username"])
 
     # Extract Unread Messages with the Sender's Username
     unread_msg_users = await get_chat_notifications(username=user_doc["Username"], db_session=db) 
-    print(unread_msg_users) # Sample output: ['tzy', 'ljj', 'declan']
-
+    # Sample output: ['tzy', 'ljj', 'declan']
+    
     # Construct notifications data
     notifications = [
         {
@@ -89,6 +88,4 @@ async def get_notifications(
         for notification in unread_msg_users
     ]
 
-    print(notifications)
-    
     return ORJSONResponse(notifications)
