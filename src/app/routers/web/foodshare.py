@@ -70,8 +70,8 @@ async def show_add_listing_form(request: Request, rbac_res: rbac.RBACResults | R
 @foodshare_router.get("/myListings")
 async def show_my_listings_page(request: Request, db:Session = Depends(get_db)) :
     session = request.session.get(C.SESSION_COOKIE, None)
-    if session is None or "user_id" not in session:
-        return RedirectResponse(url="/login") 
+    # if session is None or "user_id" not in session:
+    #     return RedirectResponse(url="/login") 
     
     user_id = session["user_id"]
 
