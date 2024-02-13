@@ -60,7 +60,7 @@ def add_middlewares(app: FastAPI) -> None:
         SessionMiddleware,
         secret_key="change_me",
         session_cookie=C.SESSION_COOKIE,
-        https_only=not C.DEBUG_MODE,
+        https_only=False,
         max_age=6000,
     )
     add_app_exception_handlers(app)
@@ -86,12 +86,12 @@ def add_routers(app: FastAPI) -> None:
     # API routers
     app.include_router(routers.foodshare_api)
     app.include_router(routers.chat_api)
+    app.include_router(routers.user_api)
 
 """--------------------------- End of App Routes ---------------------------"""
 @app.on_event("startup")
 async def startup() -> None:
     app.state.chat_connected_users = set()
-
 
 add_middlewares(app)
 add_routers(app)
@@ -103,7 +103,7 @@ add_routers(app)
 #         host="localhost", 
 #         port=8080,
 #         reload=True,
-#         log_level="debug",
+#         log_level="info",#"debug",
 #     )
 
 if __name__ == "__main__":
