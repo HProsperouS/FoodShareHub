@@ -199,7 +199,7 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
 @guest_router.post("/login")
 async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     
-    try:
+    # try:
         base_url = str(request.base_url)
         # User credentials
         name = formData.Name
@@ -277,12 +277,11 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         # return ORJSONResponse(
         #     content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}
         # ) 
-    except Exception as e :
-        print(e)
-
-        return ORJSONResponse(
-            content={"redirect_url": f"{base_url}login","status":"fail",'error':str(e)}
-        )
+    # except Exception as e :
+    #     print(e)
+    #     return ORJSONResponse(
+    #         content={"redirect_url": f"{base_url}login","status":"fail",'error':str(e)}
+    #     )
 
 
 
