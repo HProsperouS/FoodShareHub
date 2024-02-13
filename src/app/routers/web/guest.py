@@ -207,13 +207,15 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         password = formData.Password
 
         # Authenticate user
-        auth_user = authenticate_user(name,password)
+        auth_user_list = authenticate_user(name,password)
         print(auth_user)
+        auth_user = auth_user_list[0]
+        auth_error = auth_user_list[1]
 
-        # TODO Check if ip has failed to access account for 3x
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
         user_attempts = login_attempts(ip_address,name)
+
         if user_attempts == "too many attempts":
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"too many attempts"}
@@ -221,7 +223,7 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
 
         elif auth_user == "fail" :
             return ORJSONResponse(
-                content={"redirect_url": f"{base_url}login","status":"fail"}
+                content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
             )
         elif auth_user == "account disabled":
             return ORJSONResponse(

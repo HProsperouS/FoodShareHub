@@ -14,13 +14,23 @@ def authenticate_user(name:str,password:str):
             },
             ClientId=C.COGNITO_CLIENT_ID
             )
-        return login
+        return [login,"success"]
     except Exception as e:
         print(e)
         if "User is disabled" in str(e):
             return "account disabled"
+        return ["fail",str(e)]
+
+def logout(access_token):
+    try:
+        response = client.global_sign_out(
+            AccessToken=access_token
+        )
+        return response
+    except Exception as e:
+        print(e)
         return "fail"
-        
+          
 
 def register_user(name:str,password:str,email:str,role:str,image:str,current_time:str):
     try:

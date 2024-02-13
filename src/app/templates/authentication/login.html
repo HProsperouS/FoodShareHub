@@ -148,7 +148,7 @@ head %} {{ super() }}
               }
             } else if (data.status === "fail") {
               // console.log("fail");
-
+              console.log(data.error);
               // Hide loader
               loadingDiv.style.display = "none";
 

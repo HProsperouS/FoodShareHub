@@ -34,7 +34,8 @@ from .Cognito import(
     edit_google_user_information,
     update_last_access,
     update_online_status,
-    edit_google_user_information
+    edit_google_user_information,
+    logout
 )
 
 from .SES import(
