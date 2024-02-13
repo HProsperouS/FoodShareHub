@@ -794,9 +794,8 @@
 
       // For list of recommended_products
       var index_recommended_products = [];
-      // For user current location
-      var UserCurrentLocation = ""
-      UserCurrentLocation = "Marina Bay Sands"
+      // Default user location value
+      var UserCurrentLocation = "Singapore"
       var input_current_location = document.getElementById("current_location");
       input_current_location.value = UserCurrentLocation
       // For current filter type by default is bicycle
@@ -826,7 +825,7 @@
                               <a href="shop-product-right.html">
                                   <img class="default-img" src="${
                                     item["Image"]
-                                  }" alt="" width=150 height=100 />
+                                  }" alt="" />
                                   <img class="hover-img" src="{{ url_for('static', path='assets/imgs/shop/product-1-2.jpg') }}" alt="" />
                               </a>
                           </div>
@@ -1026,7 +1025,7 @@
               const minLongitude = 103.59;
               const maxLongitude = 104.09;
               
-              if(latitude < minLatitude || latitude > 1.47 && longitude < minLongitude || longitude > maxLongitude){
+              if(latitude < minLatitude || latitude > maxLatitude && longitude < minLongitude || longitude > maxLongitude){
                 console.log("Location not within Singapore");
 
               }else{
@@ -1041,8 +1040,9 @@
                 .then((response) => response.json())
                 .then((data) => {
                   console.log(data.user_location);
-                  UserCurrentLocation = data.user_location;
-
+                  var input_current_location = document.getElementById("current_location");
+                  input_current_location.value = data.user_location
+                  UserCurrentLocation = data.user_location
                 })
               }
               

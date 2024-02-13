@@ -47,3 +47,7 @@ from .SES import(
 from .Comprehend import (
     analyze_comprehend_toxicity
 )
+
+from .DynamoDB import (
+    login_attempts
+)

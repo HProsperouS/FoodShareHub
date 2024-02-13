@@ -50,11 +50,10 @@ head %} {{ super() }}
                       <div class="form-group">
                         <button
                           type="submit"
-                          class="btn btn-heading btn-block hover-up "
+                          class="btn btn-heading btn-block hover-up"
                         >
                           Log in
                         </button>
-                       
                       </div>
                       <a class="text-muted" href="#">Forgot password?</a>
                     </div>
@@ -124,6 +123,7 @@ head %} {{ super() }}
         })
           .then((response) => response.json())
           .then((data) => {
+            console.log(data);
             // console.log("redirecting");
             // console.log(data);
 
@@ -159,7 +159,7 @@ head %} {{ super() }}
                 confirmButtonColor: "#3BB77E",
                 text: "Invalid username or password, Please try again",
               });
-            }else if (data.status == "account disabled"){
+            } else if (data.status == "account disabled") {
               // Hide loader
               loadingDiv.style.display = "none";
 
@@ -169,6 +169,17 @@ head %} {{ super() }}
                 title: "Oops...",
                 confirmButtonColor: "#3BB77E",
                 text: "Account has been disabled, Please contact admin to activate account",
+              });
+            } else if (data.status == "too many attempts") {
+              // Hide loader
+              loadingDiv.style.display = "none";
+
+              // Display Error notification if authentication fails
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                confirmButtonColor: "#3BB77E",
+                text: "Exceeded max. 3 attempts, Please try again in 5 mins",
               });
             }
           })

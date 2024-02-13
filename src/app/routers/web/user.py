@@ -136,9 +136,8 @@ async def sendNotificationTextEmail(request: Request, formData:UserInfo) -> ORJS
 
 @user_router.post("/getdonations")
 async def getdonations(request: Request, db:Session = Depends(get_db)) -> ORJSONResponse:
-    if request.get('session'):
-        session = request.get("session")
-        user_id = session["session"]["user_id"]
+    try:
+        user_id = request.session["session"]["user_id"]
 
         donations = get_all_donations_exclude_userid(db, user_id)
         json_donations = []
@@ -153,7 +152,9 @@ async def getdonations(request: Request, db:Session = Depends(get_db)) -> ORJSON
             json_donations += [item_info]
 
         count = len(donations)
-    else:
+    except Exception as e:
+        print(e)
+
         donations = get_all_donations(db)
         json_donations = []
         for donation in donations:
@@ -167,22 +168,6 @@ async def getdonations(request: Request, db:Session = Depends(get_db)) -> ORJSON
             json_donations += [item_info]
         
         print(json_donations)
-
-    #     new_donation = Donation(
-    #     Status=DonationStatus.ACTIVE,
-    #     MeetUpLocation=formData.MeetUpLocation,
-    #     UserId = user_id,
-    #     Username = username,
-    #     FoodItem = new_fooditem
-    # )
-    #     new_fooditem = FoodItem(
-    #     Name=formData.FoodItem.Name,
-    #     Description=formData.FoodItem.Description,
-    #     ExpiryDate=formData.FoodItem.ExpiryDate,
-    #     CategoryID=formData.FoodItem.CategoryID,
-    #     Attachment=new_attachment,
-    # )
-    #     PublicAccessURL = publicAccessURL
         count = len(json_donations)
     
     return ORJSONResponse(

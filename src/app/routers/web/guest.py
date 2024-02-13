@@ -26,7 +26,8 @@ from aws.services import (
     update_last_access,
     verify_email_address,
     update_online_status,
-    get_current_user_location
+    get_current_user_location,
+    login_attempts
 )
 import jwt
 # import local libraries
@@ -212,9 +213,13 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         # TODO Check if ip has failed to access account for 3x
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
-        print(ip_address)
+        user_attempts = login_attempts(ip_address,name)
+        if user_attempts == "too many attempts":
+            return ORJSONResponse(
+                content={"redirect_url": f"{base_url}login","status":"too many attempts"}
+            )
 
-        if auth_user == "fail" :
+        elif auth_user == "fail" :
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"fail"}
             )
