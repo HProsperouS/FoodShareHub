@@ -212,15 +212,15 @@ async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = 
         auth_user = auth_user_list[0]
         auth_error = auth_user_list[1]
 
-        hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(hostname)
-        user_attempts = login_attempts(ip_address,name)
+        # hostname = socket.gethostname()
+        # ip_address = socket.gethostbyname(hostname)
+        # user_attempts = login_attempts(ip_address,name)
 
-        if user_attempts == "too many attempts":
-            return ORJSONResponse(
-                content={"redirect_url": f"{base_url}login","status":"too many attempts"}
-            )
-        elif auth_user == "fail" :
+        # if user_attempts == "too many attempts":
+        #     return ORJSONResponse(
+        #         content={"redirect_url": f"{base_url}login","status":"too many attempts"}
+        #     )
+        if auth_user == "fail" :
             return ORJSONResponse(
                 content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
             )
