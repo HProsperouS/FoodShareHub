@@ -107,7 +107,7 @@ async def getUserCurrentLocation(request:Request, formData:UserLocation) -> ORJS
 @guest_router.post("/googleurl")
 async def googleurl(request: Request) -> ORJSONResponse:
     base_url = str(request.base_url)
-    google_login_url = 'https://foodsharehub.auth.ap-southeast-1.amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=' + base_url + 'login&response_type=TOKEN&client_id=7uq1jl7tbrcg525aeddpg0hhev&scope=email openid profile'
+    google_login_url = 'https://foodsharehub.auth.ap-southeast-1.amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=http://localhost:8000/login&response_type=TOKEN&client_id=7uq1jl7tbrcg525aeddpg0hhev&scope=email openid profile'
 
     return ORJSONResponse(
         content={"redirect_url": google_login_url}
