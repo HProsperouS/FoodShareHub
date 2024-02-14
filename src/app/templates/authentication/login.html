@@ -50,10 +50,13 @@ head %} {{ super() }}
                       <div class="form-group">
                         <button
                           type="submit"
-                          class="btn btn-heading btn-block hover-up"
+                          class="btn btn-heading btn-block hover-up g-recaptcha"
+                          data-sitekey="{{site_key}}"
+                          data-callback="onSubmit"
+                          data-action="submit"
                         >
                           Log in
-                        </button>
+                        
                       </div>
                       <a class="text-muted" href="#">Forgot password?</a>
                     </div>
@@ -98,97 +101,109 @@ head %} {{ super() }}
       });
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    document
-      .getElementById("signin_form")
-      .addEventListener("submit", function (event) {
-        event.preventDefault();
+  // submit for with Captcha
+  function onSubmit(token) {
+    
+      // Show loader
+      loadingDiv.style.display = "block";
 
-        // Show loader
-        loadingDiv.style.display = "block";
+      const formData = {
+        Name: document.getElementById("name").value,
+        Password: document.getElementById("password").value,
+        CaptchaResponse : token
+      };
 
-        const formData = {
-          Name: document.getElementById("name").value,
-          Password: document.getElementById("password").value,
-        };
+      // Start: Send form data using Fetch API
+      fetch("/login", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          // console.log("redirecting");
+          // console.log(data);
+          debugger;
+          // Check for status of Login
+          if (data.status == "captcha fail"){
+            // Hide loader
+            loadingDiv.style.display = "none";
 
-        // console.log("fetching api");
-        // Start: Send form data using Fetch API
-        fetch("/login", {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-            // console.log("redirecting");
-            // console.log(data);
-            debugger;
-            // Check for status of Login  
-            if (data.status === "success") {
-              // Extract the redirect URL from the JSON response
-              const redirectUrl = data.redirect_url;
-              if (data.mfa === "Enabled") {
-                mfaCode(data.name, data.password);
+            // Display Error notification if authentication fails
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              confirmButtonColor: "#3BB77E",
+              text: "Captcha verification failed",
+            });
+          }
+          else if(data.status === "success") {
+            // Extract the redirect URL from the JSON response
+            const redirectUrl = data.redirect_url;
+            if (data.mfa === "Enabled") {
+              mfaCode(data.name, data.password);
 
-                // Hide loader
-                loadingDiv.style.display = "none";
-              } else if (data.mfa === "Disabled") {
-                // Set item in local to display message in next page
-                localStorage.setItem("action", "success_login");
-
-                // Redirect to the extracted URL
-                window.location.href = data.redirect_url;
-
-                // Hide loader
-                loadingDiv.style.display = "none";
-              }
-            } else if (data.status === "fail") {
-              // console.log("fail");
-              console.log(data.error);
               // Hide loader
               loadingDiv.style.display = "none";
+            } else if (data.mfa === "Disabled") {
+              // Set item in local to display message in next page
+              localStorage.setItem("action", "success_login");
 
-              // Display Error notification if authentication fails
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                confirmButtonColor: "#3BB77E",
-                text: "Invalid username or password, Please try again",
-              });
-            } else if (data.status == "account disabled") {
+              // Redirect to the extracted URL
+              window.location.href = data.redirect_url;
+
               // Hide loader
               loadingDiv.style.display = "none";
-
-              // Display Error notification if authentication fails
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                confirmButtonColor: "#3BB77E",
-                text: "Account has been disabled, Please contact admin to activate account",
-              });
-            } else if (data.status == "too many attempts") {
-              // Hide loader
-              loadingDiv.style.display = "none";
-
-              // Display Error notification if authentication fails
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                confirmButtonColor: "#3BB77E",
-                text: "Exceeded max. 3 attempts, Please try again in 5 mins",
-              });
             }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
+          } else if (data.status === "fail") {
+            // console.log("fail");
+            console.log(data.error);
+            // Hide loader
+            loadingDiv.style.display = "none";
+
+            // Display Error notification if authentication fails
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              confirmButtonColor: "#3BB77E",
+              text: "Invalid username or password, Please try again",
+            });
+          } else if (data.status == "account disabled") {
+            // Hide loader
+            loadingDiv.style.display = "none";
+
+            // Display Error notification if authentication fails
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              confirmButtonColor: "#3BB77E",
+              text: "Account has been disabled, Please contact admin to activate account",
+            });
+          } else if (data.status == "too many attempts") {
+            // Hide loader
+            loadingDiv.style.display = "none";
+
+            // Display Error notification if authentication fails
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              confirmButtonColor: "#3BB77E",
+              text: "Exceeded max. 3 attempts, Please try again in 5 mins",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+        
         // End: Send form data using Fetch API
-      });
-  });
+   
+      
+   }
+
 
   function mfaAuthCode(name, password, code) {
     const formData = { Name: name, Password: password, Code: code };

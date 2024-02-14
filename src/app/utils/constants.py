@@ -20,6 +20,9 @@ APP_ROOT_PATH = pathlib.Path(__file__).parent.parent.resolve()
 STATIC_PATH = APP_ROOT_PATH.joinpath("static")
 FAVICON_PATH = STATIC_PATH.joinpath("favicon.ico")
 
+# ReCaptcha v3
+SITE_KEY = "6LdfO3IpAAAAAB-OyYkIfTYKmgPV1tOt8kwNlqnb"
+CAPTCHA_SECRET_KEY = "6LdfO3IpAAAAAFdwyjwN1iHWK8HMtmsMoIQnzlPa"
 PASSWORD_HASHER = PasswordHasher(
     encoding="utf-8",
     time_cost=4,         # 4 count of iterations

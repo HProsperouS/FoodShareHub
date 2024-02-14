@@ -11,10 +11,9 @@ from fastapi.responses import (
     RedirectResponse,
 )
 from pydantic import BaseModel
-import os
+import requests
 from dotenv import load_dotenv
 import boto3
-import redis
 import datetime
 from aws.services import (
     register_user,
@@ -40,6 +39,7 @@ from depends import (
     RBAC_TYPING,
     RBACResults
 )
+from utils import constants as C
 import socket
 load_dotenv()
 
@@ -51,6 +51,7 @@ guest_router = APIRouter(
 class ExistingUser(BaseModel):
     Name: str
     Password: str
+    CaptchaResponse: str
 
 class NewUser(BaseModel):
     Name:str
@@ -124,6 +125,7 @@ async def login(request: Request, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> HTMLR
         name="authentication/login.html",
         context={
             "request": request,
+            "site_key":C.SITE_KEY
         },
     )
 
@@ -200,79 +202,88 @@ async def googlelogin(request: Request, formData:AccessToken) -> ORJSONResponse:
 async def login(request: Request,formData:ExistingUser, rbac_res: RBAC_TYPING = RBAC_DEPENDS) -> ORJSONResponse:
     
     # try:
+        captcha_response = formData.CaptchaResponse
+        # print(await request.form())
         base_url = str(request.base_url)
-        # User credentials
-        name = formData.Name
-        password = formData.Password
-
-        # Authenticate user
-        auth_user_list = authenticate_user(name,password)
-        print(auth_user_list)
-        auth_user = auth_user_list[0]
-        auth_error = auth_user_list[1]
-
-        hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(hostname)
+        verify_captcha_response = requests.post(url=f'https://www.google.com/recaptcha/api/siteverify?secret={C.CAPTCHA_SECRET_KEY}&response={captcha_response}').json()
         
-        if auth_user == "fail" :
-            user_attempts = login_attempts(ip_address,name)
-            if user_attempts == "too many attempts":
-                return ORJSONResponse(
-                    content={"redirect_url": f"{base_url}login","status":"too many attempts"}
-                )
-            return ORJSONResponse(
-                content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
-            )
-        elif auth_user == "account disabled":
-            return ORJSONResponse(
-                content={"redirect_url": f"{base_url}login","status":"account disabled"}
-            )
-        elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
-            request.session["temp_session"] = auth_user["Session"]
+        if verify_captcha_response["success"] == True:
+            # User credentials
+            name = formData.Name
+            password = formData.Password
+
+            # Authenticate user
+            auth_user_list = authenticate_user(name,password)
+            print(auth_user_list)
+            auth_user = auth_user_list[0]
+            auth_error = auth_user_list[1]
+
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
             
-            return ORJSONResponse(
-                content={"name":name,"password":password,"status":"success","mfa":"Enabled"}
-            )
+            if auth_user == "fail" :
+                user_attempts = login_attempts(ip_address,name)
+                if user_attempts == "too many attempts":
+                    return ORJSONResponse(
+                        content={"redirect_url": f"{base_url}login","status":"too many attempts"}
+                    )
+                return ORJSONResponse(
+                    content={"redirect_url": f"{base_url}login","status":"fail","error":auth_error}
+                )
+            elif auth_user == "account disabled":
+                return ORJSONResponse(
+                    content={"redirect_url": f"{base_url}login","status":"account disabled"}
+                )
+            elif auth_user["ChallengeName"] == "SOFTWARE_TOKEN_MFA":
+                request.session["temp_session"] = auth_user["Session"]
+                
+                return ORJSONResponse(
+                    content={"name":name,"password":password,"status":"success","mfa":"Enabled"}
+                )
+            else:
+                # Get user info
+                get_user = retreive_user(name)
+                if get_user == 'fail':
+                    return ORJSONResponse(
+                        content={"redirect_url": f"{base_url}login","status":"fail","error":"fail to retrieve user"}
+                    )
+                # Retreive user attributes
+                user_attributes = get_user["UserAttributes"]
+                attributes = {"id":"","email":"","role":""}
+                for attribute in user_attributes:
+                    if attribute["Name"] == "custom:role":
+                        attributes["role"] = attribute["Value"]
+                    if attribute["Name"] == "email":
+                        attributes["email"] = attribute["Value"]
+                    if attribute["Name"] == "sub":
+                        attributes["id"] = attribute["Value"]
+                    if attribute["Name"] == "custom:image":
+                        attributes["image"] = attribute["Value"]
+
+                # Create session
+                role = attributes["role"] 
+                email= attributes["email"] 
+                id = attributes["id"] 
+                session = auth_user["Session"]
+                image = attributes["image"]
+                mfa = "Disabled"
+                status = "Online"
+
+                create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image,status=status)
+                
+                print(request.session.get("session"))
+                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                update_last_access(name,current_time)
+                update_online_status(name,"Online")
+
+
+                return ORJSONResponse(
+                    content={"redirect_url": f"{base_url}foodshare/myListings","status":"success","mfa":"Disabled"}
+                ) 
         else:
-            # Get user info
-            get_user = retreive_user(name)
-            if get_user == 'fail':
-                return ORJSONResponse(
-                    content={"redirect_url": f"{base_url}login","status":"fail","error":"fail to retrieve user"}
-                )
-            # Retreive user attributes
-            user_attributes = get_user["UserAttributes"]
-            attributes = {"id":"","email":"","role":""}
-            for attribute in user_attributes:
-                if attribute["Name"] == "custom:role":
-                    attributes["role"] = attribute["Value"]
-                if attribute["Name"] == "email":
-                    attributes["email"] = attribute["Value"]
-                if attribute["Name"] == "sub":
-                    attributes["id"] = attribute["Value"]
-                if attribute["Name"] == "custom:image":
-                    attributes["image"] = attribute["Value"]
-
-            # Create session
-            role = attributes["role"] 
-            email= attributes["email"] 
-            id = attributes["id"] 
-            session = auth_user["Session"]
-            image = attributes["image"]
-            mfa = "Disabled"
-            status = "Online"
-
-            create_session(username=name,role=role,request=request,email=email,user_id=id,session_id=session,mfa=mfa,image=image,status=status)
-            
-            print(request.session.get("session"))
-            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
-            update_last_access(name,current_time)
-            update_online_status(name,"Online")
-
-
             return ORJSONResponse(
-                content={"redirect_url": f"{base_url}foodshare/myListings","status":"success","mfa":"Disabled"}
+                content={"redirect_url": f"{base_url}login","status":"captcha fail"}
             ) 
         # return ORJSONResponse(
         #     content={"redirect_url": "http://127.0.0.1:8000/foodshare/myListings","status":"success"}

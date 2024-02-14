@@ -701,12 +701,11 @@
     <script src="https://www.google.com/recaptcha/api.js"></script>
 
     <script>
-  
+     
       document
         .getElementById("current_location")
         .addEventListener("input", function () {
-         
-
+        
           var controller = new AbortController(); // Create a new controller for the current request
 
           var searchQuery = document.getElementById("current_location").value;
@@ -789,11 +788,7 @@
         }
       }
 
-      // For captcha TO DO LATER
-      function onSubmit(token) {
-        document.getElementById("signin_form").submit();
-      }
-
+      
       // For list of recommended_products
       var index_recommended_products = [];
       // Default user location value
