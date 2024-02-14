@@ -13,7 +13,7 @@ def analyze_comprehend_toxicity(text):
         LanguageCode='en'
     )
 
-    threshold = 0.6
+    threshold = 0.5
     toxicity_score = toxic_response.get('ResultList', [{}])[0].get('Toxicity', 0)
     print(toxic_response)
     if toxicity_score > threshold:
